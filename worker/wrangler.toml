@@ -1,0 +1,10 @@
+name = "english-radar-notion-sync"
+main = "src/index.js"
+compatibility_date = "2026-08-02"
+
+[vars]
+ALLOWED_ORIGINS = "http://localhost:8000,https://cyrilla-mist.github.io"
+NOTION_VERSION = "2026-03-11"
+
+# Production GitHub Pages origin should be appended after it is confirmed.
+# Secrets are configured with `npx wrangler secret put` and never stored here.

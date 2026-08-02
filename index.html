@@ -1,0 +1,101 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="English Radar v1.0 — a quiet, local-first archive for real internet English.">
+  <meta name="theme-color" content="#1f2c27"><meta name="color-scheme" content="dark light"><link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <title>Today — English Radar</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="app-shell"><a class="skip-link" href="#main-content">Skip to content</a>
+  <aside class="sidebar" aria-label="Primary navigation">
+    <a class="brand" href="./index.html" aria-label="English Radar Today">
+      <svg class="signal-logo" viewBox="0 0 42 24" aria-hidden="true"><path d="M7 5C3 8 3 16 7 19M35 5C39 8 39 16 35 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M12 8.5C10 10.5 10 13.5 12 15.5M30 8.5C32 10.5 32 13.5 30 15.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="21" cy="12" r="3" fill="currentColor"></circle></svg>
+      <span class="brand-copy"><strong>ENGLISH RADAR</strong><small>Personal language archive</small></span>
+    </a>
+    <div class="sidebar-rule"></div>
+    <nav class="side-nav">
+      <a class="nav-item is-active" aria-current="page" href="./index.html"><span class="nav-index">01</span><span>Today</span></a>
+      <a class="nav-item" href="./learn.html?mode=review"><span class="nav-index">02</span><span>Review</span></a>
+      <a class="nav-item" href="./dictionary.html"><span class="nav-index">03</span><span>Dictionary</span></a>
+      <a class="nav-item" href="./inbox.html"><span class="nav-index">04</span><span>Inbox</span></a>
+      <a class="nav-item" href="./me.html"><span class="nav-index">05</span><span>Me</span></a>
+    </nav>
+    <div class="sidebar-note"><span class="mono">ARCHIVE / 01</span><p>Real language,<br>kept in context.</p></div>
+  </aside>
+
+  <main id="main-content" class="workspace today-workspace">
+    <a class="mobile-brand" href="./index.html" aria-label="English Radar Today"><svg class="signal-logo" viewBox="0 0 42 24" aria-hidden="true"><path d="M7 5C3 8 3 16 7 19M35 5C39 8 39 16 35 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M12 8.5C10 10.5 10 13.5 12 15.5M30 8.5C32 10.5 32 13.5 30 15.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="21" cy="12" r="3" fill="currentColor"></circle></svg><span class="brand-copy"><strong>ENGLISH RADAR</strong><small>Personal language archive</small></span><span class="mobile-date" data-date-mobile>AUG 02</span></a>
+    <header class="page-header">
+      <span class="mobile-today">TODAY <span>· <span data-date-mobile>AUG 02</span></span></span>
+      <div><span class="eyebrow">ER/01</span><span class="header-rule"></span><span class="eyebrow" data-date-label>AUG 02 · SUNDAY</span></div>
+      <span class="header-note">PERSONAL LANGUAGE ARCHIVE</span>
+    </header>
+
+    <section class="today-intro section-grid">
+      <div class="section-label">TODAY<br><span class="mono" data-date-mobile>AUG 02</span></div>
+      <div class="intro-copy">
+        <p class="kicker">A small session for a noisy internet.</p>
+        <h1>What do you want<br><em>to decode today?</em></h1>
+        <div class="daily-counts"><span><strong data-stat="new-signals">0</strong> new signals</span><span><strong data-stat="reviews-waiting">0</strong> reviews waiting</span></div>
+      </div>
+    </section>
+
+    <section class="session-recovery" data-session-recovery hidden aria-live="polite"><div><span class="recovery-kicker">SESSION NOTE</span><p>You have an unfinished session.</p><strong data-recovery-progress>Signal — of —</strong></div><div class="recovery-actions"><a class="recovery-continue" href="./learn.html?resume=1">Continue session</a><button type="button" data-new-session>Start a new session</button></div></section>
+
+    <section class="session-section section-grid" aria-labelledby="session-title">
+      <div class="section-label" id="session-title">SESSION<br><span class="mono">CHOOSE A DEPTH</span></div>
+      <div class="session-content">
+        <div class="session-options" role="radiogroup" aria-label="Session length">
+          <button class="session-option" type="button" data-session="Quick Scan — 5" data-size="5" role="radio" aria-checked="false"><span class="session-number">01</span><span>Quick Scan</span><small>05 signals</small></button>
+          <button class="session-option is-selected" type="button" data-session="Standard — 15" data-size="15" role="radio" aria-checked="true"><span class="session-number">02</span><span>Standard</span><small>15 signals</small></button>
+          <button class="session-option" type="button" data-session="Deep Dive" data-size="all" role="radio" aria-checked="false"><span class="session-number">03</span><span>Deep Dive</span><small data-deep-dive-label>All 15 signals</small></button>
+          <button class="session-option" type="button" data-session="Custom" data-size="custom" role="radio" aria-checked="false"><span class="session-number">04</span><span>Custom</span><small>your pace</small></button>
+        </div>
+        <div class="custom-session" hidden><label for="custom-size">Signals in this session</label><input id="custom-size" type="number" min="1" max="15" value="7" inputmode="numeric"><span>of 15 available</span></div>
+        <a class="primary-button" href="./learn.html?size=15">Start Daily Radar <span>→</span></a>
+      </div>
+    </section>
+
+    <section class="progress-section section-grid">
+      <div class="section-label">TODAY<br>PROGRESS</div>
+      <div class="progress-content">
+        <div class="progress-topline"><strong><span data-stat="today-progress">0</span> <span>signals explored</span></strong><strong><span data-stat="today-progress-ratio">0</span> / <span data-stat="session-total">15</span></strong></div>
+        <div class="progress-track"><span data-today-progress-bar style="width: 0%"></span></div>
+        <div class="progress-stats"><span><b data-stat="today-clear">0</b> clearly understood</span><span><b data-stat="today-fuzzy">0</b> still fuzzy</span></div>
+      </div>
+    </section>
+
+    <section class="context-check-section section-grid">
+      <div class="section-label">CONTEXT CHECK<br><span class="mono">TEST THE LANGUAGE</span></div>
+      <div class="context-check-list"><p>Test the language, not just the translation.</p><a href="./quiz.html?mode=quick"><span class="signal-tag">05 QUESTIONS</span><strong>Quick check</strong><span class="signal-arrow">↗</span></a><a href="./quiz.html?mode=standard"><span class="signal-tag">10 QUESTIONS</span><strong>Standard check</strong><span class="signal-arrow">↗</span></a><a class="quiz-mistakes-link" data-quiz-mistakes-link href="./quiz.html?mode=mistakes"><span class="signal-tag" data-quiz-mistakes>0 MISTAKES</span><strong data-quiz-mistakes-label>No mistakes waiting.</strong><span class="signal-arrow">↗</span></a></div>
+    </section>
+
+    <section class="archive-section section-grid" id="inbox">
+      <div class="section-label">WEAK SIGNALS<br><span class="mono">REVISIT SOON</span></div>
+      <div class="signal-words" data-weak-list><span>No weak signals right now.</span></div>
+    </section>
+
+    <section class="archive-section section-grid">
+      <div class="section-label">RADAR INBOX<br><span class="mono">RECENTLY CAUGHT</span></div>
+      <div class="signal-list"><a href="./learn.html"><span class="signal-tag">IC / 08</span><strong>this is sending me</strong><span class="signal-arrow">↗</span></a><a href="./learn.html"><span class="signal-tag">IC / 09</span><strong>bro has lore</strong><span class="signal-arrow">↗</span></a><a href="./learn.html"><span class="signal-tag">IC / 10</span><strong>we are so back</strong><span class="signal-arrow">↗</span></a></div>
+    </section>
+
+    <section class="explore-section section-grid">
+      <div class="section-label">EXPLORE<br><span class="mono">SIGNAL SOURCES</span></div>
+      <div class="topic-list"><a href="#internet-culture">Internet Culture <span>↗</span></a><a href="#ai-builder">AI Builder <span>↗</span></a><a href="#github">GitHub <span>↗</span></a><a href="#product-design">Product Design <span>↗</span></a><a href="#fandom">Fandom <span>↗</span></a><a href="#sports">Sports <span>↗</span></a></div>
+    </section>
+    <footer class="page-footer"><span>ENGLISH RADAR / V1.0</span><span>KEEP THE FEELING, NOT JUST THE WORD.</span></footer>
+  </main>
+  <nav class="mobile-nav" aria-label="Mobile navigation"><a class="is-active" aria-current="page" href="./index.html"><span>⌂</span>Today</a><a href="./learn.html?mode=review"><span>↺</span>Review</a><a href="./dictionary.html"><span>⌕</span>Dictionary</a><a href="./inbox.html"><span>⌁</span>Inbox</a><a href="./me.html"><span>○</span>Me</a></nav>
+  <script src="./js/storage.js"></script><script src="./data/signals.js"></script><script src="./js/content-registry.js"></script><script src="./js/review.js"></script><script src="./js/app.js"></script>
+</body>
+</html>
+
+
+

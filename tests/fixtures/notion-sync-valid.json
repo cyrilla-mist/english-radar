@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "schemaVersion": 1,
+  "source": "notion",
+  "generatedAt": "2026-08-03T00:00:00.000Z",
+  "nextCursor": null,
+  "hasMore": false,
+  "signals": [
+    {
+      "id": "notion-internet-culture-vibe-check",
+      "term": "vibe check",
+      "displayTerm": "VIBE CHECK",
+      "speechText": "vibe check",
+      "pronunciation": "—",
+      "category": "Internet Culture",
+      "platforms": ["Discord"],
+      "tone": ["Casual"],
+      "status": "Imported Candidate",
+      "formality": "Informal",
+      "meaningEn": "A quick read of the mood or atmosphere.",
+      "meaningZh": "快速判断气氛。",
+      "exampleEn": "Quick vibe check before we ship this.",
+      "exampleZh": "上线前先快速感受一下气氛。",
+      "contentStatus": "active",
+      "quizStatus": "none"
+    }
+  ],
+  "records": [
+    {
+      "notionPageId": "fixture-page-vibe-check",
+      "lastEditedAt": "2026-08-03T00:00:00.000Z",
+      "signal": {
+        "id": "notion-internet-culture-vibe-check",
+        "term": "vibe check",
+        "category": "Internet Culture",
+        "meaningZh": "快速判断气氛。",
+        "exampleEn": "Quick vibe check before we ship this.",
+        "contentStatus": "active",
+        "quizStatus": "none"
+      }
+    }
+  ]
+}

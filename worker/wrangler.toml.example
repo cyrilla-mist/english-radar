@@ -1,0 +1,12 @@
+name = "english-radar-notion-sync"
+main = "src/index.js"
+compatibility_date = "2026-08-02"
+
+[vars]
+ALLOWED_ORIGINS = "https://YOUR-USERNAME.github.io"
+NOTION_VERSION = "2026-03-11"
+
+# Set these with Wrangler secrets. Never commit real values.
+# wrangler secret put NOTION_TOKEN
+# wrangler secret put NOTION_DATA_SOURCE_ID
+# wrangler secret put SYNC_ADMIN_TOKEN

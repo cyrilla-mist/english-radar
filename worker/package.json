@@ -1,0 +1,10 @@
+{
+  "name": "english-radar-notion-sync",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Credential-protecting Cloudflare Worker for English Radar Notion sync.",
+  "scripts": {
+    "check": "node --check src/index.js"
+  }
+}

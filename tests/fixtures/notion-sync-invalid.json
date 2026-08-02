@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "source": "notion",
+  "records": [
+    { "notionPageId": "fixture-invalid", "signal": { "id": "NOTION BAD ID", "term": "", "category": "Internet Culture", "meaningZh": "", "exampleEn": "" } }
+  ]
+}

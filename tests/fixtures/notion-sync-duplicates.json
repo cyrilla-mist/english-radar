@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "source": "notion",
+  "signals": [
+    { "id": "notion-internet-culture-vibe-check", "term": "vibe check", "category": "Internet Culture", "meaningZh": "重复。", "exampleEn": "A vibe check." },
+    { "id": "notion-internet-culture-vibe-check", "term": "vibe check", "category": "Internet Culture", "meaningZh": "重复。", "exampleEn": "Another vibe check." }
+  ]
+}
