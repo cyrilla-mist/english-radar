@@ -95,7 +95,7 @@
     var preferredSettings = storage && storage.getSettings ? storage.getSettings() : { defaultSessionSize: 15 };
     var preferredSize = preferredSettings.defaultSessionSize;
     if (Number.isInteger(Number(preferredSize)) && Number(preferredSize) > available) preferredSize = available;
-    if (preferredSize === 'all' || options.some(function (option) { return option.getAttribute('data-size') === String(preferredSize); })) {
+    if (preferredSize === 'all' || Array.prototype.some.call(options, function (option) { return option.getAttribute('data-size') === String(preferredSize); })) {
       options.forEach(function (option) {
         var active = option.getAttribute('data-size') === String(preferredSize);
         option.classList.toggle('is-selected', active); option.setAttribute('aria-checked', active ? 'true' : 'false');
