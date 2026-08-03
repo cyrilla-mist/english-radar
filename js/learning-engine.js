@@ -2,18 +2,16 @@
   'use strict';
 
   var registry = window.EnglishRadarContent;
-  var originalGetSignals;
-  if (registry && typeof registry.getActiveLearningSignals === 'function') {
-    originalGetSignals = registry.getActiveLearningSignals.bind(registry);
-  } else {
-    originalGetSignals = function () {
-      return Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS.slice() : [];
-    };
+  if (!registry || typeof registry.getActiveLearningSignals !== 'function') {
     registry = registry || {};
-    registry.getActiveLearningSignals = originalGetSignals;
+    registry.getActiveLearningSignals = function () { return Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS.slice() : []; };
     window.EnglishRadarContent = registry;
   }
   var storage = window.EnglishRadarStorage;
+  var review = window.EnglishRadarReview;
+  var baseSignalsCache = null;
+  var progressCache = null;
+  var todaySnapshotCache = null;
   var params = new URLSearchParams(window.location.search);
   var dateKey = (function () {
     var now = new Date();
@@ -53,6 +51,17 @@
     });
   }
 
+  function pickDeterministic(items, selectedIds, salt) {
+    var best = null;
+    var bestRank = Infinity;
+    items.forEach(function (signal) {
+      if (!signal || selectedIds[signal.id]) return;
+      var rank = hash(dateKey + '|' + salt + '|' + text(signal.id));
+      if (rank < bestRank) { best = signal; bestRank = rank; }
+    });
+    return best;
+  }
+
   function asDate(value) {
     if (!value) return null;
     var parsed = new Date(value);
@@ -69,7 +78,9 @@
   }
 
   function progressMap() {
-    return storage && typeof storage.getProgress === 'function' ? storage.getProgress() : {};
+    if (progressCache) return progressCache;
+    progressCache = storage && typeof storage.getProgress === 'function' ? storage.getProgress() : {};
+    return progressCache;
   }
 
   function isUnseen(signal, progress) {
@@ -87,42 +98,85 @@
     return record.mastery === 'new' || record.mastery === 'fuzzy' || !!(due && due.getTime() <= now.getTime());
   }
 
-  function oldestFirst(items, progress) {
-    return items.slice().sort(function (a, b) {
-      var left = asDate(progress[a.id] && progress[a.id].lastReviewedAt);
-      var right = asDate(progress[b.id] && progress[b.id].lastReviewedAt);
-      return (left ? left.getTime() : 0) - (right ? right.getTime() : 0);
+  function pickOldest(items, progress, selectedIds) {
+    var best = null;
+    var bestTime = Infinity;
+    var bestRank = Infinity;
+    items.forEach(function (signal) {
+      if (!signal || selectedIds[signal.id]) return;
+      var parsed = asDate(progress[signal.id] && progress[signal.id].lastReviewedAt);
+      var time = parsed ? parsed.getTime() : 0;
+      var rank = hash(dateKey + '|oldest|' + text(signal.id));
+      if (time < bestTime || (time === bestTime && rank < bestRank)) { best = signal; bestTime = time; bestRank = rank; }
     });
-  }
-
-  function takeFirst(list, selected) {
-    for (var index = 0; index < list.length; index += 1) {
-      if (!selected.some(function (item) { return item.id === list[index].id; })) {
-        selected.push(list[index]);
-        return;
-      }
-    }
+    return best;
   }
 
   function buildDailyMix(allSignals, progress) {
     var now = new Date();
-    var unseen = stableShuffle(allSignals.filter(function (signal) { return isUnseen(signal, progress); }), 'unseen');
-    var unseenInterest = stableShuffle(unseen.filter(isInterest), 'interest-unseen');
-    var interestAny = stableShuffle(allSignals.filter(isInterest), 'interest-any');
-    var weak = oldestFirst(allSignals.filter(function (signal) { return dueOrWeak(signal, progress, now); }), progress);
-    var learned = oldestFirst(allSignals.filter(function (signal) { return !isUnseen(signal, progress); }), progress);
-    var selected = [];
-
-    takeFirst(unseen, selected);
-    takeFirst(unseen.slice(1), selected);
-    takeFirst(unseenInterest.length ? unseenInterest : interestAny, selected);
-    takeFirst(weak, selected);
-    takeFirst(learned, selected);
-
-    unique(unseen.concat(weak, learned, allSignals)).forEach(function (signal) {
-      if (selected.length < 5 && !selected.some(function (item) { return item.id === signal.id; })) selected.push(signal);
+    var unseen = [];
+    var unseenInterest = [];
+    var interestAny = [];
+    var weak = [];
+    var learned = [];
+    allSignals.forEach(function (signal) {
+      var unseenSignal = isUnseen(signal, progress);
+      if (unseenSignal) unseen.push(signal);
+      if (isInterest(signal)) { interestAny.push(signal); if (unseenSignal) unseenInterest.push(signal); }
+      if (dueOrWeak(signal, progress, now)) weak.push(signal);
+      if (!unseenSignal) learned.push(signal);
     });
+    var selected = [];
+    var selectedIds = {};
+    function add(signal) { if (signal && !selectedIds[signal.id] && selected.length < 5) { selected.push(signal); selectedIds[signal.id] = true; } }
+    add(pickDeterministic(unseen, selectedIds, 'unseen'));
+    add(pickDeterministic(unseen, selectedIds, 'unseen'));
+    add(pickDeterministic(unseenInterest.length ? unseenInterest : interestAny, selectedIds, unseenInterest.length ? 'interest-unseen' : 'interest-any'));
+    add(pickOldest(weak, progress, selectedIds));
+    add(pickOldest(learned, progress, selectedIds));
+    allSignals.forEach(function (signal) { if (selected.length < 5 && !selectedIds[signal.id]) add(signal); });
     return unique(selected).slice(0, 5);
+  }
+
+  function getBaseSignals() {
+    if (baseSignalsCache) return baseSignalsCache;
+    baseSignalsCache = registry && typeof registry.getActiveLearningSignals === 'function' ? registry.getActiveLearningSignals() : [];
+    return baseSignalsCache;
+  }
+
+  function getDailyMix() {
+    var build = function () { return buildDailyMix(getBaseSignals(), progressMap()); };
+    return window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.dailyMixCalculation', build) : build();
+  }
+
+  function buildStatistics(signals, progress) {
+    var now = new Date();
+    var quizIds = {};
+    (Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : []).forEach(function (quiz) { if (quiz && quiz.signalId) quizIds[quiz.signalId] = true; });
+    var learned = 0; var mastered = 0; var due = 0; var todayRecords = 0; var clearToday = 0; var fuzzyToday = 0;
+    signals.forEach(function (signal) {
+      var record = progress[signal.id];
+      if (!record || !record.firstLearnedAt) return;
+      learned += 1;
+      if (record.mastery === 'clear') mastered += 1;
+      if (review && typeof review.isDue === 'function' && review.isDue(record, now)) due += 1;
+      if (review && typeof review.sameLocalDay === 'function' && review.sameLocalDay(review.asDate(record.lastReviewedAt), now)) { todayRecords += 1; if (record.mastery === 'clear') clearToday += 1; if (record.mastery === 'fuzzy' || record.mastery === 'new') fuzzyToday += 1; }
+    });
+    var quizReady = signals.filter(function (signal) { return quizIds[signal.id] || signal.quizStatus === 'ready'; }).length;
+    return { learned: learned, mastered: mastered, unseen: signals.length - learned, learning: learned - mastered, due: due, todayRecords: todayRecords, clearToday: clearToday, fuzzyToday: fuzzyToday, quizReady: quizReady, quizSignalIds: quizIds };
+  }
+
+  function getTodaySnapshot() {
+    if (todaySnapshotCache) return todaySnapshotCache;
+    var build = function () {
+      var signals = getBaseSignals();
+      var progress = progressMap();
+      var dailyMix = getDailyMix();
+      var statistics = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.statisticsCalculation', function () { return buildStatistics(signals, progress); }) : buildStatistics(signals, progress);
+      return { signals: signals, progress: progress, dailyMix: dailyMix, statistics: statistics, quizReadyCount: statistics.quizReady };
+    };
+    todaySnapshotCache = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.snapshotBuild', build) : build();
+    return todaySnapshotCache;
   }
 
   function topicMatch(signal, topic) {
@@ -138,13 +192,13 @@
   }
 
   function getLearningSignals() {
-    var allSignals = originalGetSignals();
+    var allSignals = getBaseSignals();
     var progress = progressMap();
     var feed = params.get('feed');
     var topic = text(params.get('topic')).toLowerCase();
     var category = text(params.get('category'));
 
-    if (feed === 'daily-mix') return buildDailyMix(allSignals, progress);
+    if (feed === 'daily-mix') return getDailyMix();
     if (feed === 'unseen') {
       var unseen = allSignals.filter(function (signal) { return isUnseen(signal, progress); });
       return stableShuffle(unseen.length ? unseen : allSignals, 'discovery');
@@ -154,12 +208,16 @@
     return allSignals;
   }
 
-  registry.getActiveLearningSignals = getLearningSignals;
   window.EnglishRadarLearningEngine = {
-    getSignals: function () { return getLearningSignals(); },
-    getDailyMix: function () { return buildDailyMix(originalGetSignals(), progressMap()); },
-    getUnseenCount: function () { var progress = progressMap(); return originalGetSignals().filter(function (signal) { return isUnseen(signal, progress); }).length; },
+    getBaseSignals: getBaseSignals,
+    getFilteredSignals: getLearningSignals,
+    getSignals: getLearningSignals,
+    getDailyMix: getDailyMix,
+    getTodaySnapshot: getTodaySnapshot,
+    getProgress: progressMap,
+    getUnseenCount: function () { var progress = progressMap(); return getBaseSignals().filter(function (signal) { return isUnseen(signal, progress); }).length; },
     interestCategories: interestCategories.slice(),
-    dateKey: dateKey
+    dateKey: dateKey,
+    _resetForTests: function () { baseSignalsCache = null; progressCache = null; todaySnapshotCache = null; }
   };
 }());

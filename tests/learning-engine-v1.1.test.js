@@ -79,6 +79,7 @@ function buildSignals() {
 function loadLearningEngine(search, progress) {
   const signals = buildSignals();
   const registry = { getActiveLearningSignals: () => signals.slice() };
+  const originalRegistryMethod = registry.getActiveLearningSignals;
   const windowValue = {
     location: { search },
     EnglishRadarContent: registry,
@@ -86,7 +87,7 @@ function loadLearningEngine(search, progress) {
   };
   const context = createContext(windowValue, FixedDate);
   runScript('js/learning-engine.js', context);
-  return { windowValue, registry, signals };
+  return { windowValue, registry, signals, originalRegistryMethod };
 }
 
 function testDailyMix() {
@@ -113,7 +114,8 @@ function testDailyMix() {
   };
 
   const { windowValue } = loadLearningEngine('?feed=daily-mix', progress);
-  const mix = windowValue.EnglishRadarContent.getActiveLearningSignals().slice(0, 5);
+  const mix = windowValue.EnglishRadarLearningEngine.getFilteredSignals().slice(0, 5);
+  const repeat = windowValue.EnglishRadarLearningEngine.getDailyMix();
   const ids = mix.map((signal) => signal.id);
 
   assert.equal(mix.length, 5, 'Daily Mix should provide five signals when enough are available.');
@@ -122,6 +124,7 @@ function testDailyMix() {
   assert.ok(ids.includes('weak-due'), 'Daily Mix should include a weak or due signal.');
   assert.ok(ids.includes('old-learned'), 'Daily Mix should include an older learned signal.');
   assert.ok(mix.filter((signal) => !progress[signal.id]).length >= 2, 'Daily Mix should include at least two unseen signals.');
+  assert.deepEqual(repeat.map((signal) => signal.id), ids, 'Daily Mix should be deterministic for a fixed date and input.');
 }
 
 function testUnseenAndTopicFilters() {
@@ -131,18 +134,50 @@ function testUnseenAndTopicFilters() {
   };
 
   const unseenLoad = loadLearningEngine('?feed=unseen', progress);
-  const unseen = unseenLoad.windowValue.EnglishRadarContent.getActiveLearningSignals();
+  const unseen = unseenLoad.windowValue.EnglishRadarLearningEngine.getFilteredSignals();
   assert.ok(unseen.length > 0);
   assert.ok(unseen.every((signal) => !progress[signal.id]), 'Discovery mode should contain only unseen signals.');
 
   const fandomLoad = loadLearningEngine('?topic=fandom', progress);
-  const fandom = fandomLoad.windowValue.EnglishRadarContent.getActiveLearningSignals();
+  const fandom = fandomLoad.windowValue.EnglishRadarLearningEngine.getFilteredSignals();
   assert.ok(fandom.length > 0);
   assert.ok(fandom.every((signal) => /fandom|idol|k-pop|j-pop/i.test([signal.category].concat(signal.platforms || []).join(' '))));
+}
+
+function testTodaySnapshot() {
+  const signals = buildSignals();
+  let customReads = 0;
+  let progressReads = 0;
+  const registry = {};
+  const progress = {};
+  const windowValue = {
+    location: { search: '' },
+    EnglishRadarContent: registry,
+    ENGLISH_RADAR_SIGNALS: signals,
+    EnglishRadarStorage: {
+      getCustomSignals: function () { customReads += 1; return { signals: {} }; },
+      getInbox: function () { return []; },
+      getProgress: function () { progressReads += 1; return progress; }
+    },
+    ENGLISH_RADAR_QUIZZES: []
+  };
+  const context = createContext(windowValue, FixedDate);
+  runScript('js/content-registry.js', context);
+  const originalRegistryMethod = windowValue.EnglishRadarContent.getActiveLearningSignals;
+  runScript('js/learning-engine.js', context);
+  const engine = windowValue.EnglishRadarLearningEngine;
+  const first = engine.getTodaySnapshot();
+  const second = engine.getTodaySnapshot();
+  assert.equal(first, second, 'Today snapshot should be reused during one page lifecycle.');
+  assert.equal(customReads, 1, 'Today snapshot should read customSignals once.');
+  assert.equal(progressReads, 1, 'Today snapshot should read progress once.');
+  assert.equal(windowValue.EnglishRadarContent.getActiveLearningSignals, originalRegistryMethod, 'Learning Engine must not replace Registry methods.');
+  assert.equal(first.dailyMix.length, 5, 'Today snapshot should include a five-signal Daily Mix.');
 }
 
 testReviewSchedule();
 testDailyMix();
 testUnseenAndTopicFilters();
+testTodaySnapshot();
 
 console.log('English Radar v1.1 learning engine tests passed.');

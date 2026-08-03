@@ -6,10 +6,12 @@
   var customPanel = document.querySelector('.custom-session');
   var customInput = document.querySelector('#custom-size');
   var deepDiveLabel = document.querySelector('[data-deep-dive-label]');
-  var signals = window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []);
+  var learningEngine = window.EnglishRadarLearningEngine;
+  var todaySnapshot = learningEngine && typeof learningEngine.getTodaySnapshot === 'function' ? learningEngine.getTodaySnapshot() : null;
+  var signals = todaySnapshot ? todaySnapshot.signals : (window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []));
   var storage = window.EnglishRadarStorage;
   var review = window.EnglishRadarReview;
-  var progress = storage ? storage.getProgress() : {};
+  var progress = todaySnapshot ? todaySnapshot.progress : (storage ? storage.getProgress() : {});
   var available = signals.length;
   var today = new Date();
 

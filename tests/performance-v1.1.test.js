@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 function source(file) { return fs.readFileSync(path.join(root, file), 'utf8'); }
-function run(file, windowValue) { vm.runInNewContext(source(file), { window: windowValue, Date, Object, Array, String, Math, console }); return windowValue; }
+function run(file, windowValue) { vm.runInNewContext(source(file), { window: windowValue, Date, Object, Array, String, Math, URLSearchParams, console }); return windowValue; }
 
 const core = [{ id: 'core-1', term: 'core', category: 'Internet Culture', meaningZh: '核心', exampleEn: 'Core example.' }];
 const imported = Array.from({ length: 800 }, (_, index) => ({ id: `imported-${index}`, term: `term ${index}`, category: 'Imported', meaningZh: `含义 ${index}`, exampleEn: `Example ${index}.`, contentStatus: 'active' }));
@@ -21,6 +21,28 @@ assert.equal(customReads, 1, 'Content Registry should read imported data once pe
 registryWindow.EnglishRadarContent.invalidate();
 registryWindow.EnglishRadarContent.getActiveLearningSignals();
 assert.equal(customReads, 2, 'Cache should refresh after explicit invalidation.');
+
+let learningCustomReads = 0;
+let learningProgressReads = 0;
+const learningWindow = {
+  location: { search: '' },
+  ENGLISH_RADAR_SIGNALS: core.concat(imported),
+  EnglishRadarStorage: {
+    getCustomSignals: () => { learningCustomReads += 1; return { signals: {} }; },
+    getInbox: () => [],
+    getProgress: () => { learningProgressReads += 1; return {}; }
+  },
+  ENGLISH_RADAR_QUIZZES: []
+};
+run('js/content-registry.js', learningWindow);
+const learningRegistryMethod = learningWindow.EnglishRadarContent.getActiveLearningSignals;
+run('js/learning-engine.js', learningWindow);
+const snapshotOne = learningWindow.EnglishRadarLearningEngine.getTodaySnapshot();
+assert.equal(learningWindow.EnglishRadarLearningEngine.getTodaySnapshot(), snapshotOne);
+assert.equal(learningCustomReads, 1, 'Today should read a large customSignals payload once.');
+assert.equal(learningProgressReads, 1, 'Today should read progress once.');
+assert.equal(learningWindow.EnglishRadarContent.getActiveLearningSignals, learningRegistryMethod, 'Learning Engine must not replace Registry methods.');
+assert.equal(snapshotOne.signals.length, 801);
 
 const dictionarySource = source('js/dictionary.js');
 assert.match(dictionarySource, /visibleCount\s*=\s*50/);

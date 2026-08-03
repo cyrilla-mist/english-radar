@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  var signals = window.EnglishRadarLearningEngine && typeof window.EnglishRadarLearningEngine.getSignals === 'function' ? window.EnglishRadarLearningEngine.getSignals() : (window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []));
+  var learningEngine = window.EnglishRadarLearningEngine;
+  var signals = learningEngine && typeof learningEngine.getFilteredSignals === 'function' ? learningEngine.getFilteredSignals() : (window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []));
   var storage = window.EnglishRadarStorage;
   var review = window.EnglishRadarReview;
   var params = new URLSearchParams(window.location.search);
@@ -27,7 +28,7 @@
     title: document.querySelector('title'), meta: document.querySelector('[data-session-meta]'), category: document.querySelector('[data-field="category"]'), progress: document.querySelector('.learn-progress span'), progressTrack: document.querySelector('.learn-progress'), stamp: document.querySelector('.signal-stamp'), term: document.querySelector('.signal-heading h1'), pronunciation: document.querySelector('.pronunciation'), listen: document.querySelector('[data-speak-signal]'), meaningEn: document.querySelector('[data-field="meaningEn"]'), meaningZh: document.querySelector('[data-field="meaningZh"]'), exampleEn: document.querySelector('[data-field="exampleEn"]'), exampleZh: document.querySelector('[data-field="exampleZh"]'), platforms: document.querySelector('[data-field="platforms"]'), tone: document.querySelector('[data-field="tone"]'), status: document.querySelector('[data-field="status"]'), formality: document.querySelector('[data-field="formality"]'), useWhen: document.querySelector('[data-field="useWhen"]'), avoidWhen: document.querySelector('[data-field="avoidWhen"]'), chineseFeeling: document.querySelector('[data-field="chineseFeeling"]'), feedbacks: document.querySelectorAll('[data-session-feedback]'), exampleListen: document.querySelector('[data-speak-example]'), previous: document.querySelector('[data-session-previous]'), skip: document.querySelector('[data-session-skip]'), favorite: document.querySelector('[data-signal-favorite]'), practice: document.querySelector('[data-practice-signal]'), backLink: document.querySelector('[data-back-link]'), backLabel: document.querySelector('[data-back-label]'), summaryKicker: document.querySelector('[data-summary-kicker]'), emptyTitle: document.querySelector('[data-empty-title]'), emptyMessage: document.querySelector('[data-empty-message]'), sessionQuiz: document.querySelector('[data-session-quiz]'), reviewMistakesEmpty: document.querySelector('[data-review-mistakes-empty]'), reviewMistakesSummary: document.querySelector('[data-review-mistakes-summary]')
   };
 
-  var progressRecords = storage ? storage.getProgress() : {};
+  var progressRecords = learningEngine && typeof learningEngine.getProgress === 'function' ? learningEngine.getProgress() : (storage ? storage.getProgress() : {});
   if (storage) { var settingsRaw = storage.read(storage.keys.settings, null); if (!settingsRaw || Number(settingsRaw.dataVersion) !== 1 || Number(settingsRaw.contentVersion) !== 1) storage.setSettings(storage.getSettings()); }
 
   function text(value) { return value === undefined || value === null || value === '' ? '—' : String(value); }
