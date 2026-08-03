@@ -24,6 +24,7 @@ Status: development branch only. The public site remains on v1.0 until the Learn
 - Added `tests/learning-engine-v1.1.test.js`.
 - Added pull-request checks for content validation, project structure and Learning Engine behavior.
 - The feature remains isolated on `feat/v1.1-learning-engine` and Draft PR #1.
+- Merge is blocked until local browser testing confirms Daily Mix composition, unseen filtering, category filtering, review dates and mobile layout.
 
 ### Unchanged boundaries
 
