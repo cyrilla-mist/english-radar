@@ -46,6 +46,6 @@
     });
     return result;
   }
-  buildPools();
+  if (window.EnglishRadarPerformanceDebug) window.EnglishRadarPerformanceDebug.measure('quiz.distractorPools', buildPools); else buildPools();
   window.EnglishRadarImportedQuizGenerator = { getCapabilities: function (signal) { return capabilities[signal.id] || { meaning: false, context: false, boundary: false }; }, createForSignals: createForSignals, stats: function () { var count = Object.keys(generatedBySignal).reduce(function (total, id) { return total + generatedBySignal[id].length; }, 0); return { importedSignals: signals.length, generatedQuizzes: count, cachedSignals: Object.keys(generatedBySignal).length }; } };
 }());

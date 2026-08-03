@@ -29,6 +29,18 @@ assert.match(dictionarySource, /createDocumentFragment/);
 assert.match(dictionarySource, /setTimeout\(function \(\)/);
 assert.match(dictionarySource, /150/);
 
+const debugSource = source('js/performance-debug.js');
+assert.match(debugSource, /debug=performance/);
+assert.match(debugSource, /data-performance-panel/);
+assert.match(debugSource, /Copy report/);
+assert.match(debugSource, /Refresh measurement/);
+assert.match(debugSource, /duplicateCallWarnings/);
+assert.doesNotMatch(debugSource, /innerHTML/);
+assert.doesNotMatch(debugSource, /adminToken|exampleEn|meaningZh|displayTerm/);
+const storageSource = source('js/storage.js');
+assert.match(storageSource, /JSON\.parse/);
+assert.match(storageSource, /debug\.record\('JSON\.parse'/);
+
 const importedWindow = { EnglishRadarContent: { getImportedSignals: () => imported }, ENGLISH_RADAR_QUIZZES: [{ id: 'core-quiz', signalId: 'core-1' }] };
 run('js/imported-quiz-generator.js', importedWindow);
 assert.equal(importedWindow.ENGLISH_RADAR_QUIZZES.length, 1, 'Imported quizzes must not be generated during script initialization.');

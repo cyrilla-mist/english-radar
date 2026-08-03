@@ -64,7 +64,8 @@
     var engine = window.EnglishRadarLearningEngine;
     if (!target || !engine || typeof engine.getDailyMix !== 'function') return;
 
-    var mix = engine.getDailyMix();
+    var pickMix = function () { return engine.getDailyMix(); };
+    var mix = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.dailyMix', pickMix) : pickMix();
     target.textContent = '';
     if (!mix.length) {
       var empty = document.createElement('span');
@@ -80,6 +81,5 @@
     });
   }
 
-  renderStats();
-  renderDailyMix();
+  if (window.EnglishRadarPerformanceDebug) { window.EnglishRadarPerformanceDebug.measure('today.dashboardStatistics', renderStats); window.EnglishRadarPerformanceDebug.measure('today.dashboardDomRender', renderDailyMix); } else { renderStats(); renderDailyMix(); }
 }());

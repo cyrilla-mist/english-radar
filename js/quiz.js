@@ -56,7 +56,7 @@
     if (selected.length < limit) signals.slice().sort(function (a, b) { return text(a.id).localeCompare(text(b.id)); }).forEach(function (signal) { if (selected.length < limit && !selected.some(function (item) { return item.id === signal.id; })) selected.push(signal); });
     return selected;
   }
-  function questionsForSignals(signalList) { var generated = importedGenerator ? importedGenerator.createForSignals(signalList.filter(function (signal) { return signal.sourceType === 'imported'; })) : []; return baseQuestions(generated); }
+  function questionsForSignals(signalList) { var generate = function () { return importedGenerator ? importedGenerator.createForSignals(signalList.filter(function (signal) { return signal.sourceType === 'imported'; })) : []; }; var generated = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.generation', generate) : generate(); return baseQuestions(generated); }
   function pickUnique(items, count, picked) {
     var selected = picked || [];
     ordered(items).some(function (question) {
@@ -83,7 +83,7 @@
     var coreQuestions = baseQuestions();
     if (mode === 'mistakes') { var mistakeIds = Object.keys(history.byQuiz || {}).filter(function (id) { return history.byQuiz[id] && history.byQuiz[id].lastAnswerCorrect === false; }).map(function (id) { return history.byQuiz[id].signalId; }).filter(Boolean); var mistakeSignals = signals.filter(function (signal) { return mistakeIds.indexOf(signal.id) !== -1; }); return getMistakeQuestions(questionsForSignals(mistakeSignals)); }
     if (mode === 'signal') { var signalId = params.get('signal'); var signal = signalMap[signalId]; return signal ? ordered(questionsForSignals([signal]).filter(function (question) { return question.signalId === signalId; })).slice(0, 3) : []; }
-    var count = mode === 'standard' ? 10 : 5; var targets = mode === 'standard' ? { easy: 3, medium: 4, hard: 3 } : { easy: 2, medium: 2, hard: 1 }; var selectedSignals = candidateSignals(targets, coreQuestions, count); var all = questionsForSignals(selectedSignals); return chooseBalanced(all, Math.min(count, all.length), targets);
+    var count = mode === 'standard' ? 10 : 5; var targets = mode === 'standard' ? { easy: 3, medium: 4, hard: 3 } : { easy: 2, medium: 2, hard: 1 }; var chooseSignals = function () { return candidateSignals(targets, coreQuestions, count); }; var selectedSignals = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.candidateSignals', chooseSignals) : chooseSignals(); var all = questionsForSignals(selectedSignals); var chooseSession = function () { return chooseBalanced(all, Math.min(count, all.length), targets); }; return window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.sessionSelection', chooseSession) : chooseSession();
   }
   function setText(element, value) { if (element) element.textContent = value === undefined || value === null ? '' : String(value); }
   function typeLabel(type) { return type === 'meaning' ? 'MEANING' : type === 'boundary' ? 'USAGE BOUNDARY' : 'CONTEXT'; }
@@ -126,6 +126,6 @@
   refs.check.addEventListener('click', nextQuestion);
   document.addEventListener('keydown', function (event) { if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return; if (/^[1-4]$/.test(event.key) && !checked) { var button = refs.options.querySelectorAll('.quiz-option')[Number(event.key) - 1]; if (button) selectOption(button.dataset.optionId); } else if (event.key === 'Enter') { event.preventDefault(); nextQuestion(); } });
   var retry = document.querySelector('[data-retry-mistakes]'); if (retry) retry.addEventListener('click', retryMistakes);
-  setModeNavigation(); questions = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.candidates', getQuestions) : getQuestions();
-  if (!rawQuizzes.length || !questions.length) showEmpty(mode === 'mistakes' ? 'No context mistakes waiting.' : mode === 'signal' ? 'No context questions for this signal yet.' : 'No quiz questions available.', mode === 'mistakes' ? 'Your recent answers are clear.' : mode === 'signal' ? 'This signal can still be learned and reviewed without a quiz.' : ''); else renderQuestion();
+  setModeNavigation(); questions = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.initialization', getQuestions) : getQuestions();
+  if (!rawQuizzes.length || !questions.length) showEmpty(mode === 'mistakes' ? 'No context mistakes waiting.' : mode === 'signal' ? 'No context questions for this signal yet.' : 'No quiz questions available.', mode === 'mistakes' ? 'Your recent answers are clear.' : mode === 'signal' ? 'This signal can still be learned and reviewed without a quiz.' : ''); else if (window.EnglishRadarPerformanceDebug) window.EnglishRadarPerformanceDebug.measure('quiz.DOM render', renderQuestion); else renderQuestion();
 }());
