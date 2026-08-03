@@ -52,6 +52,7 @@
       <div class="section-label" id="learning-engine-title">LEARNING ENGINE<br><span class="mono">V1.1 PREVIEW</span></div>
       <div class="context-check-list">
         <p>Let the radar decide what is most useful today.</p>
+        <div class="signal-words" data-daily-mix-preview><span>Building today's mix…</span></div>
         <a href="./learn.html?feed=daily-mix&size=5"><span class="signal-tag">05 SIGNALS</span><strong>Daily Mix</strong><span class="signal-arrow">↗</span></a>
         <a href="./learn.html?feed=unseen&size=10"><span class="signal-tag">UNSEEN ONLY</span><strong>Discovery mode</strong><span class="signal-arrow">↗</span></a>
         <a href="./learn.html?mode=review"><span class="signal-tag">DUE + FUZZY</span><strong>Spaced review</strong><span class="signal-arrow">↗</span></a>
@@ -81,6 +82,16 @@
       </div>
     </section>
 
+    <section class="progress-section section-grid" aria-labelledby="library-status-title">
+      <div class="section-label" id="library-status-title">LIBRARY STATUS<br><span class="mono">LEARNING MAP</span></div>
+      <div class="progress-content">
+        <div class="progress-topline"><strong><span data-library-total>0</span> <span>signals installed</span></strong><strong><span data-library-quiz-ready>0</span> quiz-ready</strong></div>
+        <div class="progress-track"><span data-library-progress-bar style="width: 0%"></span></div>
+        <div class="progress-stats"><span><b data-library-unseen>0</b> unseen</span><span><b data-library-learning>0</b> learning</span></div>
+        <div class="progress-stats"><span><b data-library-mastered>0</b> clear</span><span><b data-library-due>0</b> due now</span></div>
+      </div>
+    </section>
+
     <section class="context-check-section section-grid">
       <div class="section-label">CONTEXT CHECK<br><span class="mono">TEST THE LANGUAGE</span></div>
       <div class="context-check-list"><p>Test the language, not just the translation.</p><a href="./quiz.html?mode=quick"><span class="signal-tag">05 QUESTIONS</span><strong>Quick check</strong><span class="signal-arrow">↗</span></a><a href="./quiz.html?mode=standard"><span class="signal-tag">10 QUESTIONS</span><strong>Standard check</strong><span class="signal-arrow">↗</span></a><a class="quiz-mistakes-link" data-quiz-mistakes-link href="./quiz.html?mode=mistakes"><span class="signal-tag" data-quiz-mistakes>0 MISTAKES</span><strong data-quiz-mistakes-label>No mistakes waiting.</strong><span class="signal-arrow">↗</span></a></div>
@@ -103,7 +114,7 @@
     <footer class="page-footer"><span>ENGLISH RADAR / V1.1 PREVIEW</span><span>KEEP THE FEELING, NOT JUST THE WORD.</span></footer>
   </main>
   <nav class="mobile-nav" aria-label="Mobile navigation"><a class="is-active" aria-current="page" href="./index.html"><span>⌂</span>Today</a><a href="./learn.html?mode=review"><span>↺</span>Review</a><a href="./dictionary.html"><span>⌕</span>Dictionary</a><a href="./inbox.html"><span>⌁</span>Inbox</a><a href="./me.html"><span>○</span>Me</a></nav>
-  <script src="./js/storage.js"></script><script src="./data/signals.js"></script><script src="./js/content-registry.js"></script><script src="./js/review.js"></script><script src="./js/app.js?v=1.1.0-preview"></script>
+  <script src="./js/storage.js"></script><script src="./data/signals.js"></script><script src="./data/quizzes.js"></script><script src="./js/content-registry.js"></script><script src="./js/review.js"></script><script src="./js/learning-engine.js"></script><script src="./js/app.js?v=1.1.0-preview"></script><script src="./js/dashboard.js?v=1.1.0-preview"></script>
 </body>
 </html>
 
