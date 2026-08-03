@@ -69,9 +69,8 @@
   }
   function showHomeFeedback(message) { var target = document.querySelector('[data-home-feedback]'); if (target) target.textContent = message || ''; }
 
-  updateDates();
-  updateStats();
-  updateRecovery();
+  var debug = window.EnglishRadarPerformanceDebug;
+  if (debug) debug.measure('today.render', function () { updateDates(); updateStats(); updateRecovery(); }); else { updateDates(); updateStats(); updateRecovery(); }
   if (storage) {
     var settingsRaw = storage.read(storage.keys.settings, null);
     if (!settingsRaw || Number(settingsRaw.dataVersion) !== 1 || Number(settingsRaw.contentVersion) !== 1) storage.setSettings(storage.getSettings());

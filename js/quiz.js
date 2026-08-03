@@ -126,6 +126,6 @@
   refs.check.addEventListener('click', nextQuestion);
   document.addEventListener('keydown', function (event) { if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return; if (/^[1-4]$/.test(event.key) && !checked) { var button = refs.options.querySelectorAll('.quiz-option')[Number(event.key) - 1]; if (button) selectOption(button.dataset.optionId); } else if (event.key === 'Enter') { event.preventDefault(); nextQuestion(); } });
   var retry = document.querySelector('[data-retry-mistakes]'); if (retry) retry.addEventListener('click', retryMistakes);
-  setModeNavigation(); questions = getQuestions();
+  setModeNavigation(); questions = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.candidates', getQuestions) : getQuestions();
   if (!rawQuizzes.length || !questions.length) showEmpty(mode === 'mistakes' ? 'No context mistakes waiting.' : mode === 'signal' ? 'No context questions for this signal yet.' : 'No quiz questions available.', mode === 'mistakes' ? 'Your recent answers are clear.' : mode === 'signal' ? 'This signal can still be learned and reviewed without a quiz.' : ''); else renderQuestion();
 }());
