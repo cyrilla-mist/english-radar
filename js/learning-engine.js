@@ -127,23 +127,14 @@
 
   function topicMatch(signal, topic) {
     var category = text(signal.category).toLowerCase();
-    var value = [category].concat(signal.platforms || []).join(' ').toLowerCase();
     var categoryGroups = {
-      internet: ['internet culture'],
-      builder: ['ai builder', 'github', 'github / development'],
-      fandom: ['fandom'],
-      sports: ['sports', 'sports / everyday'],
-      design: ['product design']
+      internet: ['internet culture', 'community english', 'meme english'],
+      builder: ['ai builder', 'github', 'github / development', 'builder english', 'hackathon english'],
+      fandom: ['fandom', 'idol fandom english', 'fandom english'],
+      sports: ['sports', 'sports / everyday', 'sports english', 'japanese sports english'],
+      design: ['product design', 'product design english']
     };
-    if ((categoryGroups[topic] || []).some(function (name) { return category === name; })) return true;
-    var platformGroups = {
-      internet: ['community', 'reddit', 'discord', 'meme', 'streaming', 'creator', 'platform', 'social media'],
-      builder: ['builder', 'developer', 'hackathon', 'ai'],
-      fandom: ['fandom', 'idol', 'k-pop', 'j-pop'],
-      sports: ['sport', 'running', 'table tennis', 'volleyball', 'football', 'gaming'],
-      design: ['ui', 'ux', 'figma', 'design tools', 'design chat']
-    };
-    return (platformGroups[topic] || [topic]).some(function (keyword) { return value.indexOf(keyword) !== -1; });
+    return (categoryGroups[topic] || []).some(function (name) { return category === name; });
   }
 
   function getLearningSignals() {
@@ -165,6 +156,7 @@
 
   registry.getActiveLearningSignals = getLearningSignals;
   window.EnglishRadarLearningEngine = {
+    getSignals: function () { return getLearningSignals(); },
     getDailyMix: function () { return buildDailyMix(originalGetSignals(), progressMap()); },
     getUnseenCount: function () { var progress = progressMap(); return originalGetSignals().filter(function (signal) { return isUnseen(signal, progress); }).length; },
     interestCategories: interestCategories.slice(),

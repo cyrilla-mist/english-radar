@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var signals = window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []);
+  var signals = window.EnglishRadarLearningEngine && typeof window.EnglishRadarLearningEngine.getSignals === 'function' ? window.EnglishRadarLearningEngine.getSignals() : (window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []));
   var storage = window.EnglishRadarStorage;
   var review = window.EnglishRadarReview;
   var params = new URLSearchParams(window.location.search);
