@@ -112,9 +112,9 @@
     takeFirst(learned, selected);
 
     unique(unseen.concat(weak, learned, allSignals)).forEach(function (signal) {
-      if (selected.length < allSignals.length && !selected.some(function (item) { return item.id === signal.id; })) selected.push(signal);
+      if (selected.length < 5 && !selected.some(function (item) { return item.id === signal.id; })) selected.push(signal);
     });
-    return unique(selected);
+    return unique(selected).slice(0, 5);
   }
 
   function topicMatch(signal, topic) {
@@ -148,7 +148,7 @@
 
   registry.getActiveLearningSignals = getLearningSignals;
   window.EnglishRadarLearningEngine = {
-    getDailyMix: function () { return buildDailyMix(originalGetSignals(), progressMap()).slice(0, 5); },
+    getDailyMix: function () { return buildDailyMix(originalGetSignals(), progressMap()); },
     getUnseenCount: function () { var progress = progressMap(); return originalGetSignals().filter(function (signal) { return isUnseen(signal, progress); }).length; },
     interestCategories: interestCategories.slice(),
     dateKey: dateKey
