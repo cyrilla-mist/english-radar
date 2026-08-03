@@ -12,11 +12,11 @@ function runScript(relativePath, context) {
   vm.runInContext(source, context, { filename: relativePath });
 }
 
-function createContext(windowValue) {
+function createContext(windowValue, dateConstructor = Date) {
   const context = vm.createContext({
     window: windowValue,
     console,
-    Date,
+    Date: dateConstructor,
     Intl,
     Number,
     Math,
@@ -28,6 +28,18 @@ function createContext(windowValue) {
     clearTimeout
   });
   return context;
+}
+
+const FIXED_NOW = new Date('2026-08-04T12:00:00.000Z');
+
+class FixedDate extends Date {
+  constructor(...args) {
+    super(...(args.length ? args : [FIXED_NOW.getTime()]));
+  }
+
+  static now() {
+    return FIXED_NOW.getTime();
+  }
 }
 
 function testReviewSchedule() {
@@ -60,7 +72,7 @@ function buildSignals() {
     { id: 'weak-due', term: 'delta', category: 'Builder English', platforms: ['GitHub'] },
     { id: 'old-learned', term: 'epsilon', category: 'Product Design English', platforms: ['Figma'] },
     { id: 'recent-learned', term: 'zeta', category: 'Sports English', platforms: ['Sports'] },
-    { id: 'extra-unseen', term: 'eta', category: 'Meme English', platforms: ['TikTok'] }
+    { id: 'extra-unseen', term: 'eta', category: 'General English', platforms: ['TikTok'] }
   ];
 }
 
@@ -72,13 +84,13 @@ function loadLearningEngine(search, progress) {
     EnglishRadarContent: registry,
     EnglishRadarStorage: { getProgress: () => progress }
   };
-  const context = createContext(windowValue);
+  const context = createContext(windowValue, FixedDate);
   runScript('js/learning-engine.js', context);
   return { windowValue, registry, signals };
 }
 
 function testDailyMix() {
-  const now = Date.now();
+  const now = FIXED_NOW.getTime();
   const progress = {
     'weak-due': {
       firstLearnedAt: new Date(now - 10 * 86400000).toISOString(),

@@ -27,5 +27,11 @@ jobs:
       - name: Check project structure
         run: node scripts/check-project.js
 
-      - name: Test v1.1 learning engine
+      - name: Test Learning Engine
         run: node tests/learning-engine-v1.1.test.js
+
+      - name: Test Quiz Engine
+        run: node tests/quiz-engine-v1.1.test.js
+
+      - name: Test Performance Structure
+        run: node tests/performance-v1.1.test.js
