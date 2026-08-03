@@ -1,8 +1,11 @@
 (function () {
   'use strict';
 
-  var FIRST_DELAYS = { new: 1, fuzzy: 2, clear: 7 };
-  var REPEAT_DELAYS = { new: 1, fuzzy: 3, clear: 14 };
+  var SCHEDULES = {
+    new: [1],
+    fuzzy: [2, 3, 7, 14],
+    clear: [7, 14, 30, 60]
+  };
   var ORDER = { new: 0, fuzzy: 1, clear: 2 };
 
   function asDate(value) {
@@ -18,10 +21,16 @@
     return result;
   }
 
+  function getReviewDelayDays(mastery, reviewCount) {
+    var schedule = SCHEDULES[mastery] || SCHEDULES.new;
+    var count = Number(reviewCount);
+    if (!Number.isFinite(count) || count < 0) count = 0;
+    return schedule[Math.min(count, schedule.length - 1)];
+  }
+
   function getNextReviewAt(mastery, reviewCount, fromDate) {
     var date = asDate(fromDate) || new Date();
-    var delays = Number(reviewCount) > 0 ? REPEAT_DELAYS : FIRST_DELAYS;
-    return addDays(date, delays[mastery] || FIRST_DELAYS.new).toISOString();
+    return addDays(date, getReviewDelayDays(mastery, reviewCount)).toISOString();
   }
 
   function isDue(record, now) {
@@ -57,10 +66,16 @@
 
   window.EnglishRadarReview = {
     asDate: asDate,
+    getReviewDelayDays: getReviewDelayDays,
     getNextReviewAt: getNextReviewAt,
     isDue: isDue,
     getReviewQueue: getReviewQueue,
     sameLocalDay: sameLocalDay,
-    formatLocalDate: formatLocalDate
+    formatLocalDate: formatLocalDate,
+    schedules: {
+      new: SCHEDULES.new.slice(),
+      fuzzy: SCHEDULES.fuzzy.slice(),
+      clear: SCHEDULES.clear.slice()
+    }
   };
 }());
