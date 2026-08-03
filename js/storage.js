@@ -21,10 +21,12 @@
     var store = getLocalStorage();
     if (!store) return fallback;
     try {
-      var raw = store.getItem(key);
-      if (!raw) return fallback;
       var debug = window.EnglishRadarPerformanceDebug;
       var clock = debug && window.performance && typeof window.performance.now === 'function' ? function () { return window.performance.now(); } : debug ? function () { return Date.now(); } : null;
+      var storageStarted = clock ? clock() : 0;
+      var raw = store.getItem(key);
+      if (debug && clock) debug.record('localStorage.getItem', clock() - storageStarted, { key: key });
+      if (!raw) return fallback;
       var started = clock ? clock() : 0;
       var value = JSON.parse(raw);
       if (debug && clock) debug.record('JSON.parse', clock() - started, { key: key });

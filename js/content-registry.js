@@ -20,12 +20,16 @@
   function readPersonalSignals() { var items = storage ? storage.getInbox() : []; return items.filter(function (item) { return item && item.status === 'decoded' && item.decodedSignal && item.decodedSignal.id; }).map(function (item) { return Object.assign({}, item.decodedSignal, { sourceType: 'personal', sourceInboxId: item.id }); }); }
   function buildCache() {
     if (cache) return cache;
-    var coreSignals = core.map(function (signal) { return Object.assign({}, signal, { sourceType: 'core' }); });
+    var debug = window.EnglishRadarPerformanceDebug;
+    var measure = function (name, callback) { return debug ? debug.measure(name, callback) : callback(); };
+    var coreSignals = measure('registry.coreCopy', function () { return core.map(function (signal) { return Object.assign({}, signal, { sourceType: 'core' }); }); });
     var coreIds = {}; core.forEach(function (signal) { coreIds[signal.id] = true; });
     var saved = storage ? storage.getCustomSignals() : { signals: {} };
-    var importedSignals = Object.keys(saved.signals || {}).map(function (id) { return saved.signals[id]; }).filter(function (signal) { return validateSignal(signal) && signal.contentStatus === 'active' && !coreIds[signal.id]; }).map(function (signal) { return Object.assign({}, signal); });
-    var personalSignals = readPersonalSignals(); var activeSignals = uniqueSignals(coreSignals.concat(importedSignals)); var dictionarySignals = uniqueSignals(activeSignals.concat(personalSignals)); var signalMap = {}; var sourceMap = {};
-    coreSignals.concat(importedSignals, personalSignals).forEach(function (signal) { if (!signalMap[signal.id]) signalMap[signal.id] = signal; if (!sourceMap[signal.id]) sourceMap[signal.id] = signal.sourceType || 'core'; });
+    var importedSignals = measure('registry.importedValidationFilter', function () { return Object.keys(saved.signals || {}).map(function (id) { return saved.signals[id]; }).filter(function (signal) { return validateSignal(signal) && signal.contentStatus === 'active' && !coreIds[signal.id]; }).map(function (signal) { return Object.assign({}, signal); }); });
+    var personalSignals = readPersonalSignals(); var activeSignals; var dictionarySignals; var signalMap = {}; var sourceMap = {};
+    var activeBuild = measure('registry.activeConcatDedupe', function () { var active = uniqueSignals(coreSignals.concat(importedSignals)); return { active: active, dictionary: uniqueSignals(active.concat(personalSignals)) }; });
+    activeSignals = activeBuild.active; dictionarySignals = activeBuild.dictionary;
+    measure('registry.signalMaps', function () { coreSignals.concat(importedSignals, personalSignals).forEach(function (signal) { if (!signalMap[signal.id]) signalMap[signal.id] = signal; if (!sourceMap[signal.id]) sourceMap[signal.id] = signal.sourceType || 'core'; }); });
     cache = { core: coreSignals, imported: importedSignals, personal: personalSignals, active: activeSignals, dictionary: dictionarySignals, signalMap: signalMap, sourceMap: sourceMap };
     return cache;
   }

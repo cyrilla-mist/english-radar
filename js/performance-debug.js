@@ -36,6 +36,7 @@
   function duplicateWarnings() { return ['storage.getCustomSignals', 'content.getImportedSignals', 'content.getActiveLearningSignals'].filter(function (name) { return (calls[name] || 0) > 1; }); }
   function snapshot() {
     var longest = records.reduce(function (max, item) { return Math.max(max, item.ms); }, 0);
+    var navigation = window.__englishRadarNavigationPerformance && window.__englishRadarNavigationPerformance.snapshot ? window.__englishRadarNavigationPerformance.snapshot() : {};
     return {
       page: (window.location.pathname || '').split('/').pop() || 'index.html',
       totalInitializationMs: cleanNumber(Date.now() - startedAt),
@@ -53,12 +54,23 @@
       activeSignalsCount: signalCounts.active,
       importedSignalsCount: signalCounts.imported,
       callCounts: Object.assign({}, calls),
-      duplicateCallWarnings: duplicateWarnings()
+      duplicateCallWarnings: duplicateWarnings(),
+      navigation: navigation.navigation || {},
+      paint: navigation.paint || {},
+      firstUsableContentMs: navigation.firstUsableContent,
+      totalBlockingTimeMs: navigation.totalBlockingTime || 0,
+      longTasksOver50ms: navigation.longTasksOver50ms || 0,
+      longTasksOver100ms: navigation.longTasksOver100ms || 0,
+      longestObservedTask: navigation.longestTask || { start: 0, duration: 0 },
+      layoutShift: navigation.layoutShift || 0,
+      interactions: navigation.interactions || [],
+      resources: navigation.resources || [],
+      stageRecords: records.slice()
     };
   }
   function reportRows(payload) {
     return [
-      ['Page', payload.page], ['Total initialization', payload.totalInitializationMs + ' ms'], ['Storage read', payload.storageReadMs + ' ms'], ['JSON.parse', payload.jsonParseMs + ' ms'], ['Content Registry init', payload.registryInitMs + ' ms'], ['Imported Signals normalize/copy', payload.importedNormalizeCopyMs + ' ms'], ['Active Signals build', payload.activeSignalsBuildMs + ' ms'], ['Progress/history indexing', payload.progressHistoryIndexingMs + ' ms'], ['Page-specific data preparation', payload.pagePreparationMs + ' ms'], ['DOM render', payload.domRenderMs + ' ms'], ['Initial DOM node count', payload.initialDomNodes], ['Longest synchronous task', payload.longestSynchronousTaskMs + ' ms'], ['Long Tasks >100ms', payload.longTasksOver100ms], ['Active Signals count', payload.activeSignalsCount === null ? '—' : payload.activeSignalsCount], ['Imported Signals count', payload.importedSignalsCount === null ? '—' : payload.importedSignalsCount], ['Duplicate call warning', payload.duplicateCallWarnings.length ? payload.duplicateCallWarnings.join(', ') : 'None']];
+      ['Page', payload.page], ['Total initialization', payload.totalInitializationMs + ' ms'], ['Storage read', payload.storageReadMs + ' ms'], ['JSON.parse', payload.jsonParseMs + ' ms'], ['Content Registry init', payload.registryInitMs + ' ms'], ['Imported Signals normalize/copy', payload.importedNormalizeCopyMs + ' ms'], ['Active Signals build', payload.activeSignalsBuildMs + ' ms'], ['Progress/history indexing', payload.progressHistoryIndexingMs + ' ms'], ['Page-specific data preparation', payload.pagePreparationMs + ' ms'], ['DOM render', payload.domRenderMs + ' ms'], ['Initial DOM node count', payload.initialDomNodes], ['DNS', (payload.navigation.dns || 0).toFixed(2) + ' ms'], ['Connection', (payload.navigation.connection || 0).toFixed(2) + ' ms'], ['Request / response', (payload.navigation.requestResponse || 0).toFixed(2) + ' ms'], ['DOM interactive', (payload.navigation.domInteractive || 0).toFixed(2) + ' ms'], ['DOMContentLoaded', (payload.navigation.domContentLoaded || 0).toFixed(2) + ' ms'], ['Window load', (payload.navigation.load || 0).toFixed(2) + ' ms'], ['First Paint', payload.paint.firstPaint === null ? '—' : payload.paint.firstPaint.toFixed(2) + ' ms'], ['First Contentful Paint', payload.paint.firstContentfulPaint === null ? '—' : payload.paint.firstContentfulPaint.toFixed(2) + ' ms'], ['Time to first usable content', payload.firstUsableContentMs === null ? '—' : Number(payload.firstUsableContentMs).toFixed(2) + ' ms'], ['Total Blocking Time', payload.totalBlockingTimeMs.toFixed(2) + ' ms'], ['Long Tasks >50ms', payload.longTasksOver50ms], ['Long Tasks >100ms', payload.longTasksOver100ms], ['Longest observed task', Number(payload.longestObservedTask.duration || 0).toFixed(2) + ' ms @ ' + Number(payload.longestObservedTask.start || 0).toFixed(2) + ' ms'], ['Layout Shift', payload.layoutShift], ['Interactions captured', payload.interactions.length], ['Active Signals count', payload.activeSignalsCount === null ? '—' : payload.activeSignalsCount], ['Imported Signals count', payload.importedSignalsCount === null ? '—' : payload.importedSignalsCount], ['Duplicate call warning', payload.duplicateCallWarnings.length ? payload.duplicateCallWarnings.join(', ') : 'None']];
   }
   function addCell(row, value) { var cell = document.createElement('td'); cell.textContent = String(value); row.appendChild(cell); }
   function ensurePanel() {
@@ -76,8 +88,15 @@
     [['Copy report', function () { var text = JSON.stringify(payload, null, 2); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text); }], ['Refresh measurement', function () { render(snapshot()); }]].forEach(function (item) { var button = document.createElement('button'); button.type = 'button'; button.textContent = item[0]; button.style.cssText = 'margin-left:6px;padding:5px 8px;border:1px solid rgba(255,255,255,.28);background:#cedcc7;color:#18231f;cursor:pointer;font:11px system-ui,sans-serif;'; button.addEventListener('click', item[1]); actions.appendChild(button); }); heading.appendChild(actions); panel.appendChild(heading);
     var table = document.createElement('table'); table.style.cssText = 'width:100%;border-collapse:collapse;'; reportRows(payload).forEach(function (item) { var row = document.createElement('tr'); var label = document.createElement('th'); label.textContent = item[0]; label.style.cssText = 'padding:3px 8px 3px 0;text-align:left;color:#cedcc7;font-weight:600;'; row.appendChild(label); addCell(row, item[1]); row.lastChild.style.cssText = 'padding:3px 0;text-align:right;color:#f5f2e8;'; table.appendChild(row); }); panel.appendChild(table);
     var counts = document.createElement('p'); counts.textContent = 'Calls: ' + Object.keys(payload.callCounts).map(function (name) { return name + '=' + payload.callCounts[name]; }).join(' · '); counts.style.cssText = 'margin:8px 0 0;color:#9eb09b;word-break:break-word;'; panel.appendChild(counts);
+    var interactions = document.createElement('p'); interactions.textContent = 'Interaction samples: ' + (payload.interactions.length ? payload.interactions.map(function (item) { return item.type + ' ' + item.duration + 'ms'; }).join(' · ') : 'None yet.'); interactions.style.cssText = 'margin:4px 0 0;color:#9eb09b;word-break:break-word;'; panel.appendChild(interactions);
+    var resourceTitle = document.createElement('strong'); resourceTitle.textContent = 'Resources (' + payload.resources.length + ')'; resourceTitle.style.cssText = 'display:block;margin-top:8px;color:#cedcc7;'; panel.appendChild(resourceTitle);
+    var resourceTable = document.createElement('table'); resourceTable.style.cssText = 'width:100%;border-collapse:collapse;'; payload.resources.forEach(function (item) { var row = document.createElement('tr'); addCell(row, item.file); addCell(row, item.transferSize + ' B'); addCell(row, item.decodedBodySize + ' B'); addCell(row, item.duration + ' ms'); row.querySelectorAll('td').forEach(function (cell) { cell.style.cssText = 'padding:2px 4px 2px 0;color:#f5f2e8;word-break:break-all;'; }); resourceTable.appendChild(row); }); panel.appendChild(resourceTable);
+    var stageTitle = document.createElement('strong'); stageTitle.textContent = 'Stage details'; stageTitle.style.cssText = 'display:block;margin-top:8px;color:#cedcc7;'; panel.appendChild(stageTitle);
+    var stageTable = document.createElement('table'); stageTable.style.cssText = 'width:100%;border-collapse:collapse;'; payload.stageRecords.forEach(function (item) { var row = document.createElement('tr'); addCell(row, item.name); addCell(row, item.ms + ' ms'); row.querySelectorAll('td').forEach(function (cell) { cell.style.cssText = 'padding:2px 4px 2px 0;color:#f5f2e8;word-break:break-word;'; }); stageTable.appendChild(row); }); panel.appendChild(stageTable);
   }
   function publish() { var payload = snapshot(); window.__englishRadarPerformance = payload; render(payload); console.info('[English Radar performance]', payload); }
+  var publishScheduled = false;
+  function schedulePublish() { if (publishScheduled) return; publishScheduled = true; var raf = window.requestAnimationFrame || function (callback) { callback(); }; raf(function () { raf(function () { publishScheduled = false; publish(); }); }); }
 
   window.EnglishRadarPerformanceDebug = { enabled: true, measure: measure, record: record, increment: increment, snapshot: snapshot, publish: publish };
   if (window.PerformanceObserver) {
@@ -94,5 +113,8 @@
   wrap(window.EnglishRadarContent, 'getActiveLearningSignals', 'content.getActiveLearningSignals', function (result, details, elapsed) { signalCounts.active = Array.isArray(result) ? result.length : null; details.count = signalCounts.active; if (details.call === 1) { record('contentRegistry.init', elapsed); record('content.activeSignals.build', elapsed); } });
   wrap(window.EnglishRadarContent, 'getDictionarySignals', 'content.getDictionarySignals', function (result, details) { details.count = Array.isArray(result) ? result.length : null; });
   wrap(window.EnglishRadarContent, 'getSignalSource', 'content.getSignalSource');
-  window.addEventListener('load', function () { setTimeout(publish, 250); });
+  window.addEventListener('load', schedulePublish);
+  document.addEventListener('click', schedulePublish, true);
+  document.addEventListener('input', schedulePublish, true);
+  window.addEventListener('scroll', schedulePublish, { passive: true });
 }());

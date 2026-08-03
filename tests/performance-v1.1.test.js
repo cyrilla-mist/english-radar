@@ -40,6 +40,20 @@ assert.doesNotMatch(debugSource, /adminToken|exampleEn|meaningZh|displayTerm/);
 const storageSource = source('js/storage.js');
 assert.match(storageSource, /JSON\.parse/);
 assert.match(storageSource, /debug\.record\('JSON\.parse'/);
+const bootstrapSource = source('js/performance-bootstrap.js');
+assert.match(bootstrapSource, /performanceObject\.timeOrigin/);
+assert.match(bootstrapSource, /getEntriesByType\('navigation'\)/);
+assert.match(bootstrapSource, /getEntriesByType\('resource'\)/);
+assert.match(bootstrapSource, /PerformanceObserver/);
+assert.match(bootstrapSource, /first-contentful-paint/);
+assert.doesNotMatch(bootstrapSource, /startedAt\s*=\s*Date\.now/);
+assert.doesNotMatch(debugSource, /setTimeout\(publish/);
+['index.html', 'learn.html', 'dictionary.html', 'quiz.html', 'me.html'].forEach((file) => {
+  const html = source(file);
+  const bootstrapIndex = html.indexOf('performance-bootstrap.js');
+  const cssIndex = html.indexOf('css/tokens.css');
+  assert.ok(bootstrapIndex !== -1 && bootstrapIndex < cssIndex, `${file} should load performance bootstrap before CSS.`);
+});
 
 const importedWindow = { EnglishRadarContent: { getImportedSignals: () => imported }, ENGLISH_RADAR_QUIZZES: [{ id: 'core-quiz', signalId: 'core-1' }] };
 run('js/imported-quiz-generator.js', importedWindow);
