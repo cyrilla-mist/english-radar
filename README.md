@@ -1,14 +1,14 @@
-# English Radar v1.1 Preview
+# English Radar v1.1.0
 
 English Radar is a local-first learning tool for real internet English. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation and personal mastery rather than a traditional word list.
 
 ## Release status
 
-English Radar v1.0 remains the stable public release on `main`. The `feat/v1.1-learning-engine` branch contains the in-progress Learning Engine preview and is not yet deployed to the public site.
+English Radar v1.1.0 is the Release Candidate on `feat/v1.1-learning-engine`. PR #1 remains Draft and `main` has not been modified or merged; the public site remains on the existing release until review is complete.
 
-The stable v1.0 release includes 60 Core Signals, 120 Core Context Quizzes, 140 Bundled Cyrilla Notion Archive Signals and a manual Notion Continuous Content Pipeline. Additional imported Content Packs remain local to each browser.
+The release includes 60 Core Signals, 120 Core Context Quizzes, 140 Bundled Cyrilla Notion Archive Signals and a manual Notion Continuous Content Pipeline. Additional imported Content Packs remain local to each browser.
 
-## v1.1 Learning Engine preview
+## v1.1.0 Learning Engine
 
 - Daily Mix: five Signals selected from unseen, personal-interest, weak or due, and older learned items
 - Unseen Discovery mode
@@ -20,6 +20,11 @@ The stable v1.0 release includes 60 Core Signals, 120 Core Context Quizzes, 140 
   - Fuzzy: 2 → 3 → 7 → 14 days
   - Clear: 7 → 14 → 30 → 60 days
 - Automated Node tests and pull-request validation workflow
+- Dynamic Meaning Recognition, Context Choice and Usage Boundary quizzes
+- Dictionary pagination with 50-item initial rendering
+- Installed Packs management and local Content Pack import/export
+- Shared Today snapshot for Signals, Progress, Daily Mix and statistics
+- Full-library mobile performance path validated with 796 Active Signals
 
 ## Existing features
 
@@ -72,6 +77,8 @@ node scripts/validate-data.js
 node scripts/check-project.js
 node scripts/validate-content-pack.js path/to/pack.json
 node tests/learning-engine-v1.1.test.js
+node tests/quiz-engine-v1.1.test.js
+node tests/performance-v1.1.test.js
 ```
 
 ## Directory structure

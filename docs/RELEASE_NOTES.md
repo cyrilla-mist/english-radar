@@ -1,8 +1,8 @@
 # Release Notes
 
-## English Radar v1.1 Preview
+## English Radar v1.1.0
 
-Status: development branch only. The public site remains on v1.0 until the Learning Engine passes functional, responsive and regression testing.
+Status: Release Candidate on `feat/v1.1-learning-engine`. PR #1 remains Draft and `main` has not been modified or merged.
 
 ### Learning Engine
 
@@ -11,6 +11,10 @@ Status: development branch only. The public site remains on v1.0 until the Learn
 - Added Category Focus for Internet, Builder, Product Design, Fandom and Sports.
 - Added a Daily Mix preview to Today.
 - Added a Library Status dashboard showing total installed, unseen, learning, clear, due and quiz-ready Signals.
+- Added Dictionary pagination with a 50-item initial render and Load more behavior.
+- Added Installed Packs expand/collapse management.
+- Added a shared Today snapshot for Signals, Progress, Daily Mix and statistics.
+- Added the Dynamic Quiz Engine for Meaning Recognition, Context Choice and Usage Boundary.
 
 ### Review scheduling
 
@@ -22,9 +26,10 @@ Status: development branch only. The public site remains on v1.0 until the Learn
 ### Validation
 
 - Added `tests/learning-engine-v1.1.test.js`.
-- Added pull-request checks for content validation, project structure and Learning Engine behavior.
+- Added pull-request checks for content validation, project structure, Learning Engine, Quiz Engine and performance structure.
+- Validated the full-library mobile path with 796 Active Signals, one customSignals read, one Active Signals read, one Progress read, 3.4ms Daily Mix calculation and 55.1ms first usable content.
 - The feature remains isolated on `feat/v1.1-learning-engine` and Draft PR #1.
-- Merge is blocked until local browser testing confirms Daily Mix composition, unseen filtering, category filtering, review dates and mobile layout.
+- Merge remains subject to final browser regression review for Daily Mix composition, unseen filtering, category filtering, review dates and mobile layout.
 
 ### Unchanged boundaries
 

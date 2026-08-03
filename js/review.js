@@ -68,7 +68,7 @@
     if (typeof document === 'undefined') return;
     if (!document.querySelector('[data-packs-list]') || document.querySelector('script[data-me-packs-loader]')) return;
     var script = document.createElement('script');
-    script.src = './js/me-packs.js?v=1.1.0-preview';
+    script.src = './js/me-packs.js?v=1.1.0';
     script.defer = true;
     script.setAttribute('data-me-packs-loader', '');
     document.head.appendChild(script);
