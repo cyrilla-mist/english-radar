@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="English Radar v1.0 — a quiet, local-first archive for real internet English.">
+  <meta name="description" content="English Radar v1.1 — a local-first learning engine for real internet English.">
   <meta name="theme-color" content="#1f2c27"><meta name="color-scheme" content="dark light"><link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <title>Today — English Radar</title>
   <link rel="stylesheet" href="css/tokens.css">
@@ -48,8 +48,18 @@
 
     <section class="session-recovery" data-session-recovery hidden aria-live="polite"><div><span class="recovery-kicker">SESSION NOTE</span><p>You have an unfinished session.</p><strong data-recovery-progress>Signal — of —</strong></div><div class="recovery-actions"><a class="recovery-continue" href="./learn.html?resume=1">Continue session</a><button type="button" data-new-session>Start a new session</button></div></section>
 
+    <section class="context-check-section section-grid" aria-labelledby="learning-engine-title">
+      <div class="section-label" id="learning-engine-title">LEARNING ENGINE<br><span class="mono">V1.1 PREVIEW</span></div>
+      <div class="context-check-list">
+        <p>Let the radar decide what is most useful today.</p>
+        <a href="./learn.html?feed=daily-mix&size=5"><span class="signal-tag">05 SIGNALS</span><strong>Daily Mix</strong><span class="signal-arrow">↗</span></a>
+        <a href="./learn.html?feed=unseen&size=10"><span class="signal-tag">UNSEEN ONLY</span><strong>Discovery mode</strong><span class="signal-arrow">↗</span></a>
+        <a href="./learn.html?mode=review"><span class="signal-tag">DUE + FUZZY</span><strong>Spaced review</strong><span class="signal-arrow">↗</span></a>
+      </div>
+    </section>
+
     <section class="session-section section-grid" aria-labelledby="session-title">
-      <div class="section-label" id="session-title">SESSION<br><span class="mono">CHOOSE A DEPTH</span></div>
+      <div class="section-label" id="session-title">LIBRARY SESSION<br><span class="mono">CHOOSE A DEPTH</span></div>
       <div class="session-content">
         <div class="session-options" role="radiogroup" aria-label="Session length">
           <button class="session-option" type="button" data-session="Quick Scan — 5" data-size="5" role="radio" aria-checked="false"><span class="session-number">01</span><span>Quick Scan</span><small>05 signals</small></button>
@@ -58,7 +68,7 @@
           <button class="session-option" type="button" data-session="Custom" data-size="custom" role="radio" aria-checked="false"><span class="session-number">04</span><span>Custom</span><small>your pace</small></button>
         </div>
         <div class="custom-session" hidden><label for="custom-size">Signals in this session</label><input id="custom-size" type="number" min="1" max="15" value="7" inputmode="numeric"><span>of 15 available</span></div>
-        <a class="primary-button" href="./learn.html?size=15">Start Daily Radar <span>→</span></a>
+        <a class="primary-button" href="./learn.html?size=15">Start Library Session <span>→</span></a>
       </div>
     </section>
 
@@ -87,13 +97,13 @@
     </section>
 
     <section class="explore-section section-grid">
-      <div class="section-label">EXPLORE<br><span class="mono">SIGNAL SOURCES</span></div>
-      <div class="topic-list"><a href="#internet-culture">Internet Culture <span>↗</span></a><a href="#ai-builder">AI Builder <span>↗</span></a><a href="#github">GitHub <span>↗</span></a><a href="#product-design">Product Design <span>↗</span></a><a href="#fandom">Fandom <span>↗</span></a><a href="#sports">Sports <span>↗</span></a></div>
+      <div class="section-label">CATEGORY FOCUS<br><span class="mono">CHOOSE A TERRITORY</span></div>
+      <div class="topic-list"><a href="./learn.html?topic=internet&size=10">Internet Culture <span>↗</span></a><a href="./learn.html?topic=builder&size=10">AI &amp; Builder <span>↗</span></a><a href="./learn.html?topic=design&size=10">Product Design <span>↗</span></a><a href="./learn.html?topic=fandom&size=10">Fandom <span>↗</span></a><a href="./learn.html?topic=sports&size=10">Sports <span>↗</span></a></div>
     </section>
-    <footer class="page-footer"><span>ENGLISH RADAR / V1.0</span><span>KEEP THE FEELING, NOT JUST THE WORD.</span></footer>
+    <footer class="page-footer"><span>ENGLISH RADAR / V1.1 PREVIEW</span><span>KEEP THE FEELING, NOT JUST THE WORD.</span></footer>
   </main>
   <nav class="mobile-nav" aria-label="Mobile navigation"><a class="is-active" aria-current="page" href="./index.html"><span>⌂</span>Today</a><a href="./learn.html?mode=review"><span>↺</span>Review</a><a href="./dictionary.html"><span>⌕</span>Dictionary</a><a href="./inbox.html"><span>⌁</span>Inbox</a><a href="./me.html"><span>○</span>Me</a></nav>
-  <script src="./js/storage.js"></script><script src="./data/signals.js"></script><script src="./js/content-registry.js"></script><script src="./js/review.js"></script><script src="./js/app.js?v=1.0.1"></script>
+  <script src="./js/storage.js"></script><script src="./data/signals.js"></script><script src="./js/content-registry.js"></script><script src="./js/review.js"></script><script src="./js/app.js?v=1.1.0-preview"></script>
 </body>
 </html>
 
