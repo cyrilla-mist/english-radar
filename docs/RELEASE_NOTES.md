@@ -1,27 +1,51 @@
-# English Radar v1.0
+# Release Notes
 
-## Release summary
+## English Radar v1.1 Preview
 
-- 60 Core Signals and 120 Core Context Quizzes
-- 140 Bundled Cyrilla Notion Archive Signals
-- Daily learning, Review, Dictionary, Radar Inbox and My Radar
-- Context Quiz, mistake practice and Session Summary
-- Content Pack import and export
-- Notion Continuous Content Pipeline through a Cloudflare Worker
-- Preview-first manual sync with local Admin token input
-- Local-first storage with no account or cross-device synchronization
+Status: development branch only. The public site remains on v1.0 until the Learning Engine passes functional, responsive and regression testing.
 
-## Current limitations
+### Learning Engine
 
-- Learning data remains in the current browser's LocalStorage.
-- Notion Sync requires user configuration on the live My Radar page.
-- No AI decoding or AI-generated questions.
-- No PWA or offline installation layer.
-- Personal Signals do not enter automatic Review or Quiz.
-- Recent Activity is reconstructed from existing records, not a complete event log.
+- Added Daily Mix with five Signals selected from unseen, personal-interest, weak or due, and older learned items.
+- Added Unseen Discovery mode.
+- Added Category Focus for Internet, Builder, Product Design, Fandom and Sports.
+- Added a Daily Mix preview to Today.
+- Added a Library Status dashboard showing total installed, unseen, learning, clear, due and quiz-ready Signals.
 
-## Public release boundaries
+### Review scheduling
 
-- Core data remains 60 Signals and 120 Context Quizzes.
-- Imported Signals may exist without Quiz records.
-- No claims are made about professional language review, accounts, AI explanations or cross-device synchronization.
+- New: review again after 1 day.
+- Fuzzy: 2, 3, 7 and then 14 days.
+- Clear: 7, 14, 30 and then 60 days.
+- Existing progress records remain compatible; future reviews use the expanded schedule when a Signal is rated again.
+
+### Validation
+
+- Added `tests/learning-engine-v1.1.test.js`.
+- Added pull-request checks for content validation, project structure and Learning Engine behavior.
+- The feature remains isolated on `feat/v1.1-learning-engine` and Draft PR #1.
+
+### Unchanged boundaries
+
+- No Worker or Notion Sync behavior changes.
+- No automatic Content Pack installation or removal.
+- No LocalStorage reset or schema replacement.
+- No cross-device account or cloud-progress feature.
+
+## English Radar v1.0
+
+English Radar v1.0 is the first public release.
+
+### Included
+
+- 60 Core Signals and 120 Core Context Quizzes.
+- 140 bundled Cyrilla Notion Archive Signals.
+- Learning Sessions, Review, Dictionary, Inbox, Context Quiz and My Radar.
+- Local backup import and export.
+- Content Pack validation, preview, import, export and removal.
+- Manual Notion Continuous Content Pipeline through a Cloudflare Worker.
+
+### Privacy
+
+- Learning progress and imported vocabulary remain in the current browser's LocalStorage.
+- Admin tokens and private Notion configuration are not stored in the public repository or exported backups.
