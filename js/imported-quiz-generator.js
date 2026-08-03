@@ -3,88 +3,49 @@
 
   var registry = window.EnglishRadarContent;
   if (!registry || typeof registry.getImportedSignals !== 'function') return;
-
   var signals = registry.getImportedSignals();
-  var existing = Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : [];
-  var placeholders = ['-', '—', 'n/a', 'na', 'none', 'unknown', 'tbd', 'generic placeholder'];
+  var placeholders = ['-', '\u2014', '\u2013', 'n/a', 'na', 'none', 'unknown', 'tbd', 'generic placeholder'];
+  var pools = { meaning: [], meaningZh: [], useWhen: [], avoidWhen: [] };
+  var capabilities = {};
+  var generatedBySignal = {};
 
   function text(value) { return String(value === undefined || value === null ? '' : value).trim(); }
   function usable(value) { var valueText = text(value); return !!valueText && placeholders.indexOf(valueText.toLowerCase()) === -1; }
-  function specific(value) {
-    var valueText = text(value).toLowerCase();
-    return usable(value) && valueText.indexOf('use it in informal online conversation') !== 0 && valueText.indexOf('avoid it in formal writing') !== 0;
+  function specific(value) { var valueText = text(value).toLowerCase(); return usable(value) && valueText.indexOf('use it in informal online conversation') !== 0 && valueText.indexOf('avoid it in formal writing') !== 0; }
+  function allValues(field, predicate) { var result = []; signals.forEach(function (item) { var value = text(item[field]); if (predicate(value) && result.indexOf(value) === -1) result.push(value); }); return result; }
+  function distractors(pool, correct) { return pool.filter(function (value) { return value !== correct; }); }
+  function makeOptions(correct, values, offset) { var options = values.slice(0, 3); if (options.length < 3) return null; options.splice(offset % 4, 0, correct); return options.map(function (value, index) { return { id: String.fromCharCode(97 + index), text: value }; }); }
+  function push(list, signal, type, difficulty, prompt, correct, values, explanationEn, explanationZh, offset) {
+    var options = makeOptions(correct, values, offset); if (!options) return;
+    var correctOption = options.find(function (option) { return option.text === correct; });
+    list.push({ id: 'quiz-imported-' + signal.id + '-' + type + '-01', signalId: signal.id, questionType: type, difficulty: difficulty, type: type === 'meaning' ? 'meaning-in-context' : type === 'context' ? 'natural-usage' : 'usage-boundary', prompt: prompt, question: prompt, context: text(signal.exampleEn), options: options, correctOptionId: correctOption.id, explanation: explanationEn, explanationEn: explanationEn, explanationZh: explanationZh });
   }
-  function uniqueValues(items, field, signal) {
+  function buildPools() {
+    pools.meaning = allValues('meaningEn', usable).concat(allValues('meaningZh', usable));
+    pools.useWhen = allValues('useWhen', specific);
+    pools.avoidWhen = allValues('avoidWhen', specific);
+    signals.forEach(function (signal) {
+      var meaning = text(signal.meaningEn || signal.meaningZh); var useWhen = text(signal.useWhen); var avoidWhen = text(signal.avoidWhen);
+      capabilities[signal.id] = {
+        meaning: usable(signal.term || signal.displayTerm) && usable(meaning) && usable(signal.exampleEn),
+        context: usable(signal.term || signal.displayTerm) && usable(signal.exampleEn) && specific(useWhen) && distractors(pools.useWhen, useWhen).length >= 3,
+        boundary: usable(signal.term || signal.displayTerm) && specific(avoidWhen) && distractors(pools.avoidWhen, avoidWhen).length >= 3
+      };
+    });
+  }
+  function createForSignals(requested) {
     var result = [];
-    items.forEach(function (item) {
-      var value = text(item[field]);
-      if (item.id !== signal.id && usable(value) && value !== text(signal[field]) && result.indexOf(value) === -1) result.push(value);
+    (requested || []).forEach(function (signal) {
+      if (!signal || !capabilities[signal.id]) return;
+      if (generatedBySignal[signal.id]) { result.push.apply(result, generatedBySignal[signal.id]); return; }
+      var created = []; var term = text(signal.displayTerm || signal.term); var meaning = text(signal.meaningEn || signal.meaningZh); var meaningZh = text(signal.meaningZh); var useWhen = text(signal.useWhen); var avoidWhen = text(signal.avoidWhen);
+      if (capabilities[signal.id].meaning) push(created, signal, 'meaning', 'easy', 'What does \u201c' + term + '\u201d mean in this context?', meaning, distractors(pools.meaning, meaning), 'The expression means: ' + meaning + '.', meaningZh ? '\u8fd9\u91cc\u7684\u542b\u4e49\u662f\uff1a' + meaningZh + '\u3002' : '\u8bf7\u7ed3\u5408\u4f8b\u53e5\u7406\u89e3\u8fd9\u4e2a\u8868\u8fbe\u3002', 0);
+      if (capabilities[signal.id].context) push(created, signal, 'context', 'medium', 'Which situation is the most natural use of \u201c' + term + '\u201d?', useWhen, distractors(pools.useWhen, useWhen), 'This context fits because: ' + useWhen, '\u8fd9\u4e2a\u573a\u666f\u7b26\u5408\u5b83\u7684\u4f7f\u7528\u8fb9\u754c\uff1a' + useWhen, 1);
+      if (capabilities[signal.id].boundary) push(created, signal, 'boundary', 'hard', 'When should you avoid using \u201c' + term + '\u201d?', avoidWhen, distractors(pools.avoidWhen, avoidWhen), 'Avoid it when: ' + avoidWhen + ' The expression is better used when: ' + useWhen, '\u5e94\u907f\u514d\u5728\u4ee5\u4e0b\u60c5\u51b5\u4e2d\u4f7f\u7528\uff1a' + avoidWhen + '\uff1b\u66f4\u9002\u5408\u5728\u7b26\u5408\u4f7f\u7528\u8fb9\u754c\u65f6\u4f7f\u7528\u3002', 2);
+      generatedBySignal[signal.id] = created; result.push.apply(result, created);
     });
     return result;
   }
-  function makeOptions(correct, distractors, offset) {
-    var values = distractors.slice(0, 3);
-    if (values.length < 3) return null;
-    var correctIndex = offset % 4;
-    values.splice(correctIndex, 0, correct);
-    return values.map(function (value, index) { return { id: String.fromCharCode(97 + index), text: value }; });
-  }
-  function pushQuestion(list, signal, type, difficulty, prompt, correct, distractors, explanationEn, explanationZh, offset) {
-    if (!usable(correct)) return false;
-    var options = makeOptions(correct, distractors, offset);
-    if (!options) return false;
-    list.push({
-      id: 'quiz-imported-' + signal.id + '-' + type + '-01',
-      signalId: signal.id,
-      questionType: type,
-      difficulty: difficulty,
-      type: type === 'meaning' ? 'meaning-in-context' : type === 'context' ? 'natural-usage' : 'usage-boundary',
-      prompt: prompt,
-      question: prompt,
-      context: text(signal.exampleEn),
-      options: options,
-      correctOptionId: options[options.findIndex(function (option) { return option.text === correct; })].id,
-      explanation: explanationEn,
-      explanationEn: explanationEn,
-      explanationZh: explanationZh
-    });
-    return true;
-  }
-
-  var generated = [];
-  signals.forEach(function (signal, index) {
-    var term = text(signal.displayTerm || signal.term);
-    var meaning = text(signal.meaningEn || signal.meaningZh);
-    var meaningZh = text(signal.meaningZh);
-    var example = text(signal.exampleEn);
-    var useWhen = text(signal.useWhen);
-    var avoidWhen = text(signal.avoidWhen);
-    var meaningOptions = uniqueValues(signals, 'meaningEn', signal).concat(uniqueValues(signals, 'meaningZh', signal));
-    var usageOptions = uniqueValues(signals, 'useWhen', signal).filter(specific);
-    var boundaryOptions = uniqueValues(signals, 'avoidWhen', signal).filter(specific);
-
-    if (usable(term) && usable(meaning) && usable(example)) {
-      pushQuestion(generated, signal, 'meaning', 'easy', 'What does “' + term + '” mean in this context?', meaning, meaningOptions, 'The expression means: ' + meaning + '.', meaningZh ? '这里的含义是：' + meaningZh + '。' : '请结合例句理解这个表达。', index);
-    }
-    if (usable(term) && usable(example) && specific(useWhen) && usageOptions.length >= 3) {
-      pushQuestion(generated, signal, 'context', 'medium', 'Which situation is the most natural use of “' + term + '”?', useWhen, usageOptions, 'This context fits because: ' + useWhen, '这个场景符合它的使用边界：' + useWhen, index + 1);
-    }
-    if (usable(term) && specific(avoidWhen) && boundaryOptions.length >= 3) {
-      pushQuestion(generated, signal, 'boundary', 'hard', 'When should you avoid using “' + term + '”?', avoidWhen, boundaryOptions, 'Avoid it when: ' + avoidWhen + ' The expression is better used when: ' + useWhen, '应避免在以下情况下使用：' + avoidWhen + '；更适合在符合使用边界时使用。', index + 2);
-    }
-  });
-
-  var seen = {};
-  window.ENGLISH_RADAR_QUIZZES = existing.concat(generated).filter(function (quiz) {
-    if (!quiz || !quiz.id || seen[quiz.id]) return false;
-    seen[quiz.id] = true;
-    return true;
-  });
-  window.ENGLISH_RADAR_GENERATED_QUIZ_STATS = {
-    importedSignals: signals.length,
-    generatedQuizzes: generated.length,
-    meaningQuizzes: generated.filter(function (quiz) { return quiz.questionType === 'meaning'; }).length,
-    contextQuizzes: generated.filter(function (quiz) { return quiz.questionType === 'context'; }).length,
-    boundaryQuizzes: generated.filter(function (quiz) { return quiz.questionType === 'boundary'; }).length
-  };
+  buildPools();
+  window.EnglishRadarImportedQuizGenerator = { getCapabilities: function (signal) { return capabilities[signal.id] || { meaning: false, context: false, boundary: false }; }, createForSignals: createForSignals, stats: function () { var count = Object.keys(generatedBySignal).reduce(function (total, id) { return total + generatedBySignal[id].length; }, 0); return { importedSignals: signals.length, generatedQuizzes: count, cachedSignals: Object.keys(generatedBySignal).length }; } };
 }());

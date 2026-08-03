@@ -55,12 +55,12 @@ assert.ok(signalWindow.EnglishRadarQuizEngine.getQuestions().every((item) => ite
 const imported = Array.from({ length: 5 }, (_, index) => ({ id: `imported-${index}`, term: `term ${index}`, category: 'Imported', meaningEn: `meaning ${index}`, meaningZh: `含义 ${index}`, exampleEn: `Example ${index}.`, useWhen: `Use it in context ${index}.`, avoidWhen: `Avoid it in boundary ${index}.` }));
 const generatorWindow = { EnglishRadarContent: { getImportedSignals: () => imported }, ENGLISH_RADAR_QUIZZES: [] };
 load('js/imported-quiz-generator.js', generatorWindow);
-const generated = generatorWindow.ENGLISH_RADAR_QUIZZES;
+const generated = generatorWindow.EnglishRadarImportedQuizGenerator.createForSignals(imported);
 assert.equal(generated.length, 15);
 assert.deepEqual(generated.reduce((counts, item) => { counts[item.questionType] += 1; return counts; }, { meaning: 0, context: 0, boundary: 0 }), { meaning: 5, context: 5, boundary: 5 });
 assert.ok(generated.every((item) => item.prompt && item.questionType && item.difficulty && item.options.length === 4 && item.correctOptionId && item.explanation));
 const incompleteWindow = { EnglishRadarContent: { getImportedSignals: () => [Object.assign({}, imported[0], { avoidWhen: 'unknown' })] }, ENGLISH_RADAR_QUIZZES: [] };
 load('js/imported-quiz-generator.js', incompleteWindow);
-assert.equal(incompleteWindow.ENGLISH_RADAR_QUIZZES.length, 0);
+assert.equal(incompleteWindow.EnglishRadarImportedQuizGenerator.createForSignals(incompleteWindow.EnglishRadarContent.getImportedSignals()).length, 0);
 
 console.log('English Radar v1.1 Quiz Engine tests passed.');

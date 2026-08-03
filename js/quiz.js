@@ -3,7 +3,9 @@
 
   var signals = window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []);
   var rawQuizzes = Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : [];
+  var importedGenerator = window.EnglishRadarImportedQuizGenerator;
   var storage = window.EnglishRadarStorage;
+  var history = storage && storage.getQuizHistory ? storage.getQuizHistory() : { byQuiz: {}, attempts: [] };
   var params = new URLSearchParams(window.location.search);
   var mode = params.get('mode') || 'quick';
   var signalMap = {};
@@ -40,15 +42,21 @@
     if (!question.options.some(function (option) { return option.id === question.correctOptionId; })) return null;
     return Object.assign({}, question, { questionType: questionType, difficulty: difficulty, prompt: text(question.prompt || question.question), question: text(question.question || question.prompt), explanation: explanationEn, explanationEn: explanationEn, explanationZh: explanationZh || explanationEn });
   }
-  function baseQuestions() { return rawQuizzes.map(normalizeQuestion).filter(Boolean); }
+  function baseQuestions(extra) { return rawQuizzes.concat(extra || []).map(normalizeQuestion).filter(Boolean); }
   function historyPriority(question) {
-    var history = storage ? storage.getQuizHistory() : { byQuiz: {} };
     var entry = history.byQuiz && history.byQuiz[question.id];
     if (!entry) return 0;
     return entry.lastAnswerCorrect === false ? 1 : 2;
   }
   function ordered(items) { return stableSort(items).sort(function (a, b) { return historyPriority(a) - historyPriority(b) || text(a.id).localeCompare(text(b.id)); }); }
   function signalIdsFromParam() { return (params.get('signals') || '').split(',').map(function (id) { return id.trim(); }).filter(function (id, index, ids) { return signalMap[id] && ids.indexOf(id) === index; }); }
+  function hasDifficulty(signal, difficulty, coreQuestions) { if (coreQuestions.some(function (question) { return question.signalId === signal.id && question.difficulty === difficulty; })) return true; if (importedGenerator && signal.sourceType === 'imported') { var capabilities = importedGenerator.getCapabilities(signal); return difficulty === 'easy' ? capabilities.meaning : difficulty === 'medium' ? capabilities.context : capabilities.boundary; } return false; }
+  function candidateSignals(targetCounts, coreQuestions, limit) {
+    var selected = []; ['easy', 'medium', 'hard'].forEach(function (difficulty) { var needed = targetCounts[difficulty] || 0; signals.slice().sort(function (a, b) { return text(a.id).localeCompare(text(b.id)); }).forEach(function (signal) { if (selected.length >= limit || needed <= 0 || selected.some(function (item) { return item.id === signal.id; }) || !hasDifficulty(signal, difficulty, coreQuestions)) return; selected.push(signal); needed -= 1; }); });
+    if (selected.length < limit) signals.slice().sort(function (a, b) { return text(a.id).localeCompare(text(b.id)); }).forEach(function (signal) { if (selected.length < limit && !selected.some(function (item) { return item.id === signal.id; })) selected.push(signal); });
+    return selected;
+  }
+  function questionsForSignals(signalList) { var generated = importedGenerator ? importedGenerator.createForSignals(signalList.filter(function (signal) { return signal.sourceType === 'imported'; })) : []; return baseQuestions(generated); }
   function pickUnique(items, count, picked) {
     var selected = picked || [];
     ordered(items).some(function (question) {
@@ -68,16 +76,14 @@
     return selected.slice(0, count);
   }
   function getMistakeQuestions(all) {
-    var history = storage ? storage.getQuizHistory() : { byQuiz: {} }; var byQuiz = history.byQuiz || {}; var mistakes = all.filter(function (question) { return byQuiz[question.id] && byQuiz[question.id].lastAnswerCorrect === false; }).sort(function (a, b) { return new Date(byQuiz[b.id].lastAnsweredAt || 0).getTime() - new Date(byQuiz[a.id].lastAnsweredAt || 0).getTime(); });
+    var byQuiz = history.byQuiz || {}; var mistakes = all.filter(function (question) { return byQuiz[question.id] && byQuiz[question.id].lastAnswerCorrect === false; }).sort(function (a, b) { return new Date(byQuiz[b.id].lastAnsweredAt || 0).getTime() - new Date(byQuiz[a.id].lastAnsweredAt || 0).getTime(); });
     return pickUnique(mistakes, mistakes.length, []).slice(0, mistakes.length);
   }
   function getQuestions() {
-    var all = baseQuestions();
-    if (mode === 'mistakes') return getMistakeQuestions(all);
-    if (mode === 'signal') { var signalId = params.get('signal'); return ordered(all.filter(function (question) { return question.signalId === signalId; })).slice(0, 3); }
-    if (mode === 'session') { var ids = signalIdsFromParam(); return pickUnique(all.filter(function (question) { return ids.indexOf(question.signalId) !== -1; }), all.length, []).slice(0, ids.length); }
-    var count = mode === 'standard' ? 10 : 5;
-    return chooseBalanced(all, Math.min(count, all.length), mode === 'standard' ? { easy: 3, medium: 4, hard: 3 } : { easy: 2, medium: 2, hard: 1 });
+    var coreQuestions = baseQuestions();
+    if (mode === 'mistakes') { var mistakeIds = Object.keys(history.byQuiz || {}).filter(function (id) { return history.byQuiz[id] && history.byQuiz[id].lastAnswerCorrect === false; }).map(function (id) { return history.byQuiz[id].signalId; }).filter(Boolean); var mistakeSignals = signals.filter(function (signal) { return mistakeIds.indexOf(signal.id) !== -1; }); return getMistakeQuestions(questionsForSignals(mistakeSignals)); }
+    if (mode === 'signal') { var signalId = params.get('signal'); var signal = signalMap[signalId]; return signal ? ordered(questionsForSignals([signal]).filter(function (question) { return question.signalId === signalId; })).slice(0, 3) : []; }
+    var count = mode === 'standard' ? 10 : 5; var targets = mode === 'standard' ? { easy: 3, medium: 4, hard: 3 } : { easy: 2, medium: 2, hard: 1 }; var selectedSignals = candidateSignals(targets, coreQuestions, count); var all = questionsForSignals(selectedSignals); return chooseBalanced(all, Math.min(count, all.length), targets);
   }
   function setText(element, value) { if (element) element.textContent = value === undefined || value === null ? '' : String(value); }
   function typeLabel(type) { return type === 'meaning' ? 'MEANING' : type === 'boundary' ? 'USAGE BOUNDARY' : 'CONTEXT'; }
