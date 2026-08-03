@@ -2,9 +2,17 @@
   'use strict';
 
   var registry = window.EnglishRadarContent;
-  if (!registry || typeof registry.getActiveLearningSignals !== 'function') return;
-
-  var originalGetSignals = registry.getActiveLearningSignals.bind(registry);
+  var originalGetSignals;
+  if (registry && typeof registry.getActiveLearningSignals === 'function') {
+    originalGetSignals = registry.getActiveLearningSignals.bind(registry);
+  } else {
+    originalGetSignals = function () {
+      return Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS.slice() : [];
+    };
+    registry = registry || {};
+    registry.getActiveLearningSignals = originalGetSignals;
+    window.EnglishRadarContent = registry;
+  }
   var storage = window.EnglishRadarStorage;
   var params = new URLSearchParams(window.location.search);
   var dateKey = (function () {
@@ -118,15 +126,24 @@
   }
 
   function topicMatch(signal, topic) {
-    var value = [signal.category].concat(signal.platforms || []).join(' ').toLowerCase();
-    var groups = {
-      internet: ['internet', 'community', 'reddit', 'discord', 'meme', 'streaming', 'creator', 'platform'],
-      builder: ['builder', 'github', 'developer', 'hackathon', 'ai', 'product design'],
+    var category = text(signal.category).toLowerCase();
+    var value = [category].concat(signal.platforms || []).join(' ').toLowerCase();
+    var categoryGroups = {
+      internet: ['internet culture'],
+      builder: ['ai builder', 'github', 'github / development'],
+      fandom: ['fandom'],
+      sports: ['sports', 'sports / everyday'],
+      design: ['product design']
+    };
+    if ((categoryGroups[topic] || []).some(function (name) { return category === name; })) return true;
+    var platformGroups = {
+      internet: ['community', 'reddit', 'discord', 'meme', 'streaming', 'creator', 'platform', 'social media'],
+      builder: ['builder', 'developer', 'hackathon', 'ai'],
       fandom: ['fandom', 'idol', 'k-pop', 'j-pop'],
       sports: ['sport', 'running', 'table tennis', 'volleyball', 'football', 'gaming'],
-      design: ['product design', 'ui', 'ux', 'figma']
+      design: ['ui', 'ux', 'figma', 'design tools', 'design chat']
     };
-    return (groups[topic] || [topic]).some(function (keyword) { return value.indexOf(keyword) !== -1; });
+    return (platformGroups[topic] || [topic]).some(function (keyword) { return value.indexOf(keyword) !== -1; });
   }
 
   function getLearningSignals() {
