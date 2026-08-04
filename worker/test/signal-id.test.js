@@ -17,12 +17,27 @@ let data = await query([page('ICR-20260803-based')]);
 assert.equal(data.records.length, 1);
 assert.equal(data.records[0].signal.id, 'icr-20260803-based');
 assert.equal(data.records[0].signal.originalSignalId, 'ICR-20260803-based');
+assert.equal(data.records[0].signal.rawSignalId, 'ICR-20260803-based');
 assert.equal(data.records[0].signal.normalizedSignalId, 'icr-20260803-based');
 assert.equal(data.records[0].signal.idWasNormalized, true);
 
 data = await query([page('')]);
 assert.equal(data.records.length, 0);
 assert.equal(data.invalidRecords.length, 1);
+assert.equal(data.invalidRecords[0].reason, 'Signal ID is missing.');
+
+data = await query([page(' ICR-20260803-based ')]);
+assert.equal(data.records[0].signal.id, 'icr-20260803-based');
+assert.equal(data.records[0].signal.rawSignalId, ' ICR-20260803-based ');
+assert.equal(data.records[0].signal.originalSignalId, ' ICR-20260803-based ');
+assert.equal(data.records[0].signal.normalizedSignalId, 'icr-20260803-based');
+assert.equal(data.records[0].signal.idWasNormalized, true);
+
+data = await query([page('   ')]);
+assert.equal(data.records.length, 0);
+assert.equal(data.invalidRecords[0].rawSignalId, '   ');
+assert.equal(data.invalidRecords[0].originalSignalId, '   ');
+assert.equal(data.invalidRecords[0].normalizedSignalId, '');
 assert.equal(data.invalidRecords[0].reason, 'Signal ID is missing.');
 
 data = await query([page('bad/id')]);

@@ -36,7 +36,12 @@
   Object.assign(profileZh.status, { Common: '常见', Established: '较稳定', Emerging: '正在出现', Evolving: '不断变化', Niche: '小众', Trending: '流行中', Stable: '稳定', 'Community-specific': '社区特定' });
   Object.assign(profileZh.formality, { 'Very informal': '非常非正式', Informal: '非正式', Neutral: '中性', Formal: '正式' });
   var missingZh = '该词条的中文使用说明尚未补充，请结合上方中文含义和例句理解。';
-  function translateProfile(value, map) { return String(value || '').split(/\s+(?:路|·)\s+/).map(function (item) { return map[item] || '暂无标准中文标签'; }).join(' · '); }
+  function translateProfile(value, map) {
+    var source = Array.isArray(value) ? value : String(value || '').trim();
+    var values = Array.isArray(source) ? source : source.indexOf('·') !== -1 ? source.split(/\s*·\s*/) : source.indexOf(',') !== -1 ? source.split(/\s*,\s*/) : source ? [source] : [];
+    return values.map(function (item) { return map[String(item).trim()] || '暂无标准中文标签'; }).join(' · ');
+  }
+  window.EnglishRadarProfileTools = window.EnglishRadarProfileTools || { translateProfile: translateProfile };
   if (storage) { var settingsRaw = storage.read(storage.keys.settings, null); if (!settingsRaw || Number(settingsRaw.dataVersion) !== 1 || Number(settingsRaw.contentVersion) !== 1) storage.setSettings(storage.getSettings()); }
 
   function text(value) { return value === undefined || value === null || value === '' ? '—' : String(value); }

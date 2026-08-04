@@ -12,8 +12,17 @@ assert(copy.includes('Daily Mix'));
 
 const session = read('js/session.js');
 assert(session.includes('useWhenZh') && session.includes('avoidWhenZh'));
+assert(!session.includes('(?:路|·)'));
 assert(session.includes('该词条的中文使用说明尚未补充'));
 assert(read('learn.html').includes('data-profile-zh="platforms"'));
+const profileTranslate = Function('value', 'map', `
+  var source = Array.isArray(value) ? value : String(value || '').trim();
+  var values = Array.isArray(source) ? source : source.indexOf('·') !== -1 ? source.split(/\\s*·\\s*/) : source.indexOf(',') !== -1 ? source.split(/\\s*,\\s*/) : source ? [source] : [];
+  return values.map(function (item) { return map[String(item).trim()] || '暂无标准中文标签'; }).join(' · ');
+`);
+const profileMap = { Comments: '评论区', 'Casual chat': '日常聊天', 'Social media': '社交媒体' };
+assert.equal(profileTranslate(['Comments', 'Casual chat', 'Social media'], profileMap), '评论区 · 日常聊天 · 社交媒体');
+assert.equal(profileTranslate('Comments · Casual chat · Social media', profileMap), '评论区 · 日常聊天 · 社交媒体');
 
 const quiz = read('js/quiz.js');
 assert(quiz.includes('explanationZh'));
@@ -53,23 +62,30 @@ class FakeElement {
     if (selector === ':scope > .section-label') return this.children.filter((child) => child.classList.contains('section-label'));
     if (selector === '.zh-helper') return all.filter((child) => child.classList.contains('zh-helper'));
     if (selector === '.me-collapse-toggle') return all.filter((child) => child.classList.contains('me-collapse-toggle'));
+    if (selector === '.me-collapse-status') return all.filter((child) => child.classList.contains('me-collapse-status'));
+    if (selector === '.me-collapsible-content') return all.filter((child) => child.classList.contains('me-collapsible-content'));
+    if (selector === '[data-library="packs"]') return all.filter((child) => child.getAttribute('data-library') === 'packs');
+    if (selector === '[data-sync-enabled]') return all.filter((child) => child.getAttribute('data-sync-enabled') !== null);
+    if (selector === '[name="defaultSessionSize"]') return all.filter((child) => child.getAttribute('name') === 'defaultSessionSize');
     return all;
   }
-  setAttribute(name, value) { this.attributes[name] = String(value); }
+  setAttribute(name, value) { this.attributes[name] = String(value); if (name.indexOf('data-') === 0) this.dataset[name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = String(value); }
   getAttribute(name) { return this.attributes[name] ?? null; }
-  addEventListener(name, fn) { this.listeners[name] = fn; }
-  click() { if (this.listeners.click) this.listeners.click({ preventDefault() {} }); }
+  addEventListener(name, fn) { this.listeners[name] = this.listeners[name] || []; this.listeners[name].push(fn); }
+  click() { (this.listeners.click || []).forEach((fn) => fn({ preventDefault() {} })); }
 }
 class FakeDocument extends FakeElement {
   constructor() { super('document'); this.readyState = 'complete'; }
   createElement(tag) { return new FakeElement(tag); }
-  addEventListener() {}
+  addEventListener(name, fn) { this.listeners[name] = this.listeners[name] || []; this.listeners[name].push(fn); }
+  dispatchEvent(event) { (this.listeners[event.type] || []).forEach((fn) => fn(event)); }
   querySelectorAll(selector) {
     const all = this.children.flatMap((child) => [child, ...child.querySelectorAll(selector)]);
     if (selector.includes('.side-nav')) return all.filter((child) => child.classList.contains('nav-item'));
     if (selector.includes('.mobile-nav')) return all.filter((child) => child.classList.contains('mobile-link'));
     if (selector === '.section-label, .block-label, .eyebrow') return all.filter((child) => child.classList.contains('section-label') || child.classList.contains('block-label') || child.classList.contains('eyebrow'));
     if (selector === '.me-section') return all.filter((child) => child.classList.contains('me-section'));
+    if (selector === '.me-section.me-collapsible') return all.filter((child) => child.classList.contains('me-section') && child.classList.contains('me-collapsible'));
     if (selector.includes('button')) return all.filter((child) => child.tagName === 'BUTTON');
     return all;
   }
@@ -78,13 +94,29 @@ const dom = new FakeDocument();
 const nav = new FakeElement('a', 'Today', ['nav-item']); nav.setAttribute('href', './index.html'); dom.appendChild(nav);
 const mobile = new FakeElement('a', 'Today', ['mobile-link']); mobile.setAttribute('href', './index.html'); dom.appendChild(mobile);
 const action = new FakeElement('button', 'Start Library Session'); dom.appendChild(action);
-['CONTENT LIBRARY', 'NOTION SYNC', 'PREFERENCES', 'DATA & BACKUP'].forEach((title) => { const section = new FakeElement('section', '', ['me-section']); const label = new FakeElement('div', title, ['section-label']); const content = new FakeElement('div'); content.appendChild(new FakeElement('button', 'Save settings')); section.appendChild(label); section.appendChild(content); dom.appendChild(section); });
+['CONTENT LIBRARY', 'NOTION SYNC', 'PREFERENCES', 'DATA & BACKUP'].forEach((title) => { const section = new FakeElement('section', '', ['me-section']); const label = new FakeElement('div', title, ['section-label']); const content = new FakeElement('div'); content.appendChild(new FakeElement('button', 'Save settings')); if (title === 'CONTENT LIBRARY') { const packs = new FakeElement('strong', '0'); packs.setAttribute('data-library', 'packs'); content.appendChild(packs); } if (title === 'NOTION SYNC') { const enabled = new FakeElement('input'); enabled.checked = false; enabled.setAttribute('data-sync-enabled', ''); content.appendChild(enabled); } if (title === 'PREFERENCES') { const sessionSize = new FakeElement('select'); sessionSize.value = '5'; sessionSize.setAttribute('name', 'defaultSessionSize'); content.appendChild(sessionSize); } section.appendChild(label); section.appendChild(content); dom.appendChild(section); });
 const uiContext = { document: dom, window: {}, console };
 vm.runInNewContext(copy, uiContext);
 assert.equal(nav.children.find((child) => child.classList.contains('zh-helper')).textContent, '今日学习');
 assert.equal(action.children.find((child) => child.classList.contains('zh-helper')).textContent, '开始学习');
 assert(read('js/session.js').includes('暂无标准中文标签'));
 const compactSections = dom.querySelectorAll('.me-section');
+const librarySection = compactSections[0];
+const syncSection = compactSections[1];
+const preferencesSection = compactSections[2];
+const libraryPacks = librarySection.querySelector('[data-library="packs"]');
+const syncEnabled = syncSection.querySelector('[data-sync-enabled]');
+const sessionSize = preferencesSection.querySelector('[name="defaultSessionSize"]');
+assert.equal(librarySection.querySelector('.me-collapse-status').textContent, '0 installed packs');
+libraryPacks.textContent = '9';
+dom.dispatchEvent({ type: 'english-radar:me-ready' });
+assert.equal(librarySection.querySelector('.me-collapse-status').textContent, '9 installed packs');
+syncEnabled.checked = true;
+dom.dispatchEvent({ type: 'english-radar:me-ready' });
+assert.equal(syncSection.querySelector('.me-collapse-status').textContent, 'Notion sync enabled');
+sessionSize.value = '15';
+dom.dispatchEvent({ type: 'english-radar:me-ready' });
+assert.equal(preferencesSection.querySelector('.me-collapse-status').textContent, 'Session 15');
 assert.equal(compactSections.length, 4);
 compactSections.forEach((section) => { const button = section.querySelector('.me-collapse-toggle'); assert.equal(button.getAttribute('aria-expanded'), 'false'); assert.equal(section.children[1].hidden, true); assert(button.getAttribute('aria-controls')); button.click(); assert.equal(section.children[1].hidden, false); assert.equal(button.getAttribute('aria-expanded'), 'true'); assert.equal(button.textContent, 'Collapse · 收起'); assert(section.children[1].querySelector('button')); });
 

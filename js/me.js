@@ -10,6 +10,7 @@
   var signalMap = {};
   signals.forEach(function (signal) { signalMap[signal.id] = signal; });
   var personalSignals = window.EnglishRadarContent ? window.EnglishRadarContent.getPersonalSignals() : inbox.filter(function (item) { return item && item.status === 'decoded' && item.decodedSignal && item.decodedSignal.id; }).map(function (item) { return Object.assign({}, item.decodedSignal, { sourceType: 'personal', sourceInboxId: item.id }); });
+  function notifyMeReady() { if (typeof document.dispatchEvent === 'function' && typeof Event === 'function') document.dispatchEvent(new Event('english-radar:me-ready')); }
 
   function isValidDate(value) { if (!value) return false; var date = new Date(value); return !isNaN(date.getTime()); }
   function dateOf(value) { return isValidDate(value) ? new Date(value) : null; }
@@ -119,5 +120,6 @@
   }
   function initializeReset() { var open = document.querySelector('[data-reset-open]'); var confirmArea = document.querySelector('[data-reset-confirm]'); var cancel = document.querySelector('[data-reset-cancel]'); var action = document.querySelector('[data-reset-confirm-action]'); if (open && confirmArea) open.addEventListener('click', function () { open.hidden = true; confirmArea.hidden = false; }); if (cancel && open && confirmArea) cancel.addEventListener('click', function () { open.hidden = false; confirmArea.hidden = true; }); if (action && storage) action.addEventListener('click', function () { if (storage.clearAll()) { confirmArea.hidden = true; document.querySelector('[data-return-today]').hidden = false; showBackup('Local learning data has been reset.'); } else showBackup('Local learning data could not be reset.'); }); }
   if (window.EnglishRadarPerformanceDebug) window.EnglishRadarPerformanceDebug.measure('me.render', renderAll); else renderAll(); initializePreferences(); initializeBackup(); initializeReset(); initializeContentLibrary(); initializeNotionSync();
+  notifyMeReady();
 }());
 

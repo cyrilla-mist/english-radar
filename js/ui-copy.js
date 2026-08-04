@@ -68,6 +68,21 @@
     if (key === 'preferences') { var session = content.querySelector('[name="defaultSessionSize"]'); return session ? 'Session ' + session.value : 'Local preference'; }
     return 'Local backup';
   }
+  function refreshPanelStatuses() {
+    document.querySelectorAll('.me-section.me-collapsible').forEach(function (section) {
+      var key = section.dataset.meCollapsible;
+      var content = section.querySelector('.me-collapsible-content');
+      var status = section.querySelector('.me-collapse-status');
+      if (key && content && status) status.textContent = getPanelStatus(key, content);
+    });
+  }
   window.ENGLISH_RADAR_UI_COPY = copy;
+  window.EnglishRadarUI = window.EnglishRadarUI || {};
+  window.EnglishRadarUI.refreshMePanelStatuses = refreshPanelStatuses;
+  document.addEventListener('english-radar:me-ready', refreshPanelStatuses);
+  document.addEventListener('change', function (event) {
+    var target = event && event.target;
+    if (target && typeof target.closest === 'function' && (target.closest('[data-notion-sync]') || target.closest('[data-preferences-form]') || target.closest('[data-content-library]'))) refreshPanelStatuses();
+  });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
 }());
