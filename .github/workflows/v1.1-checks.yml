@@ -38,3 +38,9 @@ jobs:
 
       - name: Test v1.1.1 bilingual and sync stability
         run: node tests/v1.1.1-bilingual.test.js
+
+      - name: Install Worker test dependencies
+        run: npm ci --prefix worker
+
+      - name: Test Worker Signal ID normalization
+        run: npm test --prefix worker

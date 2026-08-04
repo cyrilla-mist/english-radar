@@ -31,12 +31,8 @@
  .zh-helper { display: block; margin-top: 4px; color: var(--moss); font: 500 12px/1.5 "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif; letter-spacing: 0; }
  .nav-item .zh-helper, .mobile-nav .zh-helper { margin-top: 1px; font-size: 10px; line-height: 1.1; }
  .section-label .zh-helper, .block-label .zh-helper, .eyebrow .zh-helper { font-size: 11px; }
- .me-collapsible { display: grid; }
- .me-collapsible-summary { grid-column: 1; cursor: pointer; list-style: none; }
- .me-collapsible-summary::-webkit-details-marker { display: none; }
- .me-collapsible-summary::after { content: '+'; float: right; color: var(--clay); font: 18px var(--mono); }
- .me-collapsible[open] .me-collapsible-summary::after { content: '−'; }
- .me-collapsible > .content-library, .me-collapsible > .notion-sync, .me-collapsible > .preferences-form, .me-collapsible > .backup-area { grid-column: 2; }
+ .me-collapsible-content { grid-column: 2; min-width: 0; }
+ .me-collapse-status { display: block; margin-top: 6px; color: var(--ink-soft); font: 12px var(--sans); letter-spacing: 0; }
  .me-collapse-toggle { display: block; margin-top: 12px; border: 0; border-bottom: 1px solid var(--line-light); padding: 4px 0; color: var(--forest); background: transparent; cursor: pointer; font: 11px var(--mono); }
  .quiz-type-meta span + span::before { content: '·'; margin-right: 18px; color: var(--clay); }
  .dictionary-load-more { display: block; margin: 28px auto 0; border: 1px solid var(--line-dark); padding: 10px 16px; color: var(--forest); background: transparent; cursor: pointer; font: 13px var(--mono); }

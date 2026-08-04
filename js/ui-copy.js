@@ -13,10 +13,26 @@
     'CATEGORY COVERAGE': '分类覆盖', 'RECENT ACTIVITY': '最近活动', 'CONTEXT INSIGHTS': '语境洞察',
     'CONTENT LIBRARY': '内容库', 'NOTION SYNC': 'Notion 同步', 'PREFERENCES': '偏好设置', 'DATA & BACKUP': '数据与备份'
   };
+  var actionCopy = {
+    'Start Library Session': '开始学习', 'Quick Scan': '快速浏览', Standard: '标准学习', 'Deep Dive': '深入学习', Custom: '自定义',
+    'New signals': '新表达', 'Reviews waiting': '待复习', 'Signals explored': '已学习表达', 'clearly understood': '已清楚理解', 'still fuzzy': '还不太清楚',
+    Listen: '朗读', Favorite: '收藏', 'Practice this signal': '练习这个表达', Previous: '上一个', Skip: '跳过', 'New to me': '第一次接触', 'Still fuzzy': '还不太清楚', Clear: '已经理解',
+    Search: '搜索', All: '全部', Core: '核心', Imported: '导入', Personal: '个人', Favorites: '收藏', 'Load more': '加载更多', Signals: '表达',
+    Expression: '表达', Source: '来源', 'Original sentence': '原句', 'Personal note': '个人笔记', 'Save to Inbox': '保存到收集箱', Undecoded: '未解码', Decoded: '已解码',
+    Expand: '展开', Collapse: '收起', 'Save preferences': '保存偏好', 'Export backup': '导出备份', 'Import backup': '导入备份', 'Reset all local data': '重置本地数据'
+  };
 
   function addHelper(element, value) {
     if (!element || !value || element.querySelector('.zh-helper')) return;
     var helper = document.createElement('small'); helper.className = 'zh-helper'; helper.textContent = value; element.appendChild(helper);
+  }
+  function decorateActions() {
+    document.querySelectorAll('button, a.primary-button, .context-check-list > a, .signal-actions button, .audio-controls button').forEach(function (element) {
+      if (element.classList.contains('me-collapse-toggle')) return;
+      var visible = element.textContent.replace(/[→↗←▶×]/g, ' ').replace(/\s+/g, ' ').trim();
+      var key = Object.keys(actionCopy).find(function (candidate) { return visible === candidate || visible.indexOf(candidate) === 0; });
+      if (key) addHelper(element, actionCopy[key]);
+    });
   }
   function navKey(link) {
     var href = link.getAttribute('href') || '';
@@ -35,13 +51,22 @@
       var title = (label.childNodes[0] && label.childNodes[0].textContent || '').trim().toUpperCase();
       var key = { 'CONTENT LIBRARY': 'content-library', 'NOTION SYNC': 'notion-sync', 'PREFERENCES': 'preferences', 'DATA & BACKUP': 'backup' }[title];
       if (!key || section.querySelector('.me-collapse-toggle')) return;
-      section.dataset.meCollapsible = key;
-      var button = document.createElement('button'); button.type = 'button'; button.className = 'me-collapse-toggle'; button.textContent = 'Expand'; button.setAttribute('aria-expanded', 'false');
+      section.dataset.meCollapsible = key; section.classList.add('me-collapsible');
+      var button = document.createElement('button'); button.type = 'button'; button.className = 'me-collapse-toggle'; button.textContent = 'Expand · 展开'; button.setAttribute('aria-expanded', 'false');
       var content = Array.prototype.filter.call(section.children, function (child) { return child !== label; });
-      content.forEach(function (child) { child.hidden = true; });
-      button.addEventListener('click', function () { var expanded = button.getAttribute('aria-expanded') === 'true'; button.setAttribute('aria-expanded', expanded ? 'false' : 'true'); button.textContent = expanded ? 'Expand' : 'Collapse'; content.forEach(function (child) { child.hidden = expanded; }); });
+      var wrapper = document.createElement('div'); wrapper.className = 'me-collapsible-content'; wrapper.id = key + '-content'; content.forEach(function (child) { wrapper.appendChild(child); }); section.appendChild(wrapper); content = [wrapper]; content.forEach(function (child) { child.hidden = true; });
+      var status = document.createElement('small'); status.className = 'me-collapse-status'; status.textContent = getPanelStatus(key, wrapper); label.appendChild(status);
+      button.setAttribute('aria-controls', wrapper.id);
+      button.addEventListener('click', function () { var expanded = button.getAttribute('aria-expanded') === 'true'; button.setAttribute('aria-expanded', expanded ? 'false' : 'true'); button.textContent = expanded ? 'Expand · 展开' : 'Collapse · 收起'; status.textContent = getPanelStatus(key, wrapper); wrapper.hidden = expanded; });
       label.appendChild(button);
     });
+    decorateActions();
+  }
+  function getPanelStatus(key, content) {
+    if (key === 'content-library') { var packs = content.querySelector('[data-library="packs"]'); return packs ? (packs.textContent || '0') + ' installed packs' : 'Installed packs'; }
+    if (key === 'notion-sync') { var enabled = content.querySelector('[data-sync-enabled]'); return enabled && enabled.checked === true ? 'Notion sync enabled' : 'Notion sync disabled'; }
+    if (key === 'preferences') { var session = content.querySelector('[name="defaultSessionSize"]'); return session ? 'Session ' + session.value : 'Local preference'; }
+    return 'Local backup';
   }
   window.ENGLISH_RADAR_UI_COPY = copy;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
