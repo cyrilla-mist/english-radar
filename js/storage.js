@@ -21,9 +21,15 @@
     var store = getLocalStorage();
     if (!store) return fallback;
     try {
+      var debug = window.EnglishRadarPerformanceDebug;
+      var clock = debug && window.performance && typeof window.performance.now === 'function' ? function () { return window.performance.now(); } : debug ? function () { return Date.now(); } : null;
+      var storageStarted = clock ? clock() : 0;
       var raw = store.getItem(key);
+      if (debug && clock) debug.record('localStorage.getItem', clock() - storageStarted, { key: key });
       if (!raw) return fallback;
+      var started = clock ? clock() : 0;
       var value = JSON.parse(raw);
+      if (debug && clock) debug.record('JSON.parse', clock() - started, { key: key });
       return value === null || value === undefined ? fallback : value;
     } catch (error) {
       lastError = true;
@@ -64,7 +70,7 @@
   }
   function setSettings(value) { return write(KEYS.settings, validObject(value) ? value : { dataVersion: 1 }); }
   function getInbox() { var value = read(KEYS.inbox, []); return Array.isArray(value) ? value : []; }
-  function saveInbox(value) { return write(KEYS.inbox, Array.isArray(value) ? value : []); }
+  function saveInbox(value) { var saved = write(KEYS.inbox, Array.isArray(value) ? value : []); if (saved && window.EnglishRadarContent && window.EnglishRadarContent.invalidate) window.EnglishRadarContent.invalidate(); return saved; }
   function addInboxItem(item) { var items = getInbox(); items.push(item); return saveInbox(items); }
   function updateInboxItem(id, updates) {
     var items = getInbox(); var found = false;
@@ -79,7 +85,7 @@
     return result;
   }
   function getCustomSignals() { return normalizeCustomSignals(read(KEYS.customSignals, null)); }
-  function saveCustomSignals(value) { return write(KEYS.customSignals, normalizeCustomSignals(value)); }
+  function saveCustomSignals(value) { var saved = write(KEYS.customSignals, normalizeCustomSignals(value)); if (saved && window.EnglishRadarContent && window.EnglishRadarContent.invalidate) window.EnglishRadarContent.invalidate(); return saved; }
   function defaultSyncSettings() { return { version: 1, enabled: false, workerBaseUrl: '', adminToken: '', lastSyncAt: null, lastSuccessfulBatchId: null }; }
   function normalizeSyncSettings(value) { if (!validObject(value)) return defaultSyncSettings(); return Object.assign(defaultSyncSettings(), value, { version: 1, enabled: value.enabled === true, workerBaseUrl: typeof value.workerBaseUrl === 'string' ? value.workerBaseUrl.trim().replace(/\/$/, '') : '', adminToken: typeof value.adminToken === 'string' ? value.adminToken : '', lastSyncAt: value.lastSyncAt || null, lastSuccessfulBatchId: value.lastSuccessfulBatchId || null }); }
   function getSyncSettings() { return normalizeSyncSettings(read(KEYS.syncSettings, null)); }
@@ -114,7 +120,7 @@
     return { attempts: history.attempts.length, correct: correct, incorrect: incorrect, total: correct + incorrect, mistakes: getQuizMistakeIds().length };
   }
   function resetQuizHistory() { return remove(KEYS.quizHistory); }
-  function clearAll() { var progress = remove(KEYS.progress); var current = remove(KEYS.currentSession); var settings = remove(KEYS.settings); var inbox = remove(KEYS.inbox); var quizHistory = resetQuizHistory(); var customSignals = remove(KEYS.customSignals); var syncSettings = remove(KEYS.syncSettings); var syncHistory = remove(KEYS.syncHistory); return progress && current && settings && inbox && quizHistory && customSignals && syncSettings && syncHistory; }
+  function clearAll() { var progress = remove(KEYS.progress); var current = remove(KEYS.currentSession); var settings = remove(KEYS.settings); var inbox = remove(KEYS.inbox); var quizHistory = resetQuizHistory(); var customSignals = remove(KEYS.customSignals); var syncSettings = remove(KEYS.syncSettings); var syncHistory = remove(KEYS.syncHistory); var cleared = progress && current && settings && inbox && quizHistory && customSignals && syncSettings && syncHistory; if (cleared && window.EnglishRadarContent && window.EnglishRadarContent.invalidate) window.EnglishRadarContent.invalidate(); return cleared; }
 
   window.EnglishRadarStorage = {
     keys: KEYS,

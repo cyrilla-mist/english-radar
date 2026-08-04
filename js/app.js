@@ -6,10 +6,12 @@
   var customPanel = document.querySelector('.custom-session');
   var customInput = document.querySelector('#custom-size');
   var deepDiveLabel = document.querySelector('[data-deep-dive-label]');
-  var signals = window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []);
+  var learningEngine = window.EnglishRadarLearningEngine;
+  var todaySnapshot = learningEngine && typeof learningEngine.getTodaySnapshot === 'function' ? learningEngine.getTodaySnapshot() : null;
+  var signals = todaySnapshot ? todaySnapshot.signals : (window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []));
   var storage = window.EnglishRadarStorage;
   var review = window.EnglishRadarReview;
-  var progress = storage ? storage.getProgress() : {};
+  var progress = todaySnapshot ? todaySnapshot.progress : (storage ? storage.getProgress() : {});
   var available = signals.length;
   var today = new Date();
 
@@ -69,9 +71,8 @@
   }
   function showHomeFeedback(message) { var target = document.querySelector('[data-home-feedback]'); if (target) target.textContent = message || ''; }
 
-  updateDates();
-  updateStats();
-  updateRecovery();
+  var debug = window.EnglishRadarPerformanceDebug;
+  if (debug) debug.measure('today.render', function () { updateDates(); updateStats(); updateRecovery(); }); else { updateDates(); updateStats(); updateRecovery(); }
   if (storage) {
     var settingsRaw = storage.read(storage.keys.settings, null);
     if (!settingsRaw || Number(settingsRaw.dataVersion) !== 1 || Number(settingsRaw.contentVersion) !== 1) storage.setSettings(storage.getSettings());

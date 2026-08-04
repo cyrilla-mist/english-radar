@@ -27,3 +27,7 @@
  .not-found { display: grid; place-items: center; min-height: 100vh; }
  .not-found-copy { width: min(780px, 100%); padding: 72px 0; }
  .not-found-copy h1 { max-width: 650px; margin: 17px 0 35px; color: var(--forest); font: 500 clamp(48px, 7vw, 82px)/.98 var(--serif); letter-spacing: -.05em; }
+ .quiz-type-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: -10px 0 18px; color: var(--moss); font: 12px var(--mono); letter-spacing: .08em; }
+ .quiz-type-meta span + span::before { content: '·'; margin-right: 18px; color: var(--clay); }
+ .dictionary-load-more { display: block; margin: 28px auto 0; border: 1px solid var(--line-dark); padding: 10px 16px; color: var(--forest); background: transparent; cursor: pointer; font: 13px var(--mono); }
+ .dictionary-load-more[hidden] { display: none; }
