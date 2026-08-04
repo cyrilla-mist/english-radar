@@ -33,6 +33,13 @@ function readPlainText(value) {
   if (Array.isArray(parts)) return parts.map((part) => part && (part.plain_text || part.text?.content || '')).join('').trim();
   return String(value.plain_text || value.content || value.url || '').trim();
 }
+function readRawPlainText(value) {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  const parts = value.title || value.rich_text || value.text || [];
+  if (Array.isArray(parts)) return parts.map((part) => part && (part.plain_text || part.text?.content || '')).join('');
+  return String(value.plain_text || value.content || value.url || '');
+}
 
 function readSelect(value) { return value && (value.select?.name || value.status?.name || value.name || '') || ''; }
 function readMultiSelect(value) { return Array.isArray(value?.multi_select) ? value.multi_select.map((item) => item.name).filter(Boolean) : []; }
@@ -40,18 +47,24 @@ function readDate(value) { return value?.date?.start || value?.start || null; }
 function slugify(value) { return String(value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, ''); }
 function generateStableSignalId(term, category) { return `notion-${slugify(category)}-${slugify(term)}`; }
 function validId(value) { return /^[a-z0-9][a-z0-9-]{1,120}$/.test(String(value || '')); }
+function normalizeSignalId(value) { const rawSignalId = String(value ?? ''); const normalizedSignalId = rawSignalId.trim().toLowerCase(); return { rawSignalId, originalSignalId: rawSignalId, normalizedSignalId, idWasNormalized: rawSignalId !== normalizedSignalId }; }
 
 function mapNotionPageToSignal(page) {
   const properties = page?.properties || {};
   const term = readPlainText(property(properties, 'Expression'));
   const category = readSelect(property(properties, 'Category'));
-  const suppliedId = readPlainText(property(properties, 'Signal ID'));
-  const id = suppliedId || generateStableSignalId(term, category);
+  const suppliedId = readRawPlainText(property(properties, 'Signal ID'));
+  const idInfo = normalizeSignalId(suppliedId);
+  const id = idInfo.normalizedSignalId;
   const notionStatus = readSelect(property(properties, 'Status'));
   const quizStatus = readSelect(property(properties, 'Quiz Status')).toLowerCase();
   const addedAt = readDate(property(properties, 'Added At')) || page.created_time || null;
   return {
     id,
+    rawSignalId: idInfo.rawSignalId,
+    originalSignalId: idInfo.originalSignalId,
+    normalizedSignalId: idInfo.normalizedSignalId,
+    idWasNormalized: idInfo.idWasNormalized,
     term: term.toLowerCase().replace(/\s+/g, ' ').trim(),
     displayTerm: term || id,
     speechText: term || id,
@@ -82,6 +95,10 @@ function mapNotionPageToSignal(page) {
 
 function validateMappedSignal(signal) {
   return !!signal && validId(signal.id) && ['term', 'category', 'meaningZh', 'exampleEn'].every((field) => typeof signal[field] === 'string' && signal[field].trim()) && signal.contentStatus === 'active' && ['none', 'draft', 'ready'].includes(signal.quizStatus) && !signal.id.startsWith('core-');
+}
+function invalidMappedRecord(record) {
+  const signal = record.signal || {};
+  return { notionPageId: record.notionPageId, expression: signal.term || '', rawSignalId: signal.rawSignalId || signal.originalSignalId || '', originalSignalId: signal.originalSignalId || '', normalizedSignalId: signal.normalizedSignalId || '', reason: !String(signal.normalizedSignalId || '').trim() ? 'Signal ID is missing.' : !validId(signal.normalizedSignalId) ? 'Signal ID contains invalid characters or has an invalid length.' : 'Required Signal fields are missing or invalid.' };
 }
 
 function notionHeaders(env) { return { Authorization: `Bearer ${env.NOTION_TOKEN}`, 'Notion-Version': env.NOTION_VERSION || DEFAULT_NOTION_VERSION, 'Content-Type': 'application/json' }; }
@@ -114,8 +131,10 @@ async function querySignals(request, env, url) {
   if (!result.ok && !cursor) result = await notionRequest(env, `/data_sources/${encodeURIComponent(env.NOTION_DATA_SOURCE_ID)}/query`, { method: 'POST', body: Object.assign({}, body, { filter: approvedFilter(since, 'select', requestedStatus) }) });
   if (!result.ok) return json(request, env, { ok: false, error: result.error }, 502);
   const pages = Array.isArray(result.data?.results) ? result.data.results : [];
-  const records = pages.map((page) => ({ notionPageId: page.id, lastEditedAt: page.last_edited_time || null, signal: mapNotionPageToSignal(page) })).filter((record) => validateMappedSignal(record.signal));
-  return json(request, env, { ok: true, schemaVersion: 1, source: 'notion', generatedAt: new Date().toISOString(), nextCursor: result.data?.next_cursor || null, hasMore: result.data?.has_more === true, signals: records.map((record) => record.signal), records });
+  const mapped = pages.map((page) => ({ notionPageId: page.id, lastEditedAt: page.last_edited_time || null, signal: mapNotionPageToSignal(page) }));
+  const records = mapped.filter((record) => validateMappedSignal(record.signal));
+  const invalidRecords = mapped.filter((record) => !validateMappedSignal(record.signal)).map(invalidMappedRecord);
+  return json(request, env, { ok: true, schemaVersion: 1, source: 'notion', generatedAt: new Date().toISOString(), nextCursor: result.data?.next_cursor || null, hasMore: result.data?.has_more === true, signals: records.map((record) => record.signal), records, invalidRecords });
 }
 
 function authValid(request, env) { const header = request.headers.get('Authorization') || ''; return !!env.SYNC_ADMIN_TOKEN && header === `Bearer ${env.SYNC_ADMIN_TOKEN}`; }

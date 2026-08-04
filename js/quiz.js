@@ -36,7 +36,7 @@
     var difficulty = text(question.difficulty).toLowerCase();
     if (['easy', 'medium', 'hard'].indexOf(difficulty) === -1) difficulty = questionType === 'meaning' ? 'easy' : questionType === 'boundary' ? 'hard' : 'medium';
     var explanationEn = text(question.explanationEn || question.explanation);
-    var explanationZh = text(question.explanationZh || question.explanation);
+    var signal = signalMap[question.signalId]; var explanationZh = text(question.explanationZh || (signal && signal.meaningZh ? '中文理解：' + signal.meaningZh : '') || (signal && signal.chineseFeeling ? '中文语感：' + signal.chineseFeeling : '中文解释暂未补充，请结合英文解释和语境理解。'));
     if (!Array.isArray(question.options) || question.options.length !== 4 || !question.correctOptionId || !explanationEn) return null;
     if (!question.options.every(function (option, index, list) { return option && option.id && text(option.text) && list.findIndex(function (item) { return item && item.id === option.id; }) === index; })) return null;
     if (!question.options.some(function (option) { return option.id === question.correctOptionId; })) return null;

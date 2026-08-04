@@ -1,5 +1,15 @@
 # Release Notes
 
+## English Radar v1.1.1
+
+Stability and bilingual UX patch for the v1.1 Learning Engine.
+
+- Added centralized English-first Chinese helper labels across the main learning pages.
+- Added optional Chinese usage-boundary fields and safe fallbacks for older or imported Signals.
+- Added Chinese Quiz explanations without changing existing quiz history or question logic.
+- Normalized Notion Signal IDs case-insensitively and surfaced invalid records in sync previews.
+- Kept Me management panels compact by default while preserving existing controls.
+
 ## English Radar v1.1.0
 
 Status: Release Candidate on `feat/v1.1-learning-engine`. PR #1 remains Draft and `main` has not been modified or merged.

@@ -10,6 +10,7 @@
   var signalMap = {};
   signals.forEach(function (signal) { signalMap[signal.id] = signal; });
   var personalSignals = window.EnglishRadarContent ? window.EnglishRadarContent.getPersonalSignals() : inbox.filter(function (item) { return item && item.status === 'decoded' && item.decodedSignal && item.decodedSignal.id; }).map(function (item) { return Object.assign({}, item.decodedSignal, { sourceType: 'personal', sourceInboxId: item.id }); });
+  function notifyMeReady() { if (typeof document.dispatchEvent === 'function' && typeof Event === 'function') document.dispatchEvent(new Event('english-radar:me-ready')); }
 
   function isValidDate(value) { if (!value) return false; var date = new Date(value); return !isNaN(date.getTime()); }
   function dateOf(value) { return isValidDate(value) ? new Date(value) : null; }
@@ -67,8 +68,8 @@
     var registry = window.EnglishRadarContent; if (!registry) return;
     var core = registry.getCoreSignals(); var imported = registry.getImportedSignals(); var personal = registry.getPersonalSignals(); var custom = storage.getCustomSignals ? storage.getCustomSignals() : { packs: [] };
     [['core', core.length], ['imported', imported.length], ['personal', personal.length], ['packs', Array.isArray(custom.packs) ? custom.packs.length : 0]].forEach(function (item) { var node = document.querySelector('[data-library="' + item[0] + '"]'); if (node) node.textContent = String(item[1]); });
-    var list = document.querySelector('[data-packs-list]'); if (!list) return; list.textContent = '';
-    (Array.isArray(custom.packs) ? custom.packs : []).forEach(function (pack) { var row = document.createElement('div'); row.className = 'pack-row'; var copy = document.createElement('div'); appendText(copy, 'strong', libraryText(pack.name || pack.id)); appendText(copy, 'span', libraryText(pack.description || '') + ' · ' + (Array.isArray(pack.signalIds) ? pack.signalIds.length : 0) + ' Signals'); var button = document.createElement('button'); button.type = 'button'; button.textContent = 'Remove'; button.dataset.removePack = pack.id; button.addEventListener('click', function () { if (button.dataset.confirming === 'yes') { removePack(pack.id); return; } button.dataset.confirming = 'yes'; button.textContent = 'Confirm remove'; libraryFeedback('Remove this pack? Learning records will remain.'); }); row.appendChild(copy); row.appendChild(button); list.appendChild(row); });
+    var list = document.querySelector('[data-packs-list]'); if (!list) { notifyMeReady(); return; } list.textContent = '';
+    (Array.isArray(custom.packs) ? custom.packs : []).forEach(function (pack) { var row = document.createElement('div'); row.className = 'pack-row'; var copy = document.createElement('div'); appendText(copy, 'strong', libraryText(pack.name || pack.id)); appendText(copy, 'span', libraryText(pack.description || '') + ' · ' + (Array.isArray(pack.signalIds) ? pack.signalIds.length : 0) + ' Signals'); var button = document.createElement('button'); button.type = 'button'; button.textContent = 'Remove'; button.dataset.removePack = pack.id; button.addEventListener('click', function () { if (button.dataset.confirming === 'yes') { removePack(pack.id); return; } button.dataset.confirming = 'yes'; button.textContent = 'Confirm remove'; libraryFeedback('Remove this pack? Learning records will remain.'); }); row.appendChild(copy); row.appendChild(button); list.appendChild(row); }); notifyMeReady();
   }
   function libraryFeedback(message) { set('[data-library-feedback]', message); }
   function bundledPack() { return window.ENGLISH_RADAR_BUNDLED_PACK && window.ENGLISH_RADAR_BUNDLED_PACK.app === 'English Radar Content Pack' ? window.ENGLISH_RADAR_BUNDLED_PACK : null; }
@@ -119,5 +120,6 @@
   }
   function initializeReset() { var open = document.querySelector('[data-reset-open]'); var confirmArea = document.querySelector('[data-reset-confirm]'); var cancel = document.querySelector('[data-reset-cancel]'); var action = document.querySelector('[data-reset-confirm-action]'); if (open && confirmArea) open.addEventListener('click', function () { open.hidden = true; confirmArea.hidden = false; }); if (cancel && open && confirmArea) cancel.addEventListener('click', function () { open.hidden = false; confirmArea.hidden = true; }); if (action && storage) action.addEventListener('click', function () { if (storage.clearAll()) { confirmArea.hidden = true; document.querySelector('[data-return-today]').hidden = false; showBackup('Local learning data has been reset.'); } else showBackup('Local learning data could not be reset.'); }); }
   if (window.EnglishRadarPerformanceDebug) window.EnglishRadarPerformanceDebug.measure('me.render', renderAll); else renderAll(); initializePreferences(); initializeBackup(); initializeReset(); initializeContentLibrary(); initializeNotionSync();
+  notifyMeReady();
 }());
 
