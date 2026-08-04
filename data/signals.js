@@ -154,3 +154,14 @@ window.ENGLISH_RADAR_SIGNALS = window.ENGLISH_RADAR_SIGNALS.concat([
   { id:'sports-clutch', term:'clutch', displayTerm:'CLUTCH', speechText:'clutch', pronunciation:'/klʌtʃ/', category:'Sports / Everyday', platforms:['Sports','Gaming','Casual chat'], tone:['Excited','Approving','Casual'], status:'Established', formality:'Informal', meaningEn:'Describes a successful action performed under pressure at an important moment.', meaningZh:'关键时刻顶住压力、发挥关键作用', exampleEn:'That save was clutch in the final minute.', exampleZh:'最后一分钟的那次扑救太关键了。', useWhen:'Praising a timely, pressure-filled success.', avoidWhen:'Calling any ordinary successful action clutch without a high-pressure context.', chineseFeeling:'重点是“关键时刻救场”。' },
   { id:'sports-upset', term:'upset', displayTerm:'UPSET', speechText:'upset', pronunciation:'/ʌpˈsɛt/', category:'Sports / Everyday', platforms:['Sports','News chat','Casual chat'], tone:['Surprised','Dramatic','Neutral'], status:'Established', formality:'Informal', meaningEn:'A surprising victory by an underdog over an expected stronger competitor.', meaningZh:'弱势方爆冷击败强者', exampleEn:'The lower-ranked team pulled off an upset in the final.', exampleZh:'排名较低的队伍在决赛中爆冷获胜。', useWhen:'Describing an unexpected competitive result.', avoidWhen:'Using it for a routine win or a non-competitive disagreement.', chineseFeeling:'体育语境里是“爆冷”，不是普通的 upset 情绪。' }
 ]);
+/* Optional bilingual boundary guidance for high-frequency Core Signals. */
+(function () {
+  var boundaries = {
+    based: ['直接表达强烈认可或赞同。', '正式反馈、法律或学术写作中避免使用。'],
+    delulu: ['自嘲地说自己对某个希望有点想得太美。', '谈论真实的精神健康问题，或嘲笑脆弱处境中的他人时避免使用。'],
+    parasocial: ['讨论观众与公众人物之间单向的亲近感。', '把这种关系当作真实互惠关系，或用来贬低他人时避免使用。'],
+    'rent-free': ['开玩笑地说某人、某事一直占据脑海。', '严肃心理健康讨论或正式沟通中避免使用。'],
+    'this is sending me': ['对好笑或荒谬的内容做夸张反应。', '需要准确描述严肃情绪时避免使用。']
+  };
+  window.ENGLISH_RADAR_SIGNALS.forEach(function (signal) { var pair = boundaries[signal.term]; if (pair) { signal.useWhenZh = signal.useWhenZh || pair[0]; signal.avoidWhenZh = signal.avoidWhenZh || pair[1]; } });
+}());

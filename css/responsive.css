@@ -54,6 +54,7 @@
   .me-hero h1 { font-size: clamp(44px, 13vw, 68px); }
   .me-hero p { font-size: 16px; }
   .me-section { grid-template-columns: 1fr; gap: 14px; padding: 23px 0; }
+  .me-collapsible > .content-library, .me-collapsible > .notion-sync, .me-collapsible > .preferences-form, .me-collapsible > .backup-area { grid-column: 1; }
   .library-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .pack-row { align-items: flex-start; }
   .bundled-pack-heading { flex-direction: column; gap: 8px; }

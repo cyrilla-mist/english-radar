@@ -35,3 +35,6 @@ jobs:
 
       - name: Test Performance Structure
         run: node tests/performance-v1.1.test.js
+
+      - name: Test v1.1.1 bilingual and sync stability
+        run: node tests/v1.1.1-bilingual.test.js
