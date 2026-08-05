@@ -80,7 +80,14 @@ assert.match(read('js/quiz.js'), /getInterfaceQuizzes/);
 assert.match(read('js/dictionary.js'), /UI Vocabulary/);
 assert.match(read('js/learning-engine.js'), /radarType === 'interface'/);
 
-const workerChanges = require('node:child_process').execFileSync('git', ['diff', '--name-only', 'HEAD^1', 'HEAD'], { cwd: root, encoding: 'utf8' });
+const git = require('node:child_process');
+let workerChanges = '';
+try {
+  git.execFileSync('git', ['rev-parse', '--verify', 'HEAD^'], { cwd: root, stdio: 'ignore' });
+  workerChanges = git.execFileSync('git', ['diff', '--name-only', 'HEAD^', 'HEAD'], { cwd: root, encoding: 'utf8' });
+} catch (error) {
+  // Pull-request CI uses a depth-one checkout, so there is no base commit to compare.
+}
 assert.doesNotMatch(workerChanges, /(^|\r?\n)worker\//, 'Worker files must remain unchanged');
 
 console.log('V1.2.1 release readiness checks passed.');
