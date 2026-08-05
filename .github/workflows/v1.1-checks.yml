@@ -66,6 +66,9 @@ jobs:
       - name: Test V1.2 release readiness
         run: node tests/v1.2-release-readiness.test.js
 
+      - name: Test V1.2.1 maintenance hygiene
+        run: node tests/v1.2.1-maintenance.test.js
+
       - name: Install Worker test dependencies
         run: npm ci --prefix worker
 
