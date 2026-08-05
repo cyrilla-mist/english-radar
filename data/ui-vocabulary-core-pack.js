@@ -16,7 +16,7 @@ window.ENGLISH_RADAR_UI_VOCABULARY_PACK = {
       exampleEn: 'Start with today\'s Daily Mix when you want a short learning session.', exampleZh: '想进行一小段学习时，可以从今天的每日精选开始。',
       useWhen: 'Use it for a recurring daily collection that is assembled for the user.', useWhenZh: '用于说明系统每天为用户准备的一组内容。',
       avoidWhen: 'Avoid using it for a permanent library or a one-time random list.', avoidWhenZh: '不要把它用于固定词库或一次性的随机列表。', chineseFeeling: '每日精选 / 今日组合', contentStatus: 'active', quizStatus: 'none', sourceType: 'imported',
-      uiArea: ['today', 'learn'], originalMeaningEn: 'A mixture prepared for a particular day.', originalMeaningZh: '为某一天准备的一组混合内容。',
+      uiArea: ['today', 'learn'], originalMeaningEn: '“Daily” means happening or appearing every day, while “mix” means a combination of different items.', originalMeaningZh: 'daily 表示每天发生或更新，mix 表示由不同内容组合而成。',
       productMeaningEn: 'A small, ready-to-use set of learning Signals selected for today.', productMeaningZh: '产品中为今天准备、可以直接开始学习的一小组 Signal。',
       whyProductsUseItEn: 'It makes a changing set of recommendations feel intentional and easy to start.', whyProductsUseItZh: '这个词让每日变化的推荐内容听起来有选择感，也降低开始使用的门槛。',
       commonInterfaces: ['learning app', 'music app', 'content platform'],
@@ -81,10 +81,10 @@ window.ENGLISH_RADAR_UI_VOCABULARY_PACK = {
       useWhen: 'Use it for a searchable reference collection of language entries.', useWhenZh: '用于表示可搜索的语言词条参考库。',
       avoidWhen: 'Avoid assuming it only contains printed word definitions or single-word translations.', avoidWhenZh: '不要以为它只能收录纸质词典里的单词释义。', chineseFeeling: '可检索的个人词典 / 词汇库', contentStatus: 'active', quizStatus: 'none', sourceType: 'imported',
       uiArea: ['dictionary', 'learn'], originalMeaningEn: 'A reference work that gives meanings and usage information.', originalMeaningZh: '提供词义和用法信息的参考工具。',
-      productMeaningEn: 'English Radar\'s searchable archive of Signals, meanings, sources, and mastery.', productMeaningZh: 'English Radar 中可搜索 Signal、含义、来源和掌握状态的个人词汇库。',
+      productMeaningEn: 'English Radar\'s searchable reference library of Signals, meanings, sources, and mastery.', productMeaningZh: 'English Radar 中可搜索 Signal、含义、来源和掌握状态的个人参考词库。',
       whyProductsUseItEn: 'The familiar name tells users where to return when they want to look something up.', whyProductsUseItZh: '这个熟悉的名称让用户知道去哪里重新查找内容。',
       commonInterfaces: ['learning app', 'translation tool', 'writing tool'],
-      realInterfaceExamples: [{ surface: 'learning app', exampleEn: 'Search expressions, meanings or communities.', exampleZh: '搜索表达、含义或使用圈层。' }],
+      realInterfaceExamples: [{ surface: 'learning app', exampleEn: 'Search expressions or meanings…', exampleZh: '搜索表达或含义。' }],
       relatedTerms: ['ui-archive', 'ui-review'],
       confusedWith: [{ term: 'glossary', differenceEn: 'A glossary is often a focused list for one subject; a Dictionary is usually a broader reference collection.', differenceZh: 'glossary 常是某个主题的术语表；Dictionary 通常是更广的参考词库。' }],
       interfaceTargets: [{ page: 'dictionary', area: 'primary-navigation', label: 'Dictionary' }], usageBoundaryEn: 'Use it for looking up stored language knowledge, not for describing a live learning session.', usageBoundaryZh: '用于查找已保存的语言知识，不是正在进行的学习过程。'
@@ -96,14 +96,14 @@ window.ENGLISH_RADAR_UI_VOCABULARY_PACK = {
       exampleEn: 'Archive an old item when you want to keep it but no longer see it in the main list.', exampleZh: '不想让旧内容出现在主列表、但仍想保留时，可以将它归档。',
       useWhen: 'Use it when content remains available and can be found again later.', useWhenZh: '用于表示内容仍然保留、以后还能找回。',
       avoidWhen: 'Avoid using it when the action permanently removes the content.', avoidWhenZh: '如果内容会被永久删除，就不要使用 archive。', chineseFeeling: '归档，不是删除', contentStatus: 'active', quizStatus: 'none', sourceType: 'imported',
-      uiArea: ['dictionary', 'inbox'], originalMeaningEn: 'A collection or action for storing records for later reference.', originalMeaningZh: '保存记录以便日后查阅的集合或动作。',
+      uiArea: ['me', 'dictionary'], originalMeaningEn: 'A collection or action for storing records for later reference.', originalMeaningZh: '保存记录以便日后查阅的集合或动作。',
       productMeaningEn: 'A quieter place for Signals that should remain available but leave the active workspace.', productMeaningZh: '让 Signal 离开当前工作区、但仍能被保留和查找的安静区域。',
       whyProductsUseItEn: 'It separates decluttering from deletion and gives users a reversible choice.', whyProductsUseItZh: '它把“整理界面”和“删除内容”区分开，给用户可回溯的选择。',
       commonInterfaces: ['email app', 'project tool', 'cloud service'],
       realInterfaceExamples: [{ surface: 'email app', exampleEn: 'Move to Archive', exampleZh: '移至归档' }],
       relatedTerms: ['ui-inbox', 'ui-dictionary'],
       confusedWith: [{ term: 'delete', differenceEn: 'Archive keeps the item for later access; delete usually removes it or moves it toward removal.', differenceZh: 'archive 会保留内容供以后访问；delete 通常会移除内容或使其走向删除。' }],
-      interfaceTargets: [{ page: 'dictionary', area: 'archive-label', label: 'Archive' }], usageBoundaryEn: 'Use it only when the content remains recoverable or searchable.', usageBoundaryZh: '只有内容仍可恢复或搜索时，才使用 archive。'
+      interfaceTargets: [{ page: 'me', area: 'content-library', label: 'Imported Archive' }], usageBoundaryEn: 'Use it only when the content remains recoverable or searchable.', usageBoundaryZh: '只有内容仍可恢复或搜索时，才使用 archive。'
     },
     {
       id: 'ui-sync', term: 'sync', displayTerm: 'SYNC', speechText: 'sync', pronunciation: '/sɪŋk/',
@@ -112,14 +112,14 @@ window.ENGLISH_RADAR_UI_VOCABULARY_PACK = {
       exampleEn: 'Sync approved Signals from the connected content source.', exampleZh: '从已连接的内容来源同步已批准的 Signal。',
       useWhen: 'Use it when information is transferred or reconciled between systems.', useWhenZh: '用于表示信息在多个系统之间传递并保持一致。',
       avoidWhen: 'Avoid treating a one-time export or backup as ongoing synchronization.', avoidWhenZh: '不要把一次性导出或备份误称为持续同步。', chineseFeeling: '同步，让多处保持一致', contentStatus: 'active', quizStatus: 'none', sourceType: 'imported',
-      uiArea: ['inbox', 'today'], originalMeaningEn: 'To happen or operate at the same time or rate.', originalMeaningZh: '以相同时间或节奏发生、运行。',
+      uiArea: ['me', 'inbox'], originalMeaningEn: 'To happen or operate at the same time or rate.', originalMeaningZh: '以相同时间或节奏发生、运行。',
       productMeaningEn: 'A controlled transfer that keeps approved content aligned with another source.', productMeaningZh: '受控地传输内容，让已批准数据与另一个来源保持对齐。',
       whyProductsUseItEn: 'It signals an ongoing relationship between copies or sources rather than a one-off download.', whyProductsUseItZh: '它表达多个副本或来源之间的持续关系，而不是一次性下载。',
       commonInterfaces: ['cloud service', 'calendar app', 'content pipeline'],
       realInterfaceExamples: [{ surface: 'cloud service', exampleEn: 'Last synced 2 minutes ago.', exampleZh: '上次同步于 2 分钟前。' }],
       relatedTerms: ['ui-inbox', 'ui-profile'],
       confusedWith: [{ term: 'backup', differenceEn: 'Sync keeps working copies aligned; a backup is a saved safety copy for recovery.', differenceZh: 'sync 让工作副本保持一致；backup 是用于恢复的安全副本。' }],
-      interfaceTargets: [{ page: 'today', area: 'sync-status', label: 'Sync' }], usageBoundaryEn: 'Use it when at least two sources are being kept aligned; do not use it for a standalone save.', usageBoundaryZh: '至少有两个来源需要保持一致时才使用 sync，不要用于单独保存。'
+      interfaceTargets: [{ page: 'me', area: 'notion-sync', label: 'Notion Sync' }], usageBoundaryEn: 'Use it when at least two sources are being kept aligned; do not use it for a standalone save.', usageBoundaryZh: '至少有两个来源需要保持一致时才使用 sync，不要用于单独保存。'
     },
     {
       id: 'ui-profile', term: 'profile', displayTerm: 'PROFILE', speechText: 'profile', pronunciation: '/ˈproʊfaɪl/',
@@ -128,14 +128,14 @@ window.ENGLISH_RADAR_UI_VOCABULARY_PACK = {
       exampleEn: 'The Signal Profile shows tone, formality, and common contexts.', exampleZh: 'Signal Profile 展示语气、正式程度和常见语境。',
       useWhen: 'Use it for a structured view of traits, preferences, or identity-related information.', useWhenZh: '用于展示特征、偏好或身份相关信息的结构化视图。',
       avoidWhen: 'Avoid using it as a synonym for a password, login, or complete account record.', avoidWhenZh: '不要把 profile 等同于密码、登录动作或完整账户记录。', chineseFeeling: '画像 / 资料概览', contentStatus: 'active', quizStatus: 'none', sourceType: 'imported',
-      uiArea: ['learn', 'today'], originalMeaningEn: 'An outline or description of someone or something.', originalMeaningZh: '某人或某事物的轮廓、简介或描述。',
+      uiArea: ['learn'], originalMeaningEn: 'An outline or description of someone or something.', originalMeaningZh: '某人或某事物的轮廓、简介或描述。',
       productMeaningEn: 'A compact view of how a Signal behaves: tone, formality, status, and context.', productMeaningZh: '用来概览 Signal 的语气、正式程度、状态和语境的区域。',
       whyProductsUseItEn: 'It groups several characteristics into one readable overview instead of a long definition.', whyProductsUseItZh: '它把多个特征放在一个易读概览中，而不是堆成一长段定义。',
       commonInterfaces: ['social app', 'account settings', 'learning app'],
       realInterfaceExamples: [{ surface: 'learning app', exampleEn: 'Signal Profile · Casual · Softened', exampleZh: 'Signal 画像 · 随意 · 缓和' }],
       relatedTerms: ['ui-session', 'ui-review'],
       confusedWith: [{ term: 'account', differenceEn: 'An account identifies access and ownership; a profile describes the person or behavior shown inside a product.', differenceZh: 'account 关乎访问和所有权；profile 描述产品中展示的人或行为特征。' }],
-      interfaceTargets: [{ page: 'learn', area: 'signal-profile', label: 'Profile' }], usageBoundaryEn: 'Use it for a summarized set of characteristics, not for authentication or billing information.', usageBoundaryZh: '用于特征概览，不用于认证或账单信息。'
+      interfaceTargets: [{ page: 'learn', area: 'signal-profile', label: 'Signal Profile' }], usageBoundaryEn: 'Use it for a summarized set of characteristics, not for authentication or billing information.', usageBoundaryZh: '用于特征概览，不用于认证或账单信息。'
     },
     {
       id: 'ui-review', term: 'review', displayTerm: 'REVIEW', speechText: 'review', pronunciation: '/rɪˈvjuː/',
