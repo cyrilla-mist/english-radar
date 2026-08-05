@@ -112,6 +112,7 @@ assert.equal(interfaceRun.document.querySelector('[data-interface-examples]').ch
 assert.equal(interfaceRun.document.querySelector('[data-interface-confused]').children.length, 1);
 assert.equal(interfaceRun.document.querySelector('[data-interface-related]').querySelectorAll('a').length, interfaceSignals[0].relatedTerms.length);
 assert(interfaceRun.document.querySelector('[data-interface-related]').querySelector('a').href.includes('ui-session'));
+assert.equal(interfaceRun.document.querySelector('[data-practice-signal]').hidden, true);
 assert.equal(interfaceRun.document.querySelector('.signal-stamp').textContent, 'UI / 01');
 assert.equal(interfaceRun.document.querySelector('[data-field="category"]').textContent, 'UI VOCABULARY');
 assert(interfaceRun.document.querySelector('[data-speak-example]').dataset.speakExample.includes('Your Daily Mix'));
