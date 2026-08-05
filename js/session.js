@@ -63,7 +63,8 @@
   function stopSpeech() { if (window.EnglishRadarSpeech) window.EnglishRadarSpeech.cancel(); }
   function renderBilingual(signal) { setText(bilingualRefs.platforms, translateProfile(list(signal.platforms), profileZh.platforms)); setText(bilingualRefs.tone, translateProfile(list(signal.tone), profileZh.tone)); setText(bilingualRefs.status, profileZh.status[signal.status] || '暂无标准中文标签'); setText(bilingualRefs.formality, profileZh.formality[signal.formality] || '暂无标准中文标签'); setText(bilingualRefs.useWhen, signal.useWhenZh || missingZh); setText(bilingualRefs.avoidWhen, signal.avoidWhenZh || missingZh); }
   function signalById(id) { return signals.find(function (signal) { return signal.id === id; }); }
-  function hasQuiz(signalId) { return Array.isArray(window.ENGLISH_RADAR_QUIZZES) && window.ENGLISH_RADAR_QUIZZES.some(function (question) { return question && question.signalId === signalId; }); }
+  function quizList() { return window.EnglishRadarQuizRegistry && typeof window.EnglishRadarQuizRegistry.getStaticQuizzes === 'function' ? window.EnglishRadarQuizRegistry.getStaticQuizzes() : (Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : []); }
+  function hasQuiz(signalId) { return quizList().some(function (question) { return question && question.signalId === signalId; }); }
   function categoryCode(category) { return ({ 'Internet Culture': 'IC', 'Product Design': 'PD', GitHub: 'GH', Sports: 'SP', 'UI Vocabulary': 'UI' })[category] || 'ER'; }
   function parseSize(value) { if (value === 'all') return signals.length; if (!/^\d+$/.test(value || '')) return 5; var number = Number(value); return number > 0 ? number : 5; }
   function validIds(ids) { return (Array.isArray(ids) ? ids : []).filter(function (id, index, list) { return signalById(id) && list.indexOf(id) === index; }); }

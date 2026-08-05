@@ -61,7 +61,7 @@ signals.forEach((signal, index) => {
     if (signal.radarType !== 'interface') errors.push(`signals[${index}].radarType must be interface`);
     if (signal.category !== 'UI Vocabulary') errors.push(`signals[${index}].category must be UI Vocabulary`);
     if (signal.contentStatus !== 'active') errors.push(`signals[${index}].contentStatus must be active`);
-    if (signal.quizStatus !== 'none') errors.push(`signals[${index}].quizStatus must be none`);
+    if (!['none', 'ready'].includes(signal.quizStatus)) errors.push(`signals[${index}].quizStatus must be none or ready`);
     if (signal.sourceType !== 'imported') errors.push(`signals[${index}].sourceType must be imported`);
     if (!Array.isArray(signal.uiArea) || !signal.uiArea.every(text)) errors.push(`signals[${index}].uiArea must be a string array`);
     ['commonInterfaces', 'relatedTerms'].forEach((field) => { if (!Array.isArray(signal[field]) || !signal[field].every(text)) errors.push(`signals[${index}].${field} must be a string array`); });

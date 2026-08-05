@@ -28,7 +28,7 @@ pack.signals.forEach((signal) => {
   assert.equal(signal.category, 'UI Vocabulary');
   assert.equal(signal.radarType, 'interface');
   assert.equal(signal.contentStatus, 'active');
-  assert.equal(signal.quizStatus, 'none');
+  assert.equal(signal.quizStatus, 'ready');
   ['id', 'term', 'displayTerm', 'speechText', 'pronunciation', 'category', 'status', 'formality', 'meaningEn', 'meaningZh', 'exampleEn', 'exampleZh', 'useWhen', 'useWhenZh', 'avoidWhen', 'avoidWhenZh', 'chineseFeeling'].forEach((field) => assert(signal[field], `${signal.id} missing ${field}`));
   ['uiArea', 'commonInterfaces', 'relatedTerms', 'realInterfaceExamples', 'confusedWith', 'interfaceTargets'].forEach((field) => assert(Array.isArray(signal[field]), `${signal.id} ${field} must be an array`));
   ['originalMeaningEn', 'originalMeaningZh', 'productMeaningEn', 'productMeaningZh', 'whyProductsUseItEn', 'whyProductsUseItZh', 'usageBoundaryEn', 'usageBoundaryZh'].forEach((field) => assert(signal[field], `${signal.id} missing ${field}`));
