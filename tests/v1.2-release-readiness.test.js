@@ -80,7 +80,7 @@ assert.match(read('js/quiz.js'), /getInterfaceQuizzes/);
 assert.match(read('js/dictionary.js'), /UI Vocabulary/);
 assert.match(read('js/learning-engine.js'), /radarType === 'interface'/);
 
-const workerChanges = require('node:child_process').execFileSync('git', ['diff', '--name-only', 'main...HEAD'], { cwd: root, encoding: 'utf8' });
+const workerChanges = require('node:child_process').execFileSync('git', ['diff', '--name-only', 'HEAD^1', 'HEAD'], { cwd: root, encoding: 'utf8' });
 assert.doesNotMatch(workerChanges, /(^|\r?\n)worker\//, 'Worker files must remain unchanged');
 
 console.log('V1.2.1 release readiness checks passed.');
