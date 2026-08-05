@@ -3,7 +3,7 @@
 
   var registry = window.EnglishRadarContent;
   if (!registry || typeof registry.getImportedSignals !== 'function') return;
-  var signals = registry.getImportedSignals();
+  var signals = registry.getImportedSignals().filter(function (signal) { return signal && signal.radarType !== 'interface'; });
   var placeholders = ['-', '\u2014', '\u2013', 'n/a', 'na', 'none', 'unknown', 'tbd', 'generic placeholder'];
   var pools = { meaning: [], meaningZh: [], useWhen: [], avoidWhen: [] };
   var capabilities = {};

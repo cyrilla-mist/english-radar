@@ -26,7 +26,7 @@
 
     var progressBar = document.querySelector('[data-library-progress-bar]');
     if (progressBar) {
-      progressBar.style.width = (signals.length ? Math.min(100, mastered.length / signals.length * 100) : 0) + '%';
+      progressBar.style.width = (signals.length ? Math.min(100, statistics.mastered / signals.length * 100) : 0) + '%';
     }
   }
 

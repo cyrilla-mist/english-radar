@@ -2,7 +2,9 @@
   'use strict';
 
   var signals = window.EnglishRadarContent ? window.EnglishRadarContent.getActiveLearningSignals() : (Array.isArray(window.ENGLISH_RADAR_SIGNALS) ? window.ENGLISH_RADAR_SIGNALS : []);
-  var rawQuizzes = Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : [];
+  var quizRegistry = window.EnglishRadarQuizRegistry;
+  var rawQuizzes = quizRegistry && typeof quizRegistry.getStaticQuizzes === 'function' ? quizRegistry.getStaticQuizzes() : (Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : []);
+  var interfaceQuizzes = quizRegistry && typeof quizRegistry.getInterfaceQuizzes === 'function' ? quizRegistry.getInterfaceQuizzes() : [];
   var importedGenerator = window.EnglishRadarImportedQuizGenerator;
   var storage = window.EnglishRadarStorage;
   var history = storage && storage.getQuizHistory ? storage.getQuizHistory() : { byQuiz: {}, attempts: [] };
@@ -56,7 +58,7 @@
     if (selected.length < limit) signals.slice().sort(function (a, b) { return text(a.id).localeCompare(text(b.id)); }).forEach(function (signal) { if (selected.length < limit && !selected.some(function (item) { return item.id === signal.id; })) selected.push(signal); });
     return selected;
   }
-  function questionsForSignals(signalList) { var generate = function () { return importedGenerator ? importedGenerator.createForSignals(signalList.filter(function (signal) { return signal.sourceType === 'imported'; })) : []; }; var generated = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.generation', generate) : generate(); return baseQuestions(generated); }
+  function questionsForSignals(signalList) { var generate = function () { return importedGenerator ? importedGenerator.createForSignals(signalList.filter(function (signal) { return signal.sourceType === 'imported' && signal.radarType !== 'interface'; })) : []; }; var generated = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.generation', generate) : generate(); return baseQuestions(generated); }
   function pickUnique(items, count, picked) {
     var selected = picked || [];
     ordered(items).some(function (question) {
@@ -81,13 +83,22 @@
   }
   function getQuestions() {
     var coreQuestions = baseQuestions();
+    if (mode === 'interface') {
+      var interfaceSignals = signals.filter(function (signal) { return signal.radarType === 'interface'; }).sort(function (a, b) { return text(a.id).localeCompare(text(b.id)); }).slice(0, 5);
+      var interfaceIds = {}; interfaceSignals.forEach(function (signal) { interfaceIds[signal.id] = true; });
+      var interfacePool = ordered(interfaceQuizzes.filter(function (question) { return interfaceIds[question.signalId]; }));
+      var selectedInterface = []; var selectedInterfaceIds = {};
+      interfaceSignals.forEach(function (signal) { var question = interfacePool.find(function (item) { return item.signalId === signal.id; }); if (question) { selectedInterface.push(question); selectedInterfaceIds[question.id] = true; } });
+      interfacePool.forEach(function (question) { if (selectedInterface.length < 5 && !selectedInterfaceIds[question.id]) selectedInterface.push(question); });
+      return selectedInterface.slice(0, 5);
+    }
     if (mode === 'mistakes') { var mistakeIds = Object.keys(history.byQuiz || {}).filter(function (id) { return history.byQuiz[id] && history.byQuiz[id].lastAnswerCorrect === false; }).map(function (id) { return history.byQuiz[id].signalId; }).filter(Boolean); var mistakeSignals = signals.filter(function (signal) { return mistakeIds.indexOf(signal.id) !== -1; }); return getMistakeQuestions(questionsForSignals(mistakeSignals)); }
     if (mode === 'signal') { var signalId = params.get('signal'); var signal = signalMap[signalId]; return signal ? ordered(questionsForSignals([signal]).filter(function (question) { return question.signalId === signalId; })).slice(0, 3) : []; }
     var count = mode === 'standard' ? 10 : 5; var targets = mode === 'standard' ? { easy: 3, medium: 4, hard: 3 } : { easy: 2, medium: 2, hard: 1 }; var chooseSignals = function () { return candidateSignals(targets, coreQuestions, count); }; var selectedSignals = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.candidateSignals', chooseSignals) : chooseSignals(); var all = questionsForSignals(selectedSignals); var chooseSession = function () { return chooseBalanced(all, Math.min(count, all.length), targets); }; return window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.sessionSelection', chooseSession) : chooseSession();
   }
   function setText(element, value) { if (element) element.textContent = value === undefined || value === null ? '' : String(value); }
   function typeLabel(type) { return type === 'meaning' ? 'MEANING' : type === 'boundary' ? 'USAGE BOUNDARY' : 'CONTEXT'; }
-  function showEmpty(title, message) { if (refs.panel) refs.panel.hidden = true; if (refs.summary) refs.summary.hidden = true; if (refs.empty) refs.empty.hidden = false; setText(document.querySelector('[data-quiz-empty-title]'), title); setText(document.querySelector('[data-quiz-empty-message]'), message); var quick = document.querySelector('[data-empty-quick]'); if (quick) quick.hidden = mode !== 'mistakes'; }
+  function showEmpty(title, message) { if (refs.panel) refs.panel.hidden = true; if (refs.summary) refs.summary.hidden = true; if (refs.empty) refs.empty.hidden = false; setText(document.querySelector('[data-quiz-empty-title]'), title); setText(document.querySelector('[data-quiz-empty-message]'), message); var quick = document.querySelector('[data-empty-quick]'); if (quick) quick.hidden = mode !== 'mistakes'; if (mode === 'interface') { var emptyMessage = document.querySelector('[data-quiz-empty-message]'); if (emptyMessage) { emptyMessage.textContent = 'Install UI Vocabulary Core to start Interface Check. 安装界面词包后开始界面词检查。'; var link = document.querySelector('[data-interface-install-link]'); if (!link) { link = document.createElement('a'); link.className = 'primary-button'; link.href = './me.html#content-library'; link.setAttribute('data-interface-install-link', ''); link.textContent = 'Install UI Vocabulary Core / 安装界面词包'; emptyMessage.parentNode.appendChild(link); } } } }
   function setModeNavigation() { document.querySelectorAll('.side-nav .nav-item, .mobile-nav a').forEach(function (link) { link.classList.remove('is-active'); }); }
   function updateStatus() { var total = questions.length; setText(refs.progress, 'Question ' + String(questionIndex + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0')); setText(refs.correct, correctCount); if (refs.progressBar) refs.progressBar.style.width = (total ? (questionIndex + 1) / total * 100 : 0) + '%'; }
   function renderOptions(question) {
@@ -127,5 +138,5 @@
   document.addEventListener('keydown', function (event) { if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return; if (/^[1-4]$/.test(event.key) && !checked) { var button = refs.options.querySelectorAll('.quiz-option')[Number(event.key) - 1]; if (button) selectOption(button.dataset.optionId); } else if (event.key === 'Enter') { event.preventDefault(); nextQuestion(); } });
   var retry = document.querySelector('[data-retry-mistakes]'); if (retry) retry.addEventListener('click', retryMistakes);
   setModeNavigation(); questions = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('quiz.initialization', getQuestions) : getQuestions();
-  if (!rawQuizzes.length || !questions.length) showEmpty(mode === 'mistakes' ? 'No context mistakes waiting.' : mode === 'signal' ? 'No context questions for this signal yet.' : 'No quiz questions available.', mode === 'mistakes' ? 'Your recent answers are clear.' : mode === 'signal' ? 'This signal can still be learned and reviewed without a quiz.' : ''); else if (window.EnglishRadarPerformanceDebug) window.EnglishRadarPerformanceDebug.measure('quiz.DOM render', renderQuestion); else renderQuestion();
+  if (!rawQuizzes.length || !questions.length) showEmpty(mode === 'interface' ? 'Interface Check unavailable.' : mode === 'mistakes' ? 'No context mistakes waiting.' : mode === 'signal' ? 'No context questions for this signal yet.' : 'No quiz questions available.', mode === 'mistakes' ? 'Your recent answers are clear.' : mode === 'signal' ? 'This signal can still be learned and reviewed without a quiz.' : ''); else if (window.EnglishRadarPerformanceDebug) window.EnglishRadarPerformanceDebug.measure('quiz.DOM render', renderQuestion); else renderQuestion();
 }());

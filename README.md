@@ -1,14 +1,14 @@
-# English Radar v1.1.1
+# English Radar v1.2.0
 
 English Radar is a local-first learning tool for real internet English. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation and personal mastery rather than a traditional word list.
 
 ## Release status
 
-English Radar v1.1.1 is a stability and bilingual UX patch on `fix/v1.1.1-bilingual-ux-sync`. PR #1 remains Draft and `main` has not been modified or merged.
+English Radar v1.2.0 is the interface-learning release candidate on `feat/v1.2-interface-learning`. PR #3 remains open and is not merged in this branch.
 
 The release includes 60 Core Signals, 120 Core Context Quizzes, 140 Bundled Cyrilla Notion Archive Signals and a manual Notion Continuous Content Pipeline. Additional imported Content Packs remain local to each browser.
 
-## v1.1.1 Learning Engine
+## v1.2.0 Interface Learning
 
 - Daily Mix: five Signals selected from unseen, personal-interest, weak or due, and older learned items
 - Unseen Discovery mode
@@ -25,6 +25,10 @@ The release includes 60 Core Signals, 120 Core Context Quizzes, 140 Bundled Cyri
 - Installed Packs management and local Content Pack import/export
 - Shared Today snapshot for Signals, Progress, Daily Mix and statistics
 - Full-library mobile performance path validated with 796 Active Signals
+- Interface Learning Mode for marked UI vocabulary targets, stored in session-only state
+- Interface-context quiz coverage for the 20 UI Vocabulary questions
+- UI Vocabulary dictionary category and signal templates with graceful fallback for older Signals
+- Release candidate validation for 60 Core Signals, 120 runtime Core Quizzes, 20 UI Quizzes and 140 static quizzes
 
 ## Existing features
 

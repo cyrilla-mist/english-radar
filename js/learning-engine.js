@@ -91,6 +91,9 @@
     return interestCategories.indexOf(text(signal.category)) !== -1;
   }
 
+  function isInterface(signal) { return !!(signal && signal.radarType === 'interface'); }
+  function quizList() { return window.EnglishRadarQuizRegistry && typeof window.EnglishRadarQuizRegistry.getStaticQuizzes === 'function' ? window.EnglishRadarQuizRegistry.getStaticQuizzes() : (Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : []); }
+
   function dueOrWeak(signal, progress, now) {
     var record = progress[signal.id];
     if (!record || !record.firstLearnedAt) return false;
@@ -126,15 +129,19 @@
       if (dueOrWeak(signal, progress, now)) weak.push(signal);
       if (!unseenSignal) learned.push(signal);
     });
+    var interfaceSignals = allSignals.filter(isInterface);
     var selected = [];
     var selectedIds = {};
     function add(signal) { if (signal && !selectedIds[signal.id] && selected.length < 5) { selected.push(signal); selectedIds[signal.id] = true; } }
-    add(pickDeterministic(unseen, selectedIds, 'unseen'));
-    add(pickDeterministic(unseen, selectedIds, 'unseen'));
+    add(pickDeterministic(unseen.filter(function (signal) { return !isInterface(signal); }), selectedIds, 'unseen'));
+    add(pickDeterministic(unseen.filter(function (signal) { return !isInterface(signal); }), selectedIds, 'unseen'));
     add(pickDeterministic(unseenInterest.length ? unseenInterest : interestAny, selectedIds, unseenInterest.length ? 'interest-unseen' : 'interest-any'));
-    add(pickOldest(weak, progress, selectedIds));
-    add(pickOldest(learned, progress, selectedIds));
-    allSignals.forEach(function (signal) { if (selected.length < 5 && !selectedIds[signal.id]) add(signal); });
+    add(pickOldest(weak.filter(function (signal) { return !isInterface(signal); }), progress, selectedIds));
+    add(pickOldest(learned.filter(function (signal) { return !isInterface(signal); }), progress, selectedIds));
+    var interfaceCandidate = pickDeterministic(interfaceSignals.filter(function (signal) { return isUnseen(signal, progress) || dueOrWeak(signal, progress, now); }), selectedIds, 'interface-priority') || pickOldest(interfaceSignals, progress, selectedIds);
+    if (interfaceCandidate) { selected.splice(Math.min(2, selected.length), 0, interfaceCandidate); selectedIds[interfaceCandidate.id] = true; selected = selected.slice(0, 5); }
+    allSignals.forEach(function (signal) { if (selected.length < 5 && !selectedIds[signal.id] && !isInterface(signal)) add(signal); });
+    if (selected.length < 5) allSignals.forEach(function (signal) { if (selected.length < 5 && !selectedIds[signal.id]) add(signal); });
     return unique(selected).slice(0, 5);
   }
 
@@ -152,7 +159,7 @@
   function buildStatistics(signals, progress) {
     var now = new Date();
     var quizIds = {};
-    (Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : []).forEach(function (quiz) { if (quiz && quiz.signalId) quizIds[quiz.signalId] = true; });
+    quizList().forEach(function (quiz) { if (quiz && quiz.signalId) quizIds[quiz.signalId] = true; });
     var learned = 0; var mastered = 0; var due = 0; var todayRecords = 0; var clearToday = 0; var fuzzyToday = 0;
     signals.forEach(function (signal) {
       var record = progress[signal.id];
@@ -162,7 +169,7 @@
       if (review && typeof review.isDue === 'function' && review.isDue(record, now)) due += 1;
       if (review && typeof review.sameLocalDay === 'function' && review.sameLocalDay(review.asDate(record.lastReviewedAt), now)) { todayRecords += 1; if (record.mastery === 'clear') clearToday += 1; if (record.mastery === 'fuzzy' || record.mastery === 'new') fuzzyToday += 1; }
     });
-    var quizReady = signals.filter(function (signal) { return quizIds[signal.id] || signal.quizStatus === 'ready'; }).length;
+    var quizReady = signals.filter(function (signal) { return quizIds[signal.id]; }).length;
     return { learned: learned, mastered: mastered, unseen: signals.length - learned, learning: learned - mastered, due: due, todayRecords: todayRecords, clearToday: clearToday, fuzzyToday: fuzzyToday, quizReady: quizReady, quizSignalIds: quizIds };
   }
 
