@@ -27,6 +27,16 @@
   var refs = {
     title: document.querySelector('title'), meta: document.querySelector('[data-session-meta]'), category: document.querySelector('[data-field="category"]'), progress: document.querySelector('.learn-progress span'), progressTrack: document.querySelector('.learn-progress'), stamp: document.querySelector('.signal-stamp'), term: document.querySelector('.signal-heading h1'), pronunciation: document.querySelector('.pronunciation'), listen: document.querySelector('[data-speak-signal]'), meaningEn: document.querySelector('[data-field="meaningEn"]'), meaningZh: document.querySelector('[data-field="meaningZh"]'), exampleEn: document.querySelector('[data-field="exampleEn"]'), exampleZh: document.querySelector('[data-field="exampleZh"]'), platforms: document.querySelector('[data-field="platforms"]'), tone: document.querySelector('[data-field="tone"]'), status: document.querySelector('[data-field="status"]'), formality: document.querySelector('[data-field="formality"]'), useWhen: document.querySelector('[data-field="useWhen"]'), avoidWhen: document.querySelector('[data-field="avoidWhen"]'), chineseFeeling: document.querySelector('[data-field="chineseFeeling"]'), feedbacks: document.querySelectorAll('[data-session-feedback]'), exampleListen: document.querySelector('[data-speak-example]'), previous: document.querySelector('[data-session-previous]'), skip: document.querySelector('[data-session-skip]'), favorite: document.querySelector('[data-signal-favorite]'), practice: document.querySelector('[data-practice-signal]'), backLink: document.querySelector('[data-back-link]'), backLabel: document.querySelector('[data-back-label]'), summaryKicker: document.querySelector('[data-summary-kicker]'), emptyTitle: document.querySelector('[data-empty-title]'), emptyMessage: document.querySelector('[data-empty-message]'), sessionQuiz: document.querySelector('[data-session-quiz]'), reviewMistakesEmpty: document.querySelector('[data-review-mistakes-empty]'), reviewMistakesSummary: document.querySelector('[data-review-mistakes-summary]')
   };
+  var standardSignalSection = document.querySelector('[data-standard-signal-section]');
+  var interfaceSignalSection = document.querySelector('[data-interface-signal-section]');
+  var interfaceFields = {};
+  document.querySelectorAll('[data-interface-field]').forEach(function (element) { interfaceFields[element.getAttribute('data-interface-field')] = element; });
+  var interfaceSections = {};
+  document.querySelectorAll('[data-interface-section]').forEach(function (element) { interfaceSections[element.getAttribute('data-interface-section')] = element; });
+  var interfaceList = document.querySelector('[data-interface-list="commonInterfaces"]');
+  var interfaceExamples = document.querySelector('[data-interface-examples]');
+  var interfaceConfused = document.querySelector('[data-interface-confused]');
+  var interfaceRelated = document.querySelector('[data-interface-related]');
 
   var progressRecords = learningEngine && typeof learningEngine.getProgress === 'function' ? learningEngine.getProgress() : (storage ? storage.getProgress() : {});
   var bilingualRefs = { platforms: document.querySelector('[data-profile-zh="platforms"]'), tone: document.querySelector('[data-profile-zh="tone"]'), status: document.querySelector('[data-profile-zh="status"]'), formality: document.querySelector('[data-profile-zh="formality"]'), useWhen: document.querySelector('[data-field="useWhenZh"]'), avoidWhen: document.querySelector('[data-field="avoidWhenZh"]') };
@@ -45,14 +55,16 @@
   if (storage) { var settingsRaw = storage.read(storage.keys.settings, null); if (!settingsRaw || Number(settingsRaw.dataVersion) !== 1 || Number(settingsRaw.contentVersion) !== 1) storage.setSettings(storage.getSettings()); }
 
   function text(value) { return value === undefined || value === null || value === '' ? '—' : String(value); }
+  function displayTerm(value) { return hasText(value) ? String(value).trim().toUpperCase() : ''; }
   function list(value) { return Array.isArray(value) && value.length ? value.join(' · ') : '—'; }
+  function hasText(value) { return typeof value === 'string' && value.trim() && value.trim() !== '—'; }
   function setText(element, value) { if (element) element.textContent = text(value); }
   function setFeedback(value) { refs.feedbacks.forEach(function (element) { element.textContent = value || ''; }); }
   function stopSpeech() { if (window.EnglishRadarSpeech) window.EnglishRadarSpeech.cancel(); }
   function renderBilingual(signal) { setText(bilingualRefs.platforms, translateProfile(list(signal.platforms), profileZh.platforms)); setText(bilingualRefs.tone, translateProfile(list(signal.tone), profileZh.tone)); setText(bilingualRefs.status, profileZh.status[signal.status] || '暂无标准中文标签'); setText(bilingualRefs.formality, profileZh.formality[signal.formality] || '暂无标准中文标签'); setText(bilingualRefs.useWhen, signal.useWhenZh || missingZh); setText(bilingualRefs.avoidWhen, signal.avoidWhenZh || missingZh); }
   function signalById(id) { return signals.find(function (signal) { return signal.id === id; }); }
   function hasQuiz(signalId) { return Array.isArray(window.ENGLISH_RADAR_QUIZZES) && window.ENGLISH_RADAR_QUIZZES.some(function (question) { return question && question.signalId === signalId; }); }
-  function categoryCode(category) { return ({ 'Internet Culture': 'IC', 'Product Design': 'PD', GitHub: 'GH', Sports: 'SP' })[category] || 'ER'; }
+  function categoryCode(category) { return ({ 'Internet Culture': 'IC', 'Product Design': 'PD', GitHub: 'GH', Sports: 'SP', 'UI Vocabulary': 'UI' })[category] || 'ER'; }
   function parseSize(value) { if (value === 'all') return signals.length; if (!/^\d+$/.test(value || '')) return 5; var number = Number(value); return number > 0 ? number : 5; }
   function validIds(ids) { return (Array.isArray(ids) ? ids : []).filter(function (id, index, list) { return signalById(id) && list.indexOf(id) === index; }); }
   function setEmptyCopy(title, message) { if (refs.emptyTitle) refs.emptyTitle.innerHTML = title; setText(refs.emptyMessage, message || ''); }
@@ -82,13 +94,50 @@
     var active = !!(progressRecords[signal.id] && progressRecords[signal.id].favorite === true);
     refs.favorite.textContent = active ? '★ Favorited' : '☆ Favorite'; refs.favorite.classList.toggle('is-favorite', active); refs.favorite.setAttribute('aria-pressed', active ? 'true' : 'false'); refs.favorite.setAttribute('aria-label', active ? 'Remove from favorites' : 'Add to favorites');
   }
+  function isInterfaceSignal(signal) { return !!(signal && signal.radarType === 'interface'); }
+  function clearInterfaceContent() {
+    Object.keys(interfaceFields).forEach(function (key) { interfaceFields[key].textContent = ''; });
+    [interfaceList, interfaceExamples, interfaceConfused, interfaceRelated].forEach(function (element) { if (element) element.textContent = ''; });
+    Object.keys(interfaceSections).forEach(function (key) { interfaceSections[key].hidden = true; });
+  }
+  function setTemplateMode(signal) {
+    var interfaceMode = isInterfaceSignal(signal);
+    if (standardSignalSection) standardSignalSection.hidden = interfaceMode;
+    if (interfaceSignalSection) interfaceSignalSection.hidden = !interfaceMode;
+    if (!interfaceMode) clearInterfaceContent();
+  }
+  function renderInterfacePair(sectionName, enKey, zhKey, signal) {
+    var en = hasText(signal[enKey]) ? signal[enKey].trim() : '';
+    var zh = hasText(signal[zhKey]) ? signal[zhKey].trim() : '';
+    if (interfaceFields[enKey]) interfaceFields[enKey].textContent = en;
+    if (interfaceFields[zhKey]) interfaceFields[zhKey].textContent = zh;
+    if (interfaceSections[sectionName]) interfaceSections[sectionName].hidden = !(en || zh);
+  }
+  function renderInterfaceSignal(signal) {
+    clearInterfaceContent();
+    renderInterfacePair('original', 'originalMeaningEn', 'originalMeaningZh', signal);
+    renderInterfacePair('product', 'productMeaningEn', 'productMeaningZh', signal);
+    renderInterfacePair('why', 'whyProductsUseItEn', 'whyProductsUseItZh', signal);
+    var interfaces = Array.isArray(signal.commonInterfaces) ? signal.commonInterfaces.filter(hasText) : [];
+    if (interfaceList && interfaces.length) { interfaces.forEach(function (item) { var tag = document.createElement('span'); tag.className = 'interface-tag'; tag.textContent = item.trim(); interfaceList.appendChild(tag); }); interfaceSections.where.hidden = false; }
+    var examples = Array.isArray(signal.realInterfaceExamples) ? signal.realInterfaceExamples.filter(function (item) { return item && typeof item === 'object' && hasText(item.surface) && hasText(item.exampleEn) && hasText(item.exampleZh); }) : [];
+    if (interfaceExamples && examples.length) { examples.forEach(function (item) { var example = document.createElement('article'); example.className = 'interface-example'; var surface = document.createElement('span'); surface.className = 'interface-surface'; surface.textContent = item.surface.trim(); var english = document.createElement('blockquote'); english.textContent = '“' + item.exampleEn.trim() + '”'; var chinese = document.createElement('p'); chinese.className = 'zh-text zh-example'; chinese.textContent = item.exampleZh.trim(); example.appendChild(surface); example.appendChild(english); example.appendChild(chinese); interfaceExamples.appendChild(example); }); interfaceSections.examples.hidden = false; }
+    var confusions = Array.isArray(signal.confusedWith) ? signal.confusedWith.filter(function (item) { return item && typeof item === 'object' && hasText(item.term) && hasText(item.differenceEn) && hasText(item.differenceZh); }) : [];
+    if (interfaceConfused && confusions.length) { confusions.forEach(function (item) { var row = document.createElement('article'); row.className = 'interface-confusion'; var term = document.createElement('strong'); term.textContent = displayTerm(signal.term) + ' ≠ ' + displayTerm(item.term); var english = document.createElement('p'); english.textContent = item.differenceEn.trim(); var chinese = document.createElement('p'); chinese.className = 'zh-text zh-meaning'; chinese.textContent = item.differenceZh.trim(); row.appendChild(term); row.appendChild(english); row.appendChild(chinese); interfaceConfused.appendChild(row); }); interfaceSections.confused.hidden = false; }
+    var related = Array.isArray(signal.relatedTerms) ? signal.relatedTerms.map(function (id) { var target = window.EnglishRadarContent && window.EnglishRadarContent.getSignalById ? window.EnglishRadarContent.getSignalById(id) : signalById(id); return target ? { id: id, signal: target } : null; }).filter(Boolean) : [];
+    if (interfaceRelated && related.length) { related.forEach(function (item) { var link = document.createElement('a'); link.href = './learn.html?mode=lookup&signal=' + encodeURIComponent(item.id); link.textContent = displayTerm(item.signal.displayTerm || item.signal.term); interfaceRelated.appendChild(link); }); interfaceSections.related.hidden = false; }
+    renderInterfacePair('boundary', 'usageBoundaryEn', 'usageBoundaryZh', signal);
+  }
+  function renderStandardSignal(signal) {
+    setText(refs.meaningEn, signal.meaningEn); setText(refs.meaningZh, signal.meaningZh); setText(refs.exampleEn, '“' + text(signal.exampleEn) + '”'); setText(refs.exampleZh, signal.exampleZh); setText(refs.platforms, list(signal.platforms)); setText(refs.tone, list(signal.tone)); setText(refs.status, signal.status); setText(refs.formality, signal.formality); setText(refs.useWhen, signal.useWhen); setText(refs.avoidWhen, signal.avoidWhen); setText(refs.chineseFeeling, signal.chineseFeeling); renderBilingual(signal);
+  }
   function renderSignal() {
     var signal = sessionSignals[currentIndex]; if (!signal) return;
-    var position = currentIndex + 1; var total = sessionSignals.length; var displayTerm = text(signal.displayTerm || signal.term).toUpperCase();
-    refs.title.textContent = text(signal.term) + ' — English Radar'; setText(refs.meta, isLookup ? 'DICTIONARY ENTRY' : (mode === 'review' ? 'Review ' : 'SIGNAL ') + String(position).padStart(2, '0') + ' / ' + total); setText(refs.category, isLookup ? signal.category : mode === 'review' ? 'REVIEW' : signal.category);
-    if (refs.progress) refs.progress.style.width = (total ? position / total * 100 : 0) + '%'; if (refs.progressTrack) refs.progressTrack.setAttribute('aria-label', position + ' of ' + total + ' signals'); setText(refs.stamp, (isLookup ? categoryCode(signal.category) : mode === 'review' ? 'REVIEW' : categoryCode(signal.category)) + ' / ' + String(position).padStart(2, '0'));
-    setText(refs.term, displayTerm); refs.term.classList.toggle('is-long', displayTerm.length > 10); setText(refs.pronunciation, signal.pronunciation); setText(refs.meaningEn, signal.meaningEn); setText(refs.meaningZh, signal.meaningZh); setText(refs.exampleEn, '“' + text(signal.exampleEn) + '”'); setText(refs.exampleZh, signal.exampleZh); setText(refs.platforms, list(signal.platforms)); setText(refs.tone, list(signal.tone)); setText(refs.status, signal.status); setText(refs.formality, signal.formality); setText(refs.useWhen, signal.useWhen); setText(refs.avoidWhen, signal.avoidWhen); setText(refs.chineseFeeling, signal.chineseFeeling);
-    renderBilingual(signal); if (refs.listen) { refs.listen.dataset.speak = text(signal.speechText || signal.term); refs.listen.disabled = !!(window.EnglishRadarSpeech && !window.EnglishRadarSpeech.supported); } if (refs.exampleListen) { refs.exampleListen.dataset.speakExample = text(signal.exampleEn); refs.exampleListen.disabled = !!(window.EnglishRadarSpeech && !window.EnglishRadarSpeech.supported); } if (refs.practice) { refs.practice.hidden = !isLookup || signal.sourceType === 'personal' || !hasQuiz(signal.id); refs.practice.href = './quiz.html?mode=signal&signal=' + encodeURIComponent(signal.id); } if (refs.previous) refs.previous.disabled = currentIndex === 0; updateMasteryButtons(signal); updateFavorite(signal); updateSessionObject(); setFeedback(storageFailure ? 'Progress could not be saved in this browser.' : '');
+    var position = currentIndex + 1; var total = sessionSignals.length; var displayTerm = text(signal.displayTerm || signal.term).toUpperCase(); var interfaceMode = isInterfaceSignal(signal);
+    refs.title.textContent = text(signal.term) + ' — English Radar'; setText(refs.meta, isLookup ? 'DICTIONARY ENTRY' : (mode === 'review' ? 'Review ' : 'SIGNAL ') + String(position).padStart(2, '0') + ' / ' + total); setText(refs.category, interfaceMode ? 'UI VOCABULARY' : isLookup ? signal.category : mode === 'review' ? 'REVIEW' : signal.category);
+    if (refs.progress) refs.progress.style.width = (total ? position / total * 100 : 0) + '%'; if (refs.progressTrack) refs.progressTrack.setAttribute('aria-label', position + ' of ' + total + ' signals'); setText(refs.stamp, interfaceMode ? 'UI / ' + String(position).padStart(2, '0') : (isLookup ? categoryCode(signal.category) : mode === 'review' ? 'REVIEW' : categoryCode(signal.category)) + ' / ' + String(position).padStart(2, '0'));
+    setText(refs.term, displayTerm); refs.term.classList.toggle('is-long', displayTerm.length > 10); setText(refs.pronunciation, signal.pronunciation); setTemplateMode(signal); if (interfaceMode) renderInterfaceSignal(signal); else renderStandardSignal(signal);
+    var interfaceExample = interfaceMode && Array.isArray(signal.realInterfaceExamples) ? signal.realInterfaceExamples.find(function (item) { return item && hasText(item.exampleEn); }) : null; if (refs.listen) { refs.listen.dataset.speak = text(signal.speechText || signal.term); refs.listen.disabled = !!(window.EnglishRadarSpeech && !window.EnglishRadarSpeech.supported); } if (refs.exampleListen) { refs.exampleListen.dataset.speakExample = text(interfaceExample ? interfaceExample.exampleEn : signal.exampleEn); refs.exampleListen.disabled = !!(window.EnglishRadarSpeech && !window.EnglishRadarSpeech.supported); } if (refs.practice) { refs.practice.hidden = !isLookup || signal.sourceType === 'personal' || !hasQuiz(signal.id); refs.practice.href = './quiz.html?mode=signal&signal=' + encodeURIComponent(signal.id); } if (refs.previous) refs.previous.disabled = currentIndex === 0; updateMasteryButtons(signal); updateFavorite(signal); updateSessionObject(); setFeedback(storageFailure ? 'Progress could not be saved in this browser.' : '');
   }
   function showSummary() {
     stopSpeech(); if (storage) storage.setCurrentSession(null); document.body.classList.add('session-complete'); detail.hidden = true; summary.hidden = false; setText(refs.summaryKicker, mode === 'review' ? 'REVIEW COMPLETE' : 'SESSION COMPLETE'); if (refs.sessionQuiz) { var quizSignalIds = sessionSignals.filter(function (signal) { return hasQuiz(signal.id); }).map(function (signal) { return signal.id; }); refs.sessionQuiz.hidden = mode !== 'learn' || !quizSignalIds.length; if (quizSignalIds.length) refs.sessionQuiz.href = './quiz.html?mode=session&signals=' + encodeURIComponent(quizSignalIds.join(',')); } if (refs.reviewMistakesSummary) refs.reviewMistakesSummary.hidden = !(storage && storage.getQuizMistakeIds && storage.getQuizMistakeIds().length);
