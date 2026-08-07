@@ -3,9 +3,9 @@
 ## Release context
 
 - Baseline SHA: `8feb2b5a8f2b72e2f135eae0455e26fc4b003f98`
-- Approved integration head: `0d176123a9c5dacefe3c7490868f133c41b03766`
+- Finalization head: `90265f0c2a0c0c62e1db8256d773d9daa512e967`
 - Pack ID: `english-radar-content-pack-03`
-- Pack version: `1.5.0`
+- Pack version: `1.0.0`
 
 ## Audited counts
 

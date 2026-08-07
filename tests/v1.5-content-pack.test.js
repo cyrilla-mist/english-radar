@@ -12,6 +12,9 @@ const pack03 = context.window.ENGLISH_RADAR_CONTENT_PACK_03;
 const pack03Quizzes = context.window.ENGLISH_RADAR_CONTENT_PACK_03_QUIZZES;
 const pack03Ids = new Set(pack03.signals.map((signal) => signal.id));
 assert.equal(pack03.pack.id, 'english-radar-content-pack-03');
+const importReport = read('docs/content-pack-03-import-report.md');
+assert(importReport.includes(`Pack version: \`${pack03.pack.version}\``), 'Import report must identify Pack 03 internal version');
+assert(!importReport.includes('Pack version: `1.5.0`'), 'Import report must not confuse app release and Pack 03 version');
 assert.equal(pack03.pack.name, 'Interface Structure & Overlays');
 assert.equal(pack03.signals.length, 10);
 assert.equal(pack03.signals.filter((signal) => signal.radarType === 'interface').length, 10);
@@ -73,6 +76,6 @@ assert(read('README.md').includes('# English Radar v1.5.0'));
 assert(read('README.md').includes('English Radar v1.5.0 is the current release on `main`.'));
 assert(read('README.md').includes('Content Pack 03 has 10 Signals and 20 quizzes'));
 assert(read('docs/v1.5.0-release-notes.md').includes('Content Pack 03'));
-assert(read('docs/content-pack-03-import-report.md').includes('Static registry: 228'));
+assert(importReport.includes('Static registry: 228'));
 
 console.log('PASS: v1.5 Content Pack 03 metadata, validator, static/interface registry, bundled loading and learning-target boundary checks');
