@@ -16,12 +16,12 @@ try {
   if (/\.js$/i.test(fileName)) {
     const context = { window: {} };
     vm.runInNewContext(source, context, { filename: fileName });
-    payload = context.window.ENGLISH_RADAR_CONTENT_PACK_01 || context.window.ENGLISH_RADAR_CONTENT_PACK_02 || context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK || context.window.ENGLISH_RADAR_BUNDLED_PACK;
-    if (payload && payload.pack && ['english-radar-content-pack-01', 'english-radar-content-pack-02'].includes(payload.pack.id)) {
-      const quizFile = path.join(path.dirname(fileName), payload.pack.id === 'english-radar-content-pack-02' ? 'content-pack-02-quizzes.js' : 'content-pack-01-quizzes.js');
+    payload = context.window.ENGLISH_RADAR_CONTENT_PACK_01 || context.window.ENGLISH_RADAR_CONTENT_PACK_02 || context.window.ENGLISH_RADAR_CONTENT_PACK_03 || context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK || context.window.ENGLISH_RADAR_BUNDLED_PACK;
+    if (payload && payload.pack && ['english-radar-content-pack-01', 'english-radar-content-pack-02', 'english-radar-content-pack-03'].includes(payload.pack.id)) {
+      const quizFile = path.join(path.dirname(fileName), payload.pack.id === 'english-radar-content-pack-02' ? 'content-pack-02-quizzes.js' : payload.pack.id === 'english-radar-content-pack-03' ? 'content-pack-03-quizzes.js' : 'content-pack-01-quizzes.js');
       const quizContext = { window: {} };
       vm.runInNewContext(fs.readFileSync(quizFile, 'utf8'), quizContext, { filename: quizFile });
-      quizzes = payload.pack.id === 'english-radar-content-pack-02' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_02_QUIZZES || []) : (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES || []);
+      quizzes = payload.pack.id === 'english-radar-content-pack-02' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_02_QUIZZES || []) : payload.pack.id === 'english-radar-content-pack-03' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_03_QUIZZES || []) : (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES || []);
     }
   } else payload = JSON.parse(source);
 } catch (error) {
@@ -44,6 +44,7 @@ const terms = new Set();
 const isInterfacePack = payload && payload.pack && payload.pack.id === 'english-radar-ui-vocabulary-core';
 const isContentPack01 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-01';
 const isContentPack02 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-02';
+const isContentPack03 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-03';
 const interfaceRequired = ['uiArea', 'originalMeaningEn', 'originalMeaningZh', 'productMeaningEn', 'productMeaningZh', 'whyProductsUseItEn', 'whyProductsUseItZh', 'commonInterfaces', 'realInterfaceExamples', 'relatedTerms', 'confusedWith', 'interfaceTargets', 'usageBoundaryEn', 'usageBoundaryZh'];
 
 signals.forEach((signal, index) => {
@@ -135,5 +136,32 @@ if (isContentPack02) {
   signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
 }
 
+if (isContentPack03) {
+  if (signals.length !== 10) errors.push(`Content Pack 03 must contain exactly 10 Signals, found ${signals.length}`);
+  if (signals.filter((signal) => signal.radarType === 'interface').length !== 10) errors.push('Content Pack 03 must contain exactly 10 Interface Signals');
+  if (signals.filter((signal) => signal.category === 'UI Vocabulary').length !== 10) errors.push('Content Pack 03 must contain exactly 10 UI Vocabulary Signals');
+  if (signals.filter((signal) => /^ui-[a-z0-9-]+$/.test(signal.id)).length !== 10) errors.push('Content Pack 03 Signal IDs must use the ui- prefix');
+  if (signals.filter((signal) => text(signal.sourceName) && text(signal.sourceUrl) && text(signal.editorialSourceType) && text(signal.auditedAt)).length !== 10) errors.push('Content Pack 03 Signals must include complete source metadata');
+  interfaceRequired.forEach((field) => { if (signals.some((signal) => !complete(signal[field]))) errors.push(`Content Pack 03 interface field ${field} is incomplete`); });
+  if (quizzes.length !== 20) errors.push(`Content Pack 03 must contain exactly 20 quizzes, found ${quizzes.length}`);
+  const quizIds = new Set(); const counts = new Map();
+  quizzes.forEach((quiz, index) => {
+    if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
+    if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
+    if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`); quizIds.add(quiz.id);
+    if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
+    counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
+    if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
+    else {
+      const optionIds = new Set(); quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
+      if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
+      if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
+    }
+    ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
+    ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
+  });
+  signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
+}
+
 if (errors.length) { console.error(`Content pack validation failed with ${errors.length} error(s):`); errors.forEach((error) => console.error(`- ${error}`)); process.exit(1); }
-console.log(`Content pack valid: ${payload.pack.id} · ${signals.length} Signals${isContentPack01 || isContentPack02 ? ` · ${quizzes.length} Quizzes` : ''}`);
+console.log(`Content pack valid: ${payload.pack.id} · ${signals.length} Signals${isContentPack01 || isContentPack02 || isContentPack03 ? ` · ${quizzes.length} Quizzes` : ''}`);
