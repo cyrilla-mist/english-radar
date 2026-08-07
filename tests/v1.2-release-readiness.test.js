@@ -12,7 +12,7 @@ const mainPages = pages.slice(0, 6);
 
 for (const page of pages) {
   const html = read(page);
-  assert.match(html, /v1\.4\.0/i, `${page} should expose v1.4.0`);
+  assert.match(html, /v1\.5\.0/i, `${page} should expose v1.5.0`);
   assert.doesNotMatch(html, /v1\.2\.1/i, `${page} should not expose the previous release version`);
   assert.doesNotMatch(html, /v1\.2\.0|v1\.1\.1/i, `${page} should not expose an older release version`);
   assert.match(html, /components\.css\?v=1\.3\.0/);
@@ -31,16 +31,16 @@ assert.match(read('index.html'), /dashboard\.js\?v=1\.3\.0/);
 assert.match(read('learn.html'), /learning-engine\.js\?v=1\.3\.0/);
 assert.match(read('learn.html'), /session\.js\?v=1\.3\.0/);
 assert.match(read('dictionary.html'), /dictionary\.js\?v=1\.3\.0/);
-assert.match(read('quiz.html'), /quiz-registry\.js\?v=1\.4\.0/);
+assert.match(read('quiz.html'), /quiz-registry\.js\?v=1\.5\.0/);
 assert.match(read('quiz.html'), /quiz\.js\?v=1\.3\.0/);
-assert.match(read('me.html'), /me\.js\?v=1\.4\.0/);
+assert.match(read('me.html'), /me\.js\?v=1\.5\.0/);
 for (const page of mainPages) {
   const html = read(page);
-  if (html.includes('page-footer')) assert.match(html, /ENGLISH RADAR \/ V1\.4\.0/);
+  if (html.includes('page-footer')) assert.match(html, /ENGLISH RADAR \/ V1\.5\.0/);
 }
 
 const readme = read('README.md');
-assert.match(readme, /English Radar v1\.4\.0 is the current release on `main`/);
+assert.match(readme, /English Radar v1\.5\.0 is the current release on `main`/);
 assert.doesNotMatch(readme, /PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
 assert.ok(fs.existsSync(path.join(root, 'docs/v1.2.1-release-notes.md')));
 assert.ok(fs.existsSync(path.join(root, 'docs/production-release-checklist.md')));

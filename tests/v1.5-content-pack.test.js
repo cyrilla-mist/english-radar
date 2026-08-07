@@ -53,11 +53,26 @@ for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html',
   const html = read(page);
   assert(html.includes('./data/content-pack-03.js?v=1.5.0'), `${page} should load Pack 03`);
   assert(html.indexOf('./data/content-pack-03.js?v=1.5.0') < html.indexOf('./js/content-registry.js'), `${page} Pack 03 must load before registry`);
+  assert(!html.includes('./js/me.js?v=1.4.0'), `${page} must not use stale me.js cache key`);
+  assert(!html.includes('./js/quiz-registry.js?v=1.4.0'), `${page} must not use stale Quiz Registry cache key`);
+  assert(html.includes('./data/content-pack-02.js?v=1.4.0'), `${page} must preserve Pack 02 asset identity`);
+  assert(html.includes('./data/content-pack-01.js?v=1.3.0'), `${page} must preserve Pack 01 asset identity`);
 }
 for (const page of ['index.html', 'learn.html', 'quiz.html']) {
   const html = read(page);
   assert(html.includes('./data/content-pack-03-quizzes.js?v=1.5.0'), `${page} should load Pack 03 quizzes`);
   assert(html.indexOf('./data/content-pack-03-quizzes.js?v=1.5.0') < html.indexOf('./js/quiz-registry.js'), `${page} Pack 03 quizzes must load before registry`);
 }
+
+for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
+  const html = read(page);
+  assert(html.includes(page === '404.html' ? 'English Radar v1.5.0' : 'English Radar v1.5.0'), `${page} should expose V1.5.0 metadata`);
+  if (html.includes('page-footer')) assert(html.includes('ENGLISH RADAR / V1.5.0'), `${page} footer should expose V1.5.0`);
+}
+assert(read('README.md').includes('# English Radar v1.5.0'));
+assert(read('README.md').includes('English Radar v1.5.0 is the current release on `main`.'));
+assert(read('README.md').includes('Content Pack 03 has 10 Signals and 20 quizzes'));
+assert(read('docs/v1.5.0-release-notes.md').includes('Content Pack 03'));
+assert(read('docs/content-pack-03-import-report.md').includes('Static registry: 228'));
 
 console.log('PASS: v1.5 Content Pack 03 metadata, validator, static/interface registry, bundled loading and learning-target boundary checks');
