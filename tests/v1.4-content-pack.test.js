@@ -89,16 +89,16 @@ for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html',
   assert(!html.includes('./js/quiz-registry.js?v=1.3.0'), `${page} must not use stale quiz registry cache key`);
   assert(!html.includes('./js/me.js?v=1.3.0'), `${page} must not use stale me.js cache key`);
   assert(!/English Radar v1\.3\.0|ENGLISH RADAR \/ V1\.3\.0|>V1\.3\.0</.test(html), `${page} must not expose stale current release metadata`);
-  assert(/English Radar v1\.4\.0|ENGLISH RADAR \/ V1\.4\.0|>V1\.4\.0</.test(html), `${page} must expose V1.4.0 metadata`);
+  assert(/English Radar v1\.5\.0|ENGLISH RADAR \/ V1\.5\.0|>V1\.5\.0</.test(html), `${page} must expose V1.5.0 metadata`);
 }
-assert(/English Radar v1\.4\.0/.test(read('404.html')));
+assert(/English Radar v1\.5\.0/.test(read('404.html')));
 for (const page of ['index.html', 'learn.html', 'quiz.html']) {
   const html = read(page);
   assert(html.includes('./data/content-pack-02-quizzes.js?v=1.4.0'), `${page} should load Pack 02 quizzes`);
   assert(html.indexOf('./data/content-pack-02-quizzes.js?v=1.4.0') < html.indexOf('./js/quiz-registry.js'), `${page} Pack 02 quizzes must load before registry`);
 }
-for (const page of ['index.html', 'learn.html', 'quiz.html']) assert(read(page).includes('./js/quiz-registry.js?v=1.4.0'), `${page} should use v1.4.0 quiz registry cache key`);
-assert(read('me.html').includes('./js/me.js?v=1.4.0'));
+for (const page of ['index.html', 'learn.html', 'quiz.html']) assert(read(page).includes('./js/quiz-registry.js?v=1.5.0'), `${page} should use v1.5.0 quiz registry cache key`);
+assert(read('me.html').includes('./js/me.js?v=1.5.0'));
 assert(read('index.html').includes('./data/content-pack-01.js?v=1.3.0'), 'Pack 01 asset version may retain its own v1.3.0 identity');
 const releaseNotes = read('docs/v1.4.0-release-notes.md');
 ['English Radar v1.4.0 — AI Foundations', '10 audited AI Builder Signals', '20 dedicated quizzes', 'Interface Check', 'Content Pack 01 and Content Pack 02', 'Progress and Quiz History', 'LocalStorage key or schema migration', 'Worker deployment', 'Notion API change', 'Existing Core, UI Core, and Content Pack 01 content'].forEach((phrase) => assert(releaseNotes.includes(phrase), `release notes should include ${phrase}`));
