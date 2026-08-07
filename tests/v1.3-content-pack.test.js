@@ -73,12 +73,16 @@ assert.equal(progress['ui-dashboard'].mastery, 'clear');
 const meSource = read('js/me.js');
 assert(meSource.includes("bundledSourceLabel(payload)"));
 assert(meSource.includes("English Radar audited content"));
+assert.match(meSource, /document\.querySelector\('\[data-bundled-pack\]\[data-pack-id="/);
+assert(!meSource.includes('var card = cards[index]'));
+const meHtml = read('me.html');
+assert.match(meHtml, /data-pack-id="cyrilla-notion-archive-v1"/);
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
   const html = read(page);
   assert.match(html, /v1\.3\.0/i, `${page} should expose V1.3.0`);
   assert.doesNotMatch(html, /v1\.2\.1/i, `${page} should not expose stale V1.2.1 metadata`);
 }
-assert.match(read('me.html'), /me\.js\?v=1\.3\.0/);
+assert.match(meHtml, /me\.js\?v=1\.3\.0/);
 assert.match(read('quiz.html'), /quiz-registry\.js\?v=1\.3\.0/);
 assert(fs.existsSync(path.join(root, 'docs/v1.3.0-release-notes.md')));
 
