@@ -10,14 +10,14 @@ const pageFiles = ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 
 
 for (const file of pageFiles) {
   const html = read(file);
-  assert.match(html, /v1\.2\.1/i, `${file} should expose V1.2.1`);
-  assert.doesNotMatch(html, /v1\.2\.0|v1\.1\.1/i, `${file} contains stale user-visible version text`);
+  assert.match(html, /v1\.3\.0/i, `${file} should expose V1.3.0`);
+  assert.doesNotMatch(html, /v1\.2\.1|v1\.2\.0|v1\.1\.1/i, `${file} contains stale user-visible version text`);
 }
 
 const mainHtml = pageFiles.slice(0, 6).map(read).join('\n');
-assert.equal((mainHtml.match(/ENGLISH RADAR \/ V1\.2\.1/g) || []).length, 4);
+assert.equal((mainHtml.match(/ENGLISH RADAR \/ V1\.3\.0/g) || []).length, 4);
 const readme = read('README.md');
-assert.match(readme, /current maintenance release on `main`/);
+assert.match(readme, /current release on `main`/);
 assert.doesNotMatch(readme, /release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
 
 const workflow = read('.github/workflows/v1.1-checks.yml');

@@ -70,4 +70,16 @@ assert.equal(Object.keys(custom.signals).length, 12);
 assert.equal(content.getActiveLearningSignals().length, 72);
 assert.equal(progress['ui-dashboard'].mastery, 'clear');
 
+const meSource = read('js/me.js');
+assert(meSource.includes("bundledSourceLabel(payload)"));
+assert(meSource.includes("English Radar audited content"));
+for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
+  const html = read(page);
+  assert.match(html, /v1\.3\.0/i, `${page} should expose V1.3.0`);
+  assert.doesNotMatch(html, /v1\.2\.1/i, `${page} should not expose stale V1.2.1 metadata`);
+}
+assert.match(read('me.html'), /me\.js\?v=1\.3\.0/);
+assert.match(read('quiz.html'), /quiz-registry\.js\?v=1\.3\.0/);
+assert(fs.existsSync(path.join(root, 'docs/v1.3.0-release-notes.md')));
+
 console.log('PASS: v1.3 Content Pack 01 metadata, registry, activation, reinstall, partial install and removal');
