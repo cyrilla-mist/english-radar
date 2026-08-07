@@ -16,12 +16,12 @@ try {
   if (/\.js$/i.test(fileName)) {
     const context = { window: {} };
     vm.runInNewContext(source, context, { filename: fileName });
-    payload = context.window.ENGLISH_RADAR_CONTENT_PACK_01 || context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK || context.window.ENGLISH_RADAR_BUNDLED_PACK;
-    if (payload && payload.pack && payload.pack.id === 'english-radar-content-pack-01') {
-      const quizFile = path.join(path.dirname(fileName), 'content-pack-01-quizzes.js');
+    payload = context.window.ENGLISH_RADAR_CONTENT_PACK_01 || context.window.ENGLISH_RADAR_CONTENT_PACK_02 || context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK || context.window.ENGLISH_RADAR_BUNDLED_PACK;
+    if (payload && payload.pack && ['english-radar-content-pack-01', 'english-radar-content-pack-02'].includes(payload.pack.id)) {
+      const quizFile = path.join(path.dirname(fileName), payload.pack.id === 'english-radar-content-pack-02' ? 'content-pack-02-quizzes.js' : 'content-pack-01-quizzes.js');
       const quizContext = { window: {} };
       vm.runInNewContext(fs.readFileSync(quizFile, 'utf8'), quizContext, { filename: quizFile });
-      quizzes = quizContext.window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES || [];
+      quizzes = payload.pack.id === 'english-radar-content-pack-02' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_02_QUIZZES || []) : (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES || []);
     }
   } else payload = JSON.parse(source);
 } catch (error) {
@@ -43,6 +43,7 @@ const ids = new Set();
 const terms = new Set();
 const isInterfacePack = payload && payload.pack && payload.pack.id === 'english-radar-ui-vocabulary-core';
 const isContentPack01 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-01';
+const isContentPack02 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-02';
 const interfaceRequired = ['uiArea', 'originalMeaningEn', 'originalMeaningZh', 'productMeaningEn', 'productMeaningZh', 'whyProductsUseItEn', 'whyProductsUseItZh', 'commonInterfaces', 'realInterfaceExamples', 'relatedTerms', 'confusedWith', 'interfaceTargets', 'usageBoundaryEn', 'usageBoundaryZh'];
 
 signals.forEach((signal, index) => {
@@ -67,6 +68,12 @@ signals.forEach((signal, index) => {
       if (!/^builder-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the builder- prefix`);
       if (signal.radarType === 'interface') errors.push(`signals[${index}] Builder Signals must not use radarType interface`);
     }
+  }
+  if (isContentPack02) {
+    ['sourceName', 'sourceUrl', 'editorialSourceType', 'auditedAt'].forEach((field) => { if (!text(signal[field])) errors.push(`signals[${index}].${field} is required`); });
+    if (!/^ai-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the ai- prefix`);
+    if (signal.category !== 'AI Builder') errors.push(`signals[${index}].category must be AI Builder`);
+    if (signal.radarType === 'interface') errors.push(`signals[${index}] must not use radarType interface`);
   }
   if (isInterfacePack) {
     ['displayTerm', 'speechText', 'pronunciation', 'status', 'formality', 'meaningEn', 'exampleZh', 'useWhen', 'useWhenZh', 'avoidWhen', 'avoidWhenZh', 'chineseFeeling', 'contentStatus', 'quizStatus', 'sourceType'].forEach((field) => { if (!text(signal[field])) errors.push(`signals[${index}].${field} is required for UI Vocabulary`); });
@@ -105,5 +112,28 @@ if (isContentPack01) {
   signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
 }
 
+if (isContentPack02) {
+  if (signals.length !== 10) errors.push(`Content Pack 02 must contain exactly 10 Signals, found ${signals.length}`);
+  if (signals.filter((signal) => signal.radarType === 'interface').length !== 0) errors.push('Content Pack 02 must contain zero Interface Signals');
+  if (quizzes.length !== 20) errors.push(`Content Pack 02 must contain exactly 20 quizzes, found ${quizzes.length}`);
+  const quizIds = new Set(); const counts = new Map();
+  quizzes.forEach((quiz, index) => {
+    if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
+    if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
+    if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`); quizIds.add(quiz.id);
+    if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
+    counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
+    if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
+    else {
+      const optionIds = new Set(); quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
+      if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
+      if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
+    }
+    ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
+    ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
+  });
+  signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
+}
+
 if (errors.length) { console.error(`Content pack validation failed with ${errors.length} error(s):`); errors.forEach((error) => console.error(`- ${error}`)); process.exit(1); }
-console.log(`Content pack valid: ${payload.pack.id} · ${signals.length} Signals${isContentPack01 ? ` · ${quizzes.length} Quizzes` : ''}`);
+console.log(`Content pack valid: ${payload.pack.id} · ${signals.length} Signals${isContentPack01 || isContentPack02 ? ` · ${quizzes.length} Quizzes` : ''}`);
