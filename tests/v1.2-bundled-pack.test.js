@@ -43,7 +43,7 @@ assert.equal(custom.packs[0].id, cyrilla.pack.id);
 assert.equal(progress['ui-daily-mix'].mastery, 'clear');
 
 const meSource = read('js/me.js');
-assert(meSource.includes('ENGLISH_RADAR_BUNDLED_PACK, window.ENGLISH_RADAR_UI_VOCABULARY_PACK'));
+assert(meSource.includes('EnglishRadarBundledPackRegistry'));
 assert(meSource.includes("bundledInstallLabel(payload)"));
 assert(meSource.includes("state.installed ? 'Install missing signals'"));
 assert(meSource.includes("library.querySelector('[data-pack-id=\"' + payload.pack.id + '\"]')"));

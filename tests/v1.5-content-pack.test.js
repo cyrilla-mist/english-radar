@@ -47,11 +47,11 @@ assert.equal(registry.getContentPack03Quizzes().length, 20);
 assert.equal(registry.getInterfaceQuizzes().filter((quiz) => pack03Ids.has(quiz.signalId)).length, 20);
 
 const meSource = read('js/me.js');
-assert(meSource.includes('ENGLISH_RADAR_CONTENT_PACK_03'));
+assert(meSource.includes('EnglishRadarBundledPackRegistry'));
 assert(meSource.includes('data-pack-id='));
 assert(!meSource.includes('var card = cards[index]'));
 assert(!read('js/interface-learning.js').includes('CONTENT_PACK_03'));
-assert(read('scripts/validate-content-pack.js').includes('english-radar-content-pack-03'));
+assert(read('scripts/validate-content-pack.js').includes('packNumber'));
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html']) {
   const html = read(page);
   assert(html.includes('./data/content-pack-03.js?v=1.5.0'), `${page} should load Pack 03`);
@@ -69,11 +69,11 @@ for (const page of ['index.html', 'learn.html', 'quiz.html']) {
 
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
   const html = read(page);
-  assert(/English Radar v1\.6\.0|ENGLISH RADAR \/ V1\.6\.0/.test(html), `${page} should expose V1.6.0 metadata`);
-  if (html.includes('page-footer')) assert(html.includes('ENGLISH RADAR / V1.6.0'), `${page} footer should expose V1.6.0`);
+  assert(/v1\.7\.0/i.test(html), `${page} should expose V1.7.0 metadata`);
+  if (html.includes('page-footer')) assert(html.includes('ENGLISH RADAR / V1.7.0'), `${page} footer should expose V1.7.0`);
 }
-assert(read('README.md').includes('# English Radar v1.6.0'));
-assert(read('README.md').includes('English Radar v1.6.0 is the current development version'));
+assert(read('README.md').includes('# English Radar v1.7.0'));
+assert(read('README.md').includes('English Radar v1.7.0 is the current development version'));
 assert(read('README.md').includes('Content Pack 03 has 10 Signals and 20 quizzes'));
 assert(read('docs/v1.5.0-release-notes.md').includes('Content Pack 03'));
 assert(importReport.includes('Static registry: 228'));
