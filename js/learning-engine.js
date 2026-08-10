@@ -27,6 +27,7 @@
     'AI Builder English',
     'Builder English',
     'Product Design English',
+    'Community Discourse',
     'Discord & Reddit English',
     'Meme English'
   ];

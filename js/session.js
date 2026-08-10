@@ -37,6 +37,13 @@
   var interfaceExamples = document.querySelector('[data-interface-examples]');
   var interfaceConfused = document.querySelector('[data-interface-confused]');
   var interfaceRelated = document.querySelector('[data-interface-related]');
+  var richSignalSection = document.querySelector('[data-rich-signal-section]');
+  var richFields = {};
+  document.querySelectorAll('[data-rich-field]').forEach(function (element) { richFields[element.getAttribute('data-rich-field')] = element; });
+  var richSections = {};
+  document.querySelectorAll('[data-rich-section]').forEach(function (element) { richSections[element.getAttribute('data-rich-section')] = element; });
+  var richRelated = document.querySelector('[data-rich-related]');
+  var richConfused = document.querySelector('[data-rich-confused]');
 
   var progressRecords = learningEngine && typeof learningEngine.getProgress === 'function' ? learningEngine.getProgress() : (storage ? storage.getProgress() : {});
   var bilingualRefs = { platforms: document.querySelector('[data-profile-zh="platforms"]'), tone: document.querySelector('[data-profile-zh="tone"]'), status: document.querySelector('[data-profile-zh="status"]'), formality: document.querySelector('[data-profile-zh="formality"]'), useWhen: document.querySelector('[data-field="useWhenZh"]'), avoidWhen: document.querySelector('[data-field="avoidWhenZh"]') };
@@ -105,7 +112,29 @@
     var interfaceMode = isInterfaceSignal(signal);
     if (standardSignalSection) standardSignalSection.hidden = interfaceMode;
     if (interfaceSignalSection) interfaceSignalSection.hidden = !interfaceMode;
+    if (richSignalSection) richSignalSection.hidden = interfaceMode;
     if (!interfaceMode) clearInterfaceContent();
+  }
+  function clearRichContent() {
+    Object.keys(richFields).forEach(function (key) { richFields[key].textContent = ''; });
+    [richRelated, richConfused].forEach(function (element) { if (element) element.textContent = ''; });
+    Object.keys(richSections).forEach(function (key) { richSections[key].hidden = true; });
+  }
+  function renderRichPair(sectionName, enKey, zhKey, signal) {
+    var en = hasText(signal[enKey]) ? signal[enKey].trim() : '';
+    var zh = hasText(signal[zhKey]) ? signal[zhKey].trim() : '';
+    if (richFields[enKey]) richFields[enKey].textContent = en;
+    if (richFields[zhKey]) richFields[zhKey].textContent = zh;
+    if (richSections[sectionName]) richSections[sectionName].hidden = !(en || zh);
+  }
+  function renderRichSignal(signal) {
+    clearRichContent();
+    renderRichPair('original', 'originalMeaningEn', 'originalMeaningZh', signal);
+    renderRichPair('culture', 'culturalContextEn', 'culturalContextZh', signal);
+    var related = Array.isArray(signal.relatedTerms) ? signal.relatedTerms.map(function (id) { var target = window.EnglishRadarContent && window.EnglishRadarContent.getSignalById ? window.EnglishRadarContent.getSignalById(id) : signalById(id); return target ? { id: id, signal: target } : null; }).filter(Boolean) : [];
+    if (richRelated && related.length) { related.forEach(function (item) { var link = document.createElement('a'); link.href = './learn.html?mode=lookup&signal=' + encodeURIComponent(item.id); link.textContent = displayTerm(item.signal.displayTerm || item.signal.term); richRelated.appendChild(link); }); richSections.related.hidden = false; }
+    var confusions = Array.isArray(signal.confusedWith) ? signal.confusedWith.filter(function (item) { return item && typeof item === 'object' && hasText(item.term) && hasText(item.differenceEn) && hasText(item.differenceZh); }) : [];
+    if (richConfused && confusions.length) { confusions.forEach(function (item) { var row = document.createElement('article'); row.className = 'interface-confusion'; var term = document.createElement('strong'); term.textContent = displayTerm(signal.term) + ' ≠ ' + displayTerm(item.term); var english = document.createElement('p'); english.textContent = item.differenceEn.trim(); var chinese = document.createElement('p'); chinese.className = 'zh-text zh-meaning'; chinese.textContent = item.differenceZh.trim(); row.appendChild(term); row.appendChild(english); row.appendChild(chinese); richConfused.appendChild(row); }); richSections.confused.hidden = false; }
   }
   function renderInterfacePair(sectionName, enKey, zhKey, signal) {
     var en = hasText(signal[enKey]) ? signal[enKey].trim() : '';
@@ -130,7 +159,7 @@
     renderInterfacePair('boundary', 'usageBoundaryEn', 'usageBoundaryZh', signal);
   }
   function renderStandardSignal(signal) {
-    setText(refs.meaningEn, signal.meaningEn); setText(refs.meaningZh, signal.meaningZh); setText(refs.exampleEn, '“' + text(signal.exampleEn) + '”'); setText(refs.exampleZh, signal.exampleZh); setText(refs.platforms, list(signal.platforms)); setText(refs.tone, list(signal.tone)); setText(refs.status, signal.status); setText(refs.formality, signal.formality); setText(refs.useWhen, signal.useWhen); setText(refs.avoidWhen, signal.avoidWhen); setText(refs.chineseFeeling, signal.chineseFeeling); renderBilingual(signal);
+    renderRichSignal(signal); setText(refs.meaningEn, signal.meaningEn); setText(refs.meaningZh, signal.meaningZh); setText(refs.exampleEn, '“' + text(signal.exampleEn) + '”'); setText(refs.exampleZh, signal.exampleZh); setText(refs.platforms, list(signal.platforms)); setText(refs.tone, list(signal.tone)); setText(refs.status, signal.status); setText(refs.formality, signal.formality); setText(refs.useWhen, signal.useWhen); setText(refs.avoidWhen, signal.avoidWhen); setText(refs.chineseFeeling, signal.chineseFeeling); renderBilingual(signal);
   }
   function renderSignal() {
     var signal = sessionSignals[currentIndex]; if (!signal) return;
