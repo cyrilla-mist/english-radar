@@ -6273,4 +6273,5 @@
                     }
                 ]
 };
+if (window.EnglishRadarBundledPackRegistry) window.EnglishRadarBundledPackRegistry.registerPack(window.ENGLISH_RADAR_BUNDLED_PACK);
 

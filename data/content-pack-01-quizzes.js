@@ -1392,3 +1392,4 @@ window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES = [
     "explanationZh": "Production 承担真实用户和数据，因此部署、监控和回滚要求更严格。"
   }
 ];
+if (window.EnglishRadarBundledPackRegistry) window.EnglishRadarBundledPackRegistry.registerQuizPack('english-radar-content-pack-01', window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES);

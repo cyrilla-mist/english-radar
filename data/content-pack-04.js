@@ -157,3 +157,4 @@ window.ENGLISH_RADAR_CONTENT_PACK_04 = {
     }
   ]
 };
+if (window.EnglishRadarBundledPackRegistry) window.EnglishRadarBundledPackRegistry.registerPack(window.ENGLISH_RADAR_CONTENT_PACK_04);

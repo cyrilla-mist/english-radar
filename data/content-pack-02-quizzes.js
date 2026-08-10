@@ -580,3 +580,4 @@ window.ENGLISH_RADAR_CONTENT_PACK_02_QUIZZES = [
     "explanationZh": "两者属于不同层级：Fine-tuning 改变训练后的模型参数；RAG 主要在运行时引入检索内容。"
   }
 ];
+if (window.EnglishRadarBundledPackRegistry) window.EnglishRadarBundledPackRegistry.registerQuizPack('english-radar-content-pack-02', window.ENGLISH_RADAR_CONTENT_PACK_02_QUIZZES);

@@ -42,6 +42,8 @@
   document.querySelectorAll('[data-rich-field]').forEach(function (element) { richFields[element.getAttribute('data-rich-field')] = element; });
   var richSections = {};
   document.querySelectorAll('[data-rich-section]').forEach(function (element) { richSections[element.getAttribute('data-rich-section')] = element; });
+  var richContexts = document.querySelector('[data-rich-contexts]');
+  var richExamples = document.querySelector('[data-rich-examples]');
   var richRelated = document.querySelector('[data-rich-related]');
   var richConfused = document.querySelector('[data-rich-confused]');
 
@@ -72,7 +74,7 @@
   function signalById(id) { return signals.find(function (signal) { return signal.id === id; }); }
   function quizList() { return window.EnglishRadarQuizRegistry && typeof window.EnglishRadarQuizRegistry.getStaticQuizzes === 'function' ? window.EnglishRadarQuizRegistry.getStaticQuizzes() : (Array.isArray(window.ENGLISH_RADAR_QUIZZES) ? window.ENGLISH_RADAR_QUIZZES : []); }
   function hasQuiz(signalId) { return quizList().some(function (question) { return question && question.signalId === signalId; }); }
-  function categoryCode(category) { return ({ 'Internet Culture': 'IC', 'Product Design': 'PD', GitHub: 'GH', Sports: 'SP', 'UI Vocabulary': 'UI' })[category] || 'ER'; }
+  function categoryCode(category) { return ({ 'Internet Culture': 'IC', 'Product Design': 'PD', 'Product Naming': 'PN', GitHub: 'GH', Sports: 'SP', 'UI Vocabulary': 'UI' })[category] || 'ER'; }
   function parseSize(value) { if (value === 'all') return signals.length; if (!/^\d+$/.test(value || '')) return 5; var number = Number(value); return number > 0 ? number : 5; }
   function validIds(ids) { return (Array.isArray(ids) ? ids : []).filter(function (id, index, list) { return signalById(id) && list.indexOf(id) === index; }); }
   function setEmptyCopy(title, message) { if (refs.emptyTitle) refs.emptyTitle.innerHTML = title; setText(refs.emptyMessage, message || ''); }
@@ -117,8 +119,9 @@
   }
   function clearRichContent() {
     Object.keys(richFields).forEach(function (key) { richFields[key].textContent = ''; });
-    [richRelated, richConfused].forEach(function (element) { if (element) element.textContent = ''; });
+    [richContexts, richExamples, richRelated, richConfused].forEach(function (element) { if (element) element.textContent = ''; });
     Object.keys(richSections).forEach(function (key) { richSections[key].hidden = true; });
+    if (richSignalSection) richSignalSection.hidden = true;
   }
   function renderRichPair(sectionName, enKey, zhKey, signal) {
     var en = hasText(signal[enKey]) ? signal[enKey].trim() : '';
@@ -129,12 +132,21 @@
   }
   function renderRichSignal(signal) {
     clearRichContent();
+    var hasRichContent = false;
+    renderRichPair('product', 'productMeaningEn', 'productMeaningZh', signal);
+    renderRichPair('why', 'whyProductsUseItEn', 'whyProductsUseItZh', signal);
     renderRichPair('original', 'originalMeaningEn', 'originalMeaningZh', signal);
     renderRichPair('culture', 'culturalContextEn', 'culturalContextZh', signal);
+    ['product', 'why', 'original', 'culture'].forEach(function (key) { if (richSections[key] && !richSections[key].hidden) hasRichContent = true; });
+    var contexts = Array.isArray(signal.commonInterfaces) ? signal.commonInterfaces.filter(hasText) : [];
+    if (richContexts && contexts.length) { contexts.forEach(function (item) { var tag = document.createElement('span'); tag.className = 'interface-tag'; tag.textContent = item.trim(); richContexts.appendChild(tag); }); richSections.contexts.hidden = false; hasRichContent = true; }
+    var examples = Array.isArray(signal.realInterfaceExamples) ? signal.realInterfaceExamples.filter(function (item) { return item && typeof item === 'object' && hasText(item.surface) && hasText(item.exampleEn) && hasText(item.exampleZh); }) : [];
+    if (richExamples && examples.length) { examples.forEach(function (item) { var example = document.createElement('article'); example.className = 'interface-example'; var surface = document.createElement('span'); surface.className = 'interface-surface'; surface.textContent = item.surface.trim(); var english = document.createElement('blockquote'); english.textContent = '“' + item.exampleEn.trim() + '”'; var chinese = document.createElement('p'); chinese.className = 'zh-text zh-example'; chinese.textContent = item.exampleZh.trim(); example.appendChild(surface); example.appendChild(english); example.appendChild(chinese); richExamples.appendChild(example); }); richSections.examples.hidden = false; hasRichContent = true; }
     var related = Array.isArray(signal.relatedTerms) ? signal.relatedTerms.map(function (id) { var target = window.EnglishRadarContent && window.EnglishRadarContent.getSignalById ? window.EnglishRadarContent.getSignalById(id) : signalById(id); return target ? { id: id, signal: target } : null; }).filter(Boolean) : [];
-    if (richRelated && related.length) { related.forEach(function (item) { var link = document.createElement('a'); link.href = './learn.html?mode=lookup&signal=' + encodeURIComponent(item.id); link.textContent = displayTerm(item.signal.displayTerm || item.signal.term); richRelated.appendChild(link); }); richSections.related.hidden = false; }
+    if (richRelated && related.length) { related.forEach(function (item) { var link = document.createElement('a'); link.href = './learn.html?mode=lookup&signal=' + encodeURIComponent(item.id); link.textContent = displayTerm(item.signal.displayTerm || item.signal.term); richRelated.appendChild(link); }); richSections.related.hidden = false; hasRichContent = true; }
     var confusions = Array.isArray(signal.confusedWith) ? signal.confusedWith.filter(function (item) { return item && typeof item === 'object' && hasText(item.term) && hasText(item.differenceEn) && hasText(item.differenceZh); }) : [];
-    if (richConfused && confusions.length) { confusions.forEach(function (item) { var row = document.createElement('article'); row.className = 'interface-confusion'; var term = document.createElement('strong'); term.textContent = displayTerm(signal.term) + ' ≠ ' + displayTerm(item.term); var english = document.createElement('p'); english.textContent = item.differenceEn.trim(); var chinese = document.createElement('p'); chinese.className = 'zh-text zh-meaning'; chinese.textContent = item.differenceZh.trim(); row.appendChild(term); row.appendChild(english); row.appendChild(chinese); richConfused.appendChild(row); }); richSections.confused.hidden = false; }
+    if (richConfused && confusions.length) { confusions.forEach(function (item) { var row = document.createElement('article'); row.className = 'interface-confusion'; var term = document.createElement('strong'); term.textContent = displayTerm(signal.term) + ' ≠ ' + displayTerm(item.term); var english = document.createElement('p'); english.textContent = item.differenceEn.trim(); var chinese = document.createElement('p'); chinese.className = 'zh-text zh-meaning'; chinese.textContent = item.differenceZh.trim(); row.appendChild(term); row.appendChild(english); row.appendChild(chinese); richConfused.appendChild(row); }); richSections.confused.hidden = false; hasRichContent = true; }
+    if (richSignalSection) richSignalSection.hidden = !hasRichContent;
   }
   function renderInterfacePair(sectionName, enKey, zhKey, signal) {
     var en = hasText(signal[enKey]) ? signal[enKey].trim() : '';

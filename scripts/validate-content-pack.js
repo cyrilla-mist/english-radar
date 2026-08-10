@@ -11,27 +11,44 @@ if (!fileName) {
 const errors = [];
 let payload;
 let quizzes = [];
+
+function text(value) { return typeof value === 'string' && value.trim().length > 0; }
+function complete(value) { return Array.isArray(value) ? value.length > 0 : text(value); }
+function idFor(signal) { return String(signal.id || '').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '') || `imported-${String(signal.category || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${String(signal.term || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')}`; }
+function packNumber(id) { const match = String(id || '').match(/content-pack-(\d+)$/); return match ? match[1] : ''; }
+function quizFileFor(packId, sourceFile) {
+  const number = packNumber(packId);
+  if (number) return path.join(path.dirname(sourceFile), `content-pack-${String(number).padStart(2, '0')}-quizzes.js`);
+  if (packId === 'english-radar-ui-vocabulary-core') return path.join(path.dirname(sourceFile), 'ui-vocabulary-quizzes.js');
+  return null;
+}
+function quizGlobalFor(packId) {
+  const number = packNumber(packId);
+  if (number) return `ENGLISH_RADAR_CONTENT_PACK_${String(number).padStart(2, '0')}_QUIZZES`;
+  if (packId === 'english-radar-ui-vocabulary-core') return 'ENGLISH_RADAR_UI_VOCABULARY_QUIZZES';
+  return '';
+}
+
 try {
   const source = fs.readFileSync(fileName, 'utf8');
   if (/\.js$/i.test(fileName)) {
     const context = { window: {} };
     vm.runInNewContext(source, context, { filename: fileName });
-    payload = context.window.ENGLISH_RADAR_CONTENT_PACK_01 || context.window.ENGLISH_RADAR_CONTENT_PACK_02 || context.window.ENGLISH_RADAR_CONTENT_PACK_03 || context.window.ENGLISH_RADAR_CONTENT_PACK_04 || context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK || context.window.ENGLISH_RADAR_BUNDLED_PACK;
-    if (payload && payload.pack && ['english-radar-content-pack-01', 'english-radar-content-pack-02', 'english-radar-content-pack-03', 'english-radar-content-pack-04'].includes(payload.pack.id)) {
-      const quizFile = path.join(path.dirname(fileName), payload.pack.id === 'english-radar-content-pack-02' ? 'content-pack-02-quizzes.js' : payload.pack.id === 'english-radar-content-pack-03' ? 'content-pack-03-quizzes.js' : payload.pack.id === 'english-radar-content-pack-04' ? 'content-pack-04-quizzes.js' : 'content-pack-01-quizzes.js');
-      const quizContext = { window: {} };
-      vm.runInNewContext(fs.readFileSync(quizFile, 'utf8'), quizContext, { filename: quizFile });
-      quizzes = payload.pack.id === 'english-radar-content-pack-02' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_02_QUIZZES || []) : payload.pack.id === 'english-radar-content-pack-03' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_03_QUIZZES || []) : payload.pack.id === 'english-radar-content-pack-04' ? (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_04_QUIZZES || []) : (quizContext.window.ENGLISH_RADAR_CONTENT_PACK_01_QUIZZES || []);
+    payload = Object.keys(context.window).map((key) => context.window[key]).find((value) => value && value.app === 'English Radar Content Pack' && value.pack && Array.isArray(value.signals));
+    if (payload && payload.pack) {
+      const quizFile = quizFileFor(payload.pack.id, fileName);
+      const quizGlobal = quizGlobalFor(payload.pack.id);
+      if (quizFile && fs.existsSync(quizFile)) {
+        const quizContext = { window: {} };
+        vm.runInNewContext(fs.readFileSync(quizFile, 'utf8'), quizContext, { filename: quizFile });
+        quizzes = Array.isArray(quizContext.window[quizGlobal]) ? quizContext.window[quizGlobal] : [];
+      }
     }
   } else payload = JSON.parse(source);
 } catch (error) {
   console.error(`Content pack could not be read: ${error.message}`);
   process.exit(1);
 }
-
-function text(value) { return typeof value === 'string' && value.trim().length > 0; }
-function idFor(signal) { return String(signal.id || '').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '') || `imported-${String(signal.category || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${String(signal.term || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')}`; }
-function complete(value) { return Array.isArray(value) ? value.length > 0 : text(value); }
 
 if (!payload || payload.app !== 'English Radar Content Pack') errors.push('app must be "English Radar Content Pack"');
 if (!payload || Number(payload.schemaVersion) !== 1) errors.push('schemaVersion must be 1');
@@ -41,12 +58,14 @@ if (!payload || !Array.isArray(payload.signals)) errors.push('signals must be an
 const signals = payload && Array.isArray(payload.signals) ? payload.signals : [];
 const ids = new Set();
 const terms = new Set();
-const isInterfacePack = payload && payload.pack && payload.pack.id === 'english-radar-ui-vocabulary-core';
-const isContentPack01 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-01';
-const isContentPack02 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-02';
-const isContentPack03 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-03';
-const isContentPack04 = payload && payload.pack && payload.pack.id === 'english-radar-content-pack-04';
 const interfaceRequired = ['uiArea', 'originalMeaningEn', 'originalMeaningZh', 'productMeaningEn', 'productMeaningZh', 'whyProductsUseItEn', 'whyProductsUseItZh', 'commonInterfaces', 'realInterfaceExamples', 'relatedTerms', 'confusedWith', 'interfaceTargets', 'usageBoundaryEn', 'usageBoundaryZh'];
+const sourceRequired = ['sourceName', 'sourceUrl', 'editorialSourceType', 'auditedAt'];
+const productNamingRequired = ['originalMeaningEn', 'originalMeaningZh', 'productMeaningEn', 'productMeaningZh', 'whyProductsUseItEn', 'whyProductsUseItZh', 'commonInterfaces', 'realInterfaceExamples', 'relatedTerms', 'confusedWith'];
+const communityRequired = ['originalMeaningEn', 'originalMeaningZh', 'culturalContextEn', 'culturalContextZh', 'relatedTerms', 'confusedWith'];
+
+function requireFields(signal, index, fields, label) {
+  fields.forEach((field) => { if (!complete(signal[field])) errors.push(`signals[${index}].${field} is required for ${label}`); });
+}
 
 signals.forEach((signal, index) => {
   if (!signal || typeof signal !== 'object' || Array.isArray(signal)) { errors.push(`signals[${index}] must be an object`); return; }
@@ -60,140 +79,52 @@ signals.forEach((signal, index) => {
   if (signal.quizStatus && !['none', 'draft', 'ready'].includes(signal.quizStatus)) errors.push(`signals[${index}].quizStatus is invalid`);
   if (signal.platforms !== undefined && !Array.isArray(signal.platforms)) errors.push(`signals[${index}].platforms must be an array`);
   if (signal.tone !== undefined && !Array.isArray(signal.tone)) errors.push(`signals[${index}].tone must be an array`);
-  if (isContentPack01) {
-    ['sourceName', 'sourceUrl', 'editorialSourceType', 'auditedAt'].forEach((field) => { if (!text(signal[field])) errors.push(`signals[${index}].${field} is required`); });
-    if (signal.radarType === 'interface') {
-      if (signal.category !== 'UI Vocabulary') errors.push(`signals[${index}].category must be UI Vocabulary`);
-      if (!/^ui-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the ui- prefix`);
-      interfaceRequired.forEach((field) => { if (!complete(signal[field])) errors.push(`signals[${index}].${field} is required for interface Signals`); });
-    } else {
-      if (!/^builder-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the builder- prefix`);
-      if (signal.radarType === 'interface') errors.push(`signals[${index}] Builder Signals must not use radarType interface`);
-    }
-  }
-  if (isContentPack02) {
-    ['sourceName', 'sourceUrl', 'editorialSourceType', 'auditedAt'].forEach((field) => { if (!text(signal[field])) errors.push(`signals[${index}].${field} is required`); });
-    if (!/^ai-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the ai- prefix`);
-    if (signal.category !== 'AI Builder') errors.push(`signals[${index}].category must be AI Builder`);
-    if (signal.radarType === 'interface') errors.push(`signals[${index}] must not use radarType interface`);
-  }
-  if (isInterfacePack) {
-    ['displayTerm', 'speechText', 'pronunciation', 'status', 'formality', 'meaningEn', 'exampleZh', 'useWhen', 'useWhenZh', 'avoidWhen', 'avoidWhenZh', 'chineseFeeling', 'contentStatus', 'quizStatus', 'sourceType'].forEach((field) => { if (!text(signal[field])) errors.push(`signals[${index}].${field} is required for UI Vocabulary`); });
-    interfaceRequired.forEach((field) => { if (!complete(signal[field])) errors.push(`signals[${index}].${field} is required for UI Vocabulary`); });
-    if (!/^ui-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the ui- prefix`);
-    if (signal.radarType !== 'interface') errors.push(`signals[${index}].radarType must be interface`);
-    if (signal.category !== 'UI Vocabulary') errors.push(`signals[${index}].category must be UI Vocabulary`);
-    if (signal.contentStatus !== 'active') errors.push(`signals[${index}].contentStatus must be active`);
-    if (!['none', 'ready'].includes(signal.quizStatus)) errors.push(`signals[${index}].quizStatus must be none or ready`);
-    if (signal.sourceType !== 'imported') errors.push(`signals[${index}].sourceType must be imported`);
-  }
-  if (isContentPack04) {
-    ['sourceName', 'sourceUrl', 'editorialSourceType', 'auditedAt', 'originalMeaningEn', 'originalMeaningZh', 'culturalContextEn', 'culturalContextZh'].forEach((field) => { if (!text(signal[field])) errors.push(`signals[${index}].${field} is required for Community Discourse`); });
+
+  const category = String(signal.category || '').trim();
+  if (category === 'Product Naming') {
+    requireFields(signal, index, sourceRequired.concat(productNamingRequired), 'Product Naming');
+    if (!/^pn-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the pn- prefix`);
+    if (signal.radarType === 'interface') errors.push(`signals[${index}] Product Naming Signals must not use radarType interface`);
+  } else if (category === 'Community Discourse') {
+    requireFields(signal, index, sourceRequired.concat(communityRequired), 'Community Discourse');
     if (!/^cd-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the cd- prefix`);
-    if (signal.category !== 'Community Discourse') errors.push(`signals[${index}].category must be Community Discourse`);
-    if (signal.radarType === 'interface') errors.push(`signals[${index}] must not use radarType interface`);
-    if (!Array.isArray(signal.relatedTerms) || !signal.relatedTerms.length) errors.push(`signals[${index}].relatedTerms is required for Community Discourse`);
-    if (!Array.isArray(signal.confusedWith) || !signal.confusedWith.length) errors.push(`signals[${index}].confusedWith is required for Community Discourse`);
+    if (signal.radarType === 'interface') errors.push(`signals[${index}] Community Discourse Signals must not use radarType interface`);
+  } else if (category === 'AI Builder') {
+    requireFields(signal, index, sourceRequired, 'AI Builder');
+    if (!/^ai-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the ai- prefix`);
+    if (signal.radarType === 'interface') errors.push(`signals[${index}] AI Builder Signals must not use radarType interface`);
+  } else if (signal.radarType === 'interface') {
+    requireFields(signal, index, interfaceRequired, 'Interface');
+    if (!/^ui-[a-z0-9-]+$/.test(signal.id)) errors.push(`signals[${index}].id must use the ui- prefix`);
+    if (category !== 'UI Vocabulary') errors.push(`signals[${index}].category must be UI Vocabulary for Interface Signals`);
   }
 });
 
-if (isInterfacePack && signals.length !== 10) errors.push(`UI Vocabulary Pack must contain exactly 10 Signals, found ${signals.length}`);
-if (isContentPack01) {
-  if (signals.length !== 24) errors.push(`Content Pack 01 must contain exactly 24 Signals, found ${signals.length}`);
-  if (signals.filter((signal) => signal.radarType === 'interface').length !== 15) errors.push('Content Pack 01 must contain exactly 15 Interface Signals');
-  if (signals.filter((signal) => signal.radarType !== 'interface').length !== 9) errors.push('Content Pack 01 must contain exactly 9 Builder Signals');
-  if (quizzes.length !== 48) errors.push(`Content Pack 01 must contain exactly 48 quizzes, found ${quizzes.length}`);
-  const quizIds = new Set(); const counts = new Map();
-  quizzes.forEach((quiz, index) => {
-    if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
-    if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
-    if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`); quizIds.add(quiz.id);
-    if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
-    counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
-    if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
-    else {
-      const optionIds = new Set(); quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
-      if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
-      if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
-    }
-    ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
-    ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
-  });
-  signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
+function validateQuiz(quiz, index, counts, quizIds) {
+  if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
+  if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
+  if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`);
+  quizIds.add(quiz.id);
+  if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
+  counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
+  if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
+  else {
+    const optionIds = new Set();
+    quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
+    if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
+    if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
+  }
+  ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
+  ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
 }
 
-if (isContentPack02) {
-  if (signals.length !== 10) errors.push(`Content Pack 02 must contain exactly 10 Signals, found ${signals.length}`);
-  if (signals.filter((signal) => signal.radarType === 'interface').length !== 0) errors.push('Content Pack 02 must contain zero Interface Signals');
-  if (quizzes.length !== 20) errors.push(`Content Pack 02 must contain exactly 20 quizzes, found ${quizzes.length}`);
-  const quizIds = new Set(); const counts = new Map();
-  quizzes.forEach((quiz, index) => {
-    if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
-    if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
-    if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`); quizIds.add(quiz.id);
-    if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
-    counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
-    if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
-    else {
-      const optionIds = new Set(); quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
-      if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
-      if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
-    }
-    ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
-    ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
-  });
-  signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
-}
-
-if (isContentPack03) {
-  if (signals.length !== 10) errors.push(`Content Pack 03 must contain exactly 10 Signals, found ${signals.length}`);
-  if (signals.filter((signal) => signal.radarType === 'interface').length !== 10) errors.push('Content Pack 03 must contain exactly 10 Interface Signals');
-  if (signals.filter((signal) => signal.category === 'UI Vocabulary').length !== 10) errors.push('Content Pack 03 must contain exactly 10 UI Vocabulary Signals');
-  if (signals.filter((signal) => /^ui-[a-z0-9-]+$/.test(signal.id)).length !== 10) errors.push('Content Pack 03 Signal IDs must use the ui- prefix');
-  if (signals.filter((signal) => text(signal.sourceName) && text(signal.sourceUrl) && text(signal.editorialSourceType) && text(signal.auditedAt)).length !== 10) errors.push('Content Pack 03 Signals must include complete source metadata');
-  interfaceRequired.forEach((field) => { if (signals.some((signal) => !complete(signal[field]))) errors.push(`Content Pack 03 interface field ${field} is incomplete`); });
-  if (quizzes.length !== 20) errors.push(`Content Pack 03 must contain exactly 20 quizzes, found ${quizzes.length}`);
-  const quizIds = new Set(); const counts = new Map();
-  quizzes.forEach((quiz, index) => {
-    if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
-    if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
-    if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`); quizIds.add(quiz.id);
-    if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
-    counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
-    if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
-    else {
-      const optionIds = new Set(); quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
-      if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
-      if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
-    }
-    ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
-    ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
-  });
-  signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
-}
-
-if (isContentPack04) {
-  if (signals.length !== 10) errors.push(`Content Pack 04 must contain exactly 10 Signals, found ${signals.length}`);
-  if (quizzes.length !== 20) errors.push(`Content Pack 04 must contain exactly 20 quizzes, found ${quizzes.length}`);
-  const quizIds = new Set(); const counts = new Map();
-  quizzes.forEach((quiz, index) => {
-    if (!quiz || typeof quiz !== 'object') { errors.push(`quizzes[${index}] must be an object`); return; }
-    if (!text(quiz.id)) errors.push(`quizzes[${index}].id is required`);
-    if (quizIds.has(quiz.id)) errors.push(`duplicate Quiz id: ${quiz.id}`); quizIds.add(quiz.id);
-    if (!ids.has(quiz.signalId)) errors.push(`quizzes[${index}].signalId does not exist: ${quiz.signalId}`);
-    counts.set(quiz.signalId, (counts.get(quiz.signalId) || 0) + 1);
-    if (!['meaning', 'boundary'].includes(quiz.questionType || quiz.type)) errors.push(`quizzes[${index}] must use meaning or boundary questionType`);
-    if (!Array.isArray(quiz.options) || quiz.options.length !== 4) errors.push(`quizzes[${index}] must have exactly 4 options`);
-    else {
-      const optionIds = new Set(); quiz.options.forEach((option) => { if (!option || !text(option.id) || !text(option.text)) errors.push(`quizzes[${index}] options must have non-empty id and text`); else optionIds.add(option.id); });
-      if (optionIds.size !== 4) errors.push(`quizzes[${index}] option IDs must be unique`);
-      if (!optionIds.has(quiz.correctOptionId)) errors.push(`quizzes[${index}].correctOptionId is invalid`);
-    }
-    ['context', 'prompt', 'explanationEn', 'explanationZh'].forEach((field) => { if (!text(quiz[field])) errors.push(`quizzes[${index}].${field} is required`); });
-    ['context', 'prompt'].forEach((field) => { if (text(quiz[field]) && (/\$\{|correctOptionId|answerKey|metadata/i.test(quiz[field]))) errors.push(`quizzes[${index}].${field} exposes answer metadata`); });
-  });
+if (quizzes.length) {
+  const quizIds = new Set();
+  const counts = new Map();
+  quizzes.forEach((quiz, index) => validateQuiz(quiz, index, counts, quizIds));
+  if (quizzes.length !== signals.length * 2) errors.push(`each Signal must have exactly 2 quizzes; expected ${signals.length * 2}, found ${quizzes.length}`);
   signals.forEach((signal) => { if (counts.get(signal.id) !== 2) errors.push(`${signal.id} must have exactly 2 quizzes`); });
 }
 
 if (errors.length) { console.error(`Content pack validation failed with ${errors.length} error(s):`); errors.forEach((error) => console.error(`- ${error}`)); process.exit(1); }
-console.log(`Content pack valid: ${payload.pack.id} · ${signals.length} Signals${isContentPack01 || isContentPack02 || isContentPack03 || isContentPack04 ? ` · ${quizzes.length} Quizzes` : ''}`);
+console.log(`Content pack valid: ${payload.pack.id} · ${signals.length} Signals${quizzes.length ? ` · ${quizzes.length} Quizzes` : ''}`);

@@ -72,7 +72,7 @@ assert.equal(progress['ui-dashboard'].mastery, 'clear');
 assert.equal(history.byQuiz['core-1'].lastAnswerCorrect, false);
 
 const meSource = read('js/me.js');
-assert(meSource.includes('ENGLISH_RADAR_CONTENT_PACK_02'));
+assert(meSource.includes('EnglishRadarBundledPackRegistry'));
 assert(meSource.includes("bundledSourceLabel(payload)"));
 assert(meSource.includes("status.setAttribute('data-bundled-status', '')"));
 assert.match(meSource, /data-bundled-pack\]\[data-pack-id=/);
@@ -81,7 +81,7 @@ const quizSource = read('js/quiz.js');
 assert(quizSource.includes("mode === 'signal'"));
 assert(quizSource.includes("mode === 'mistakes'"));
 assert(quizSource.includes('getInterfaceQuizzes'));
-assert(read('scripts/validate-content-pack.js').includes('english-radar-content-pack-02'));
+assert(read('scripts/validate-content-pack.js').includes('packNumber'));
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html']) {
   const html = read(page);
   assert(html.includes('./data/content-pack-02.js?v=1.4.0'), `${page} should load Pack 02`);
@@ -89,9 +89,9 @@ for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html',
   assert(!html.includes('./js/quiz-registry.js?v=1.3.0'), `${page} must not use stale quiz registry cache key`);
   assert(!html.includes('./js/me.js?v=1.3.0'), `${page} must not use stale me.js cache key`);
   assert(!/English Radar v1\.3\.0|ENGLISH RADAR \/ V1\.3\.0|>V1\.3\.0</.test(html), `${page} must not expose stale current release metadata`);
-  assert(/English Radar v1\.6\.0|ENGLISH RADAR \/ V1\.6\.0|>V1\.6\.0</.test(html), `${page} must expose V1.6.0 metadata`);
+  assert(/v1\.7\.0/i.test(html), `${page} must expose V1.7.0 metadata`);
 }
-assert(/English Radar v1\.6\.0/.test(read('404.html')));
+assert(/English Radar v1\.7\.0 signal not found\./.test(read('404.html')));
 for (const page of ['index.html', 'learn.html', 'quiz.html']) {
   const html = read(page);
   assert(html.includes('./data/content-pack-02-quizzes.js?v=1.4.0'), `${page} should load Pack 02 quizzes`);

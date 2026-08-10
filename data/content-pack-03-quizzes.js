@@ -580,3 +580,4 @@ window.ENGLISH_RADAR_CONTENT_PACK_03_QUIZZES = [
     "explanationZh": "需要用户明确确认的决策应使用 Dialog 或其他阻断式确认模式，而不是短暂的 Toast。"
   }
 ];
+if (window.EnglishRadarBundledPackRegistry) window.EnglishRadarBundledPackRegistry.registerQuizPack('english-radar-content-pack-03', window.ENGLISH_RADAR_CONTENT_PACK_03_QUIZZES);

@@ -171,3 +171,4 @@ window.ENGLISH_RADAR_UI_VOCABULARY_PACK = {
     }
   ]
 };
+if (window.EnglishRadarBundledPackRegistry) window.EnglishRadarBundledPackRegistry.registerPack(window.ENGLISH_RADAR_UI_VOCABULARY_PACK);
