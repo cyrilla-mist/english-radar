@@ -93,3 +93,55 @@ body.archive-page {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Phase 3 reading hierarchy */
+.archive-search-form { min-width: 0; }
+.archive-mobile-stats { margin: 0; color: var(--archive-ink-soft); font-size: .9rem; line-height: 1.55; }
+.archive-mobile-stats strong { color: var(--archive-ink); }
+.archive-detail-header { margin: 24px 0 24px; }
+.archive-detail-header h1 { font-family: var(--archive-sans); font-weight: 750; }
+.archive-detail-chips, .archive-card-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
+.archive-chip { display: inline-flex; align-items: center; min-height: 28px; padding: 3px 9px; border: 1px solid var(--archive-line); border-radius: 999px; color: var(--archive-ink); background: rgba(255, 255, 255, .28); font-family: var(--archive-sans); font-size: .78rem; line-height: 1.2; }
+.archive-card-chips { margin-top: 16px; }
+.archive-card-chips .archive-chip { min-height: 25px; font-size: .75rem; }
+.archive-detail-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+.archive-detail-block { padding: 22px 0; border-top: 1px solid var(--archive-line); }
+.archive-detail-block.archive-primary h2 { font-family: var(--archive-sans); font-size: 1.05rem; letter-spacing: -.02em; }
+.archive-detail-block.archive-primary h2 small { font-size: .92rem; }
+.archive-detail-block.archive-primary p { max-width: 72ch; font-size: 1.05rem; line-height: 1.75; }
+.archive-usage-grid { display: grid; gap: 18px; }
+.archive-usage-grid > div { padding: 14px; background: rgba(255, 255, 255, .25); }
+.archive-usage-grid h3 { margin: 0; font-family: var(--archive-sans); font-size: .92rem; }
+.archive-usage-grid h3 small { display: block; color: var(--archive-ink-soft); font-size: .84rem; font-weight: 400; }
+.archive-usage-grid p { margin: 8px 0 0; font-size: .98rem; }
+.archive-disclosure { padding: 0; }
+.archive-disclosure summary { padding: 18px 0; cursor: pointer; list-style-position: inside; font-family: var(--archive-sans); font-size: 1rem; font-weight: 700; }
+.archive-disclosure summary span { margin-left: 7px; color: var(--archive-ink-soft); font-size: .88rem; font-weight: 400; }
+.archive-disclosure[open] summary { margin-bottom: 4px; }
+.archive-disclosure > .archive-detail-block { padding: 12px 0; border-top: 0; }
+.archive-detail-block h2 { font-size: .76rem; }
+.archive-detail-list { font-size: 1rem; }
+.archive-comparison-grid { display: grid; gap: 10px; }
+.archive-comparison-card { padding: 14px 16px; border-left: 3px solid var(--archive-sage); background: rgba(255, 255, 255, .26); }
+.archive-comparison-card h3 { margin: 0; font-family: var(--archive-sans); font-size: 1rem; }
+.archive-comparison-card p { margin: 7px 0 0; font-size: .96rem; }
+.archive-variant-list { display: grid; gap: 8px; }
+.archive-variant-list a { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 11px 13px; border: 1px solid var(--archive-line); color: var(--archive-ink); text-decoration: none; }
+.archive-variant-list span { color: var(--archive-ink-soft); font-size: .88rem; }
+.archive-record-info { display: grid; gap: 10px; margin: 0; }
+.archive-record-info div { display: grid; grid-template-columns: 100px 1fr; gap: 10px; }
+.archive-record-info dt { color: var(--archive-ink-soft); font-family: var(--archive-mono); font-size: .68rem; text-transform: uppercase; }
+.archive-record-info dd { margin: 0; overflow-wrap: anywhere; font-size: .92rem; }
+.archive-archive-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--archive-line); color: var(--archive-ink-soft); font-size: .8rem; }
+.archive-archive-footer span { text-align: right; }
+
+@media (max-width: 699px) {
+  .archive-stats { display: none; }
+  .archive-section-heading > p { font-size: .8rem; }
+}
+
+@media (min-width: 700px) {
+  .archive-mobile-stats { display: none; }
+  .archive-usage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .archive-comparison-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

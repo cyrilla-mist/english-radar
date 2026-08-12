@@ -5,81 +5,67 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+for (const file of ['archive.html', 'archive-signal.html', 'js/archive.js', 'js/archive-signal.js', 'css/archive.css']) assert(fs.existsSync(path.join(root, file)), file + ' should exist');
 
-for (const file of ['archive.html', 'archive-signal.html', 'js/archive.js', 'js/archive-signal.js', 'css/archive.css']) {
-  assert(fs.existsSync(path.join(root, file)), file + ' should exist');
-}
-
-const context = {
-  window: {},
-  document: { addEventListener() {} },
-  console,
-  Date,
-  Object,
-  Array,
-  String,
-  Number,
-  Math,
-  URLSearchParams
-};
+const context = { window: {}, document: { addEventListener() {} }, console, Date, Object, Array, String, Number, Math, URLSearchParams };
 vm.createContext(context);
-[
-  'js/bundled-pack-registry.js',
-  'data/signals.js',
-  'data/content-pack-01.js',
-  'data/content-pack-02.js',
-  'data/content-pack-03.js',
-  'data/content-pack-04.js',
-  'data/content-pack-05.js',
-  'js/content-registry.js',
-  'js/archive.js'
-].forEach((file) => vm.runInContext(read(file), context, { filename: file }));
+['js/bundled-pack-registry.js', 'data/signals.js', 'data/content-pack-01.js', 'data/content-pack-02.js', 'data/content-pack-03.js', 'data/content-pack-04.js', 'data/content-pack-05.js', 'js/content-registry.js', 'js/archive.js'].forEach((file) => vm.runInContext(read(file), context, { filename: file }));
 vm.runInContext(read('js/archive-signal.js'), context, { filename: 'js/archive-signal.js' });
 
 const archive = context.window.EnglishRadarArchive;
 const index = archive.createIndex(context.window.EnglishRadarContent, context.window.EnglishRadarBundledPackRegistry);
 assert(index.signals.length >= 100);
 assert(index.groups.length < index.signals.length, 'duplicate terms should be grouped for archive presentation');
-for (const term of ['cooked', 'touch grass', 'OP', 'ship it', 'RAG', 'Library', 'Queue']) {
-  assert(index.signals.some((signal) => signal.term.toLowerCase() === term.toLowerCase()), term + ' should be indexed');
-}
+assert(index.signals.every((signal) => !Object.prototype.hasOwnProperty.call(signal, 'archiveSearch')), 'search metadata must stay outside Signal schema');
+for (const term of ['cooked', 'touch grass', 'OP', 'ship it', 'RAG', 'Library', 'Queue']) assert(index.signals.some((signal) => signal.term.toLowerCase() === term.toLowerCase()), term + ' should be indexed');
 assert.equal(archive.recordType({ category: 'Community Discourse' }), 'COMMUNITY SIGNAL');
 assert.equal(archive.recordType({ category: 'Product Naming' }), 'PRODUCT LEXICON');
 assert.equal(archive.recordType({ category: 'AI Builder' }), 'BUILDER LOG');
 assert.equal(archive.recordType({ category: 'UI Vocabulary', radarType: 'interface' }), 'INTERFACE RECORD');
 assert.equal(archive.recordType({ category: 'Internet Culture' }), 'NETWORK ARTIFACT');
 assert.equal(archive.recordType({ category: 'Other' }), 'LANGUAGE SIGNAL');
-const searchIndex = (query) => index.signals.filter((signal) => [
-  signal.term, signal.meaningEn, signal.meaningZh, signal.category,
-  ...(signal.platforms || []), ...(signal.relatedTerms || []),
-  signal.culturalContextEn, signal.culturalContextZh,
-  signal.productMeaningEn, signal.productMeaningZh
-].filter(Boolean).join(' ').toLowerCase().includes(query.toLowerCase()));
+
 const touchGrassGroup = index.groups.find((group) => group.key === 'touch grass');
 assert(touchGrassGroup, 'touch grass group should exist');
 assert(touchGrassGroup.variants.length >= 2, 'touch grass should expose duplicate records');
-assert.equal(index.groups.filter((group) => group.variants.some((signal) => signal.term.toLowerCase() === 'touch grass')).length, 1);
-assert.equal(index.groups.filter((group) => group.variants.some((signal) => signal.id === 'pn-library')).length, 1);
-assert(searchIndex('product naming').some((signal) => signal.id === 'pn-library'));
-assert(searchIndex('community discourse').some((signal) => signal.id.startsWith('cd-')));
-assert(searchIndex('collection').some((signal) => signal.id === 'pn-collection'));
-const sparseHtml = context.window.EnglishRadarArchiveDetail.render({
-  id: 'sparse',
-  term: 'sparse',
-  category: 'Other',
-  meaningEn: 'A sparse record.'
-}, archive);
+const searchIndex = (query) => archive.searchIndex(index, query);
+assert.equal(searchIndex('Library')[0].primary.id, 'pn-library', 'exact term should rank first');
+assert.equal(searchIndex('touch grass').length, 1, 'touch grass should remain one grouped result');
+assert(searchIndex('product naming').some((group) => group.primary.id === 'pn-library'));
+assert(searchIndex('community discourse').some((group) => group.primary.id.startsWith('cd-')));
+assert(searchIndex('collection').some((group) => group.primary.id === 'pn-collection'));
+
+const renderArchive = { index, normalizeTerm: archive.normalizeTerm, findGroup: (id) => index.groupsById[id] };
+const sparseHtml = context.window.EnglishRadarArchiveDetail.render({ id: 'sparse', term: 'sparse', category: 'Other', meaningEn: 'A sparse record.' }, archive);
 assert(!sparseHtml.includes('ORIGINAL TRACE'));
 assert(!sparseHtml.includes('PRODUCT MEANING'));
+assert(!sparseHtml.includes('RECORD METADATA'));
+assert(!sparseHtml.includes('NETWORK / CONTEXT'));
+assert(!sparseHtml.includes('TONE'));
+const touchGrassHtml = context.window.EnglishRadarArchiveDetail.render(index.byId['internet-touch-grass'], renderArchive);
+assert(touchGrassHtml.includes('USAGE GUIDE'));
+assert(touchGrassHtml.includes('使用指南'));
+assert(touchGrassHtml.includes('ARCHIVE RECORDS'));
+assert(touchGrassHtml.includes('Showing the most complete record.'));
+const relatedHtml = context.window.EnglishRadarArchiveDetail.render(index.byId['cd-touch-grass'], renderArchive);
+assert(relatedHtml.includes('>Dogpile</a>'));
+assert(!relatedHtml.includes('>cd-dogpile</a>'));
+const libraryHtml = context.window.EnglishRadarArchiveDetail.render(index.byId['pn-library'], renderArchive);
+assert(libraryHtml.includes('PRODUCT MEANING'));
+assert(libraryHtml.includes('WHY PRODUCTS USE IT'));
+assert(libraryHtml.includes('ORIGINAL MEANING'));
+assert(libraryHtml.includes('CONFUSED WITH'));
 assert(!/SAFE|DANGEROUS|OFFENSIVE/.test(read('js/archive-signal.js')));
 assert(!/localStorage|EnglishRadarStorage|setItem|removeItem/.test(read('js/archive.js')));
-for (const page of ['index.html', 'learn.html', 'dictionary.html', 'quiz.html', 'me.html']) {
-  assert(!read(page).includes('archive.html'), page + ' should not add Archive to formal navigation');
-}
+assert(!/normalized term|registry remains unchanged|presentation layer|fields appear only when present/i.test(read('js/archive-signal.js')));
+for (const page of ['index.html', 'learn.html', 'dictionary.html', 'quiz.html', 'me.html']) assert(!read(page).includes('archive.html'), page + ' should not add Archive to formal navigation');
+
 assert(read('archive.html').includes('data-archive-search'));
 assert(read('archive.html').includes('搜索档案'));
-assert(read('archive.html').includes('已收录'));
+assert(read('archive.html').includes('档案条目'));
 assert(read('archive.html').includes('档案记录'));
+assert(read('archive.html').includes('data-archive-total'));
+assert(read('archive.html').includes('data-archive-result-count'));
 assert(read('archive.html').includes('data-archive-filter'));
 assert(read('archive-signal.html').includes('archive-signal.js'));
 assert(read('archive-signal.html').includes('返回档案'));
@@ -87,4 +73,6 @@ assert(read('archive-signal.html').includes('data-archive-detail-term-note'));
 assert(read('css/archive.css').includes('grid-template-columns: 1fr'));
 assert(read('css/archive.css').includes('@media (min-width: 700px)'));
 assert(read('css/archive.css').includes('@media (min-width: 1050px)'));
-console.log('PASS: Archive prototype registry index, record mapping, generic detail contract and isolation');
+assert(read('css/archive.css').includes('.archive-mobile-stats'));
+assert(read('css/archive.css').includes('.archive-comparison-card'));
+console.log('PASS: Archive Phase 3 hierarchy, ranking, resolution, bilingual rendering and isolation');
