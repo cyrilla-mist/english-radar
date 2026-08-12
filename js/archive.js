@@ -84,7 +84,7 @@
     var status = document.querySelector('[data-archive-status]');
     var categoryCount = document.querySelector('[data-archive-categories]');
     function setText(selector, value) { document.querySelectorAll(selector).forEach(function (element) { element.textContent = value; }); }
-    function render() { var result = current(); setText('[data-archive-total]', index.groups.length); setText('[data-archive-result-count]', result.length); setText('[data-archive-status]', result.length ? 'INDEX ONLINE' : 'NO MATCHES'); if (cards) cards.innerHTML = result.length ? result.map(renderCard).join('') : '<div class="archive-empty"><strong>No records found.</strong><p>没有找到匹配记录。</p></div>'; }
+    function render() { var result = current(); var hasResultState = Boolean(normalizeTerm(state.query) || state.category !== 'all'); setText('[data-archive-total]', index.groups.length); setText('[data-archive-result-count]', result.length); setText('[data-archive-status]', result.length ? 'INDEX ONLINE' : 'NO MATCHES'); document.querySelectorAll('.archive-result-status').forEach(function (element) { element.classList.toggle('is-visible', hasResultState); }); if (cards) cards.innerHTML = result.length ? result.map(renderCard).join('') : '<div class="archive-empty"><strong>No records found.</strong><p>没有找到匹配记录。</p></div>'; }
     var categories = {}; index.signals.forEach(function (signal) { categories[signal.category] = true; });
     setText('[data-archive-total]', index.groups.length);
     setText('[data-archive-result-count]', index.groups.length);

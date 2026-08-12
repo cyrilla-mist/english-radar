@@ -37,7 +37,7 @@
     var content = document.querySelector('[data-archive-detail-content]');
     if (title) title.textContent = signal ? (signal.displayTerm || signal.term) : 'UNKNOWN RECORD';
     if (type) type.textContent = signal ? archive.recordType(signal) : 'ARCHIVE ERROR';
-    if (note) note.textContent = signal ? ((signal.pronunciation || signal.ipa || '') + (signal.category ? ' · ' + signal.category : '')) : '';
+    if (note) note.textContent = signal ? ((signal.pronunciation || signal.ipa || '') + (signal.category ? ' · ' + signal.category : '') + (signal.status || signal.contentStatus ? ' · ' + (signal.status || signal.contentStatus) : '')) : '';
     if (chips && signal) chips.innerHTML = list(signal.platforms).concat(list(signal.tone)).map(function (value) { return '<span class="archive-chip">' + escapeHtml(value) + '</span>'; }).join('');
     if (content) content.innerHTML = render(signal, archive);
   }

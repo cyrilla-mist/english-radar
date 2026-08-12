@@ -23,17 +23,17 @@
     <section class="archive-toolbar" aria-labelledby="archive-search-label">
       <form class="archive-search-form" onsubmit="return false">
         <label class="archive-search-label" id="archive-search-label" for="archive-search">SEARCH THE ARCHIVE <small>搜索档案</small></label>
-        <div class="archive-search-wrap"><input id="archive-search" class="archive-search" data-archive-search type="search" autocomplete="off" placeholder="Search terms, meanings or contexts / 搜索表达、含义或语境"></div>
+        <div class="archive-search-wrap"><input id="archive-search" class="archive-search" data-archive-search type="search" autocomplete="off" placeholder="Search terms or contexts / 搜索表达或语境"></div>
       </form>
       <div class="archive-stats" aria-label="Archive totals / 档案总量">
         <div class="archive-stat"><strong data-archive-total>0</strong><span>ARCHIVE ENTRIES</span><small>档案条目</small></div>
         <div class="archive-stat"><strong data-archive-categories>0</strong><span>CATEGORIES</span><small>内容分类</small></div>
         <div class="archive-stat"><strong data-archive-status>INDEX ONLINE</strong><span>STATUS</span><small>档案状态</small></div>
       </div>
-      <p class="archive-mobile-stats"><strong data-archive-total>0</strong> entries · <strong data-archive-categories>0</strong> categories · <span data-archive-status>Online</span><br><span data-archive-result-count>0</span> results / 找到 <span data-archive-result-count>0</span> 条记录</p>
+      <p class="archive-mobile-stats"><strong data-archive-total>0</strong> entries · <strong data-archive-categories>0</strong> categories · <span data-archive-status>Online</span><br><span class="archive-result-status" data-archive-result-count>0</span> results / 找到 <span class="archive-result-status" data-archive-result-count>0</span> 条记录</p>
     </section>
     <section class="archive-browse" aria-labelledby="archive-records-title">
-      <div class="archive-section-heading"><div><h2 id="archive-records-title">RECENT / ALL SIGNALS</h2><p>档案记录</p></div><p><span data-archive-result-count>0</span> results / 结果</p></div>
+      <div class="archive-section-heading"><div><h2 id="archive-records-title">RECENT / ALL SIGNALS</h2><p>档案记录</p></div><p class="archive-result-status"><span data-archive-result-count>0</span> results / 结果</p></div>
       <div class="archive-filters" aria-label="Archive categories / 档案分类">
         <button class="archive-filter is-active" type="button" data-archive-filter="all">All / 全部</button><button class="archive-filter" type="button" data-archive-filter="Community Discourse">Community / 社区</button><button class="archive-filter" type="button" data-archive-filter="Product Naming">Product Naming / 产品命名</button><button class="archive-filter" type="button" data-archive-filter="AI Builder">AI Builder</button><button class="archive-filter" type="button" data-archive-filter="more">+ More / 更多</button>
       </div>
