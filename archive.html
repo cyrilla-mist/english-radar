@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="English Radar Internet Language Archive prototype.">
+  <meta name="color-scheme" content="light">
+  <title>Internet Language Archive — English Radar</title>
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/archive.css">
+  <script src="./js/bundled-pack-registry.js"></script>
+  <script src="./data/content-pack-01.js"></script><script src="./data/content-pack-02.js"></script><script src="./data/content-pack-03.js"></script><script src="./data/content-pack-04.js"></script><script src="./data/content-pack-05.js"></script>
+  <script src="./js/storage.js"></script><script src="./data/signals.js"></script><script src="./js/content-registry.js"></script>
+</head>
+<body class="archive-page">
+  <main class="archive-shell">
+    <header class="archive-masthead">
+      <div><div class="archive-kicker">ENGLISH RADAR / OPEN EXPERIMENT</div><h1 class="archive-title">INTERNET<br><em>LANGUAGE</em><br>ARCHIVE</h1></div>
+      <div class="archive-build"><span class="archive-label">BUILD LABEL</span><strong>ARCHIVE MODE / PHASE 1</strong><span class="archive-meta">READ-ONLY PRESENTATION</span></div>
+    </header>
+    <section class="archive-toolbar" aria-labelledby="archive-search-label">
+      <form class="archive-search" onsubmit="return false"><label id="archive-search-label" class="archive-label" for="archive-search">SEARCH THE INDEX</label><input id="archive-search" data-archive-search type="search" autocomplete="off" placeholder="term, meaning, network, category…"></form>
+      <div class="archive-stats"><div class="archive-stat"><span class="archive-label">ARCHIVE STATUS</span><strong data-archive-status>INDEX ONLINE</strong></div><div class="archive-stat"><span class="archive-label">INDEXED SIGNALS</span><strong data-archive-count>0</strong></div><div class="archive-stat"><span class="archive-label">NETWORKS / CATEGORIES</span><strong data-archive-categories>0</strong></div></div>
+    </section>
+    <section aria-labelledby="archive-records-title"><div class="archive-card-top" style="margin-top:28px"><h2 id="archive-records-title" class="archive-label">ARCHIVE RECORDS / AUTOMATIC INDEX</h2><span class="archive-meta">NO MANUAL CARD DATA</span></div><div class="archive-record-grid" data-archive-record-grid></div></section>
+    <footer class="archive-archive-footer">Prototype only · existing Signal Registry · no learning state written · <a class="archive-link" href="./index.html">Return to English Radar</a></footer>
+  </main>
+  <script src="./js/archive.js"></script>
+</body>
+</html>
