@@ -137,6 +137,29 @@ body.archive-page {
 .archive-result-status { display: none; }
 .archive-result-status.is-visible { display: block; }
 
+body.archive-page { display: flex; min-height: 100vh; }
+body.archive-page .archive-product-sidebar { display: block; flex: 0 0 220px; }
+body.archive-page .archive-shell { flex: 1 1 auto; min-width: 0; }
+.archive-scope { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.archive-scope-button { border: 1px solid var(--archive-line); background: transparent; color: var(--archive-ink-soft); padding: 10px 13px; cursor: pointer; font: inherit; }
+.archive-scope-button small { display: block; margin-top: 3px; font-size: .75rem; }
+.archive-scope-button.is-active { border-color: var(--archive-ink); color: var(--archive-ink); background: rgba(255,255,255,.32); }
+.archive-availability, .archive-active-badge { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; color: var(--archive-ink); font-family: var(--archive-mono); font-size: .68rem; letter-spacing: .04em; }
+.archive-availability small { color: var(--archive-ink-soft); font-family: var(--archive-sans); letter-spacing: 0; }
+.archive-availability-quiet { color: var(--archive-ink-soft); }
+.archive-detail-availability { margin-top: 13px; }
+.archive-detail-actions { margin-top: 18px; }
+.archive-cta { display: inline-flex; padding: 11px 14px; background: var(--archive-ink); color: #fff; text-decoration: none; font-size: .9rem; }
+.archive-secondary-link { display: inline-block; margin-top: 18px; color: var(--archive-ink); }
+@media (max-width: 767px) {
+  body.archive-page { display: block; padding-bottom: 76px; }
+  body.archive-page .archive-product-sidebar { display: none; }
+  body.archive-page .archive-shell { width: 100%; padding-inline: 18px; }
+  body.archive-page .archive-mobile-nav { display: grid; position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; grid-template-columns: repeat(5, 1fr); min-height: 64px; background: var(--archive-paper); border-top: 1px solid var(--archive-line); }
+  body.archive-page .archive-mobile-nav a { display: grid; place-items: center; align-content: center; gap: 3px; color: var(--archive-ink-soft); text-decoration: none; font-size: .68rem; }
+  body.archive-page .archive-mobile-nav a.is-active { color: var(--archive-ink); font-weight: 700; }
+}
+
 @media (max-width: 699px) {
   .archive-stats { display: none; }
   .archive-section-heading > p { font-size: .8rem; }
