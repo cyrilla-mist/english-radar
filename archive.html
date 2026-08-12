@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="English Radar Internet Language Archive prototype.">
   <meta name="color-scheme" content="light">
-  <title>Internet Language Archive — English Radar</title>
+  <title>English Radar Archive - Internet Language</title>
   <link rel="stylesheet" href="./css/tokens.css">
   <link rel="stylesheet" href="./css/base.css">
   <link rel="stylesheet" href="./css/archive.css">
@@ -16,15 +16,35 @@
 <body class="archive-page">
   <main class="archive-shell">
     <header class="archive-masthead">
-      <div><div class="archive-kicker">ENGLISH RADAR / OPEN EXPERIMENT</div><h1 class="archive-title">INTERNET<br><em>LANGUAGE</em><br>ARCHIVE</h1></div>
-      <div class="archive-build"><span class="archive-label">BUILD LABEL</span><strong>ARCHIVE MODE / PHASE 1</strong><span class="archive-meta">READ-ONLY PRESENTATION</span></div>
+      <div class="archive-kicker">ENGLISH RADAR ARCHIVE</div>
+      <h1 class="archive-title">Internet Language Archive</h1>
+      <p class="archive-subtitle">互联网语言档案</p>
+      <p class="archive-intro">Internet English, decoded and archived.<span>收集、解释真实互联网里的英语表达。</span></p>
+      <div class="archive-experiment">ARCHIVE 01 - EXPERIMENTAL</div>
     </header>
     <section class="archive-toolbar" aria-labelledby="archive-search-label">
-      <form class="archive-search" onsubmit="return false"><label id="archive-search-label" class="archive-label" for="archive-search">SEARCH THE INDEX</label><input id="archive-search" data-archive-search type="search" autocomplete="off" placeholder="term, meaning, network, category…"></form>
-      <div class="archive-stats"><div class="archive-stat"><span class="archive-label">ARCHIVE STATUS</span><strong data-archive-status>INDEX ONLINE</strong></div><div class="archive-stat"><span class="archive-label">INDEXED SIGNALS</span><strong data-archive-count>0</strong></div><div class="archive-stat"><span class="archive-label">NETWORKS / CATEGORIES</span><strong data-archive-categories>0</strong></div></div>
+      <form class="archive-search-form" onsubmit="return false">
+        <label class="archive-search-label" id="archive-search-label" for="archive-search">SEARCH THE ARCHIVE <small>搜索档案</small></label>
+        <div class="archive-search-wrap"><input id="archive-search" class="archive-search" data-archive-search type="search" autocomplete="off" placeholder="Search terms, meanings or contexts / 搜索表达、含义或语境"></div>
+      </form>
+      <div class="archive-stats">
+        <div class="archive-stat"><strong data-archive-count>0</strong><span>INDEXED SIGNALS</span><small>已收录</small></div>
+        <div class="archive-stat"><strong data-archive-categories>0</strong><span>CATEGORIES</span><small>内容分类</small></div>
+        <div class="archive-stat"><strong data-archive-status>INDEX ONLINE</strong><span>STATUS</span><small>档案状态</small></div>
+      </div>
     </section>
-    <section aria-labelledby="archive-records-title"><div class="archive-card-top" style="margin-top:28px"><h2 id="archive-records-title" class="archive-label">ARCHIVE RECORDS / AUTOMATIC INDEX</h2><span class="archive-meta">NO MANUAL CARD DATA</span></div><div class="archive-record-grid" data-archive-record-grid></div></section>
-    <footer class="archive-archive-footer">Prototype only · existing Signal Registry · no learning state written · <a class="archive-link" href="./index.html">Return to English Radar</a></footer>
+    <section class="archive-browse" aria-labelledby="archive-records-title">
+      <div class="archive-section-heading"><div><h2 id="archive-records-title">RECENT / ALL SIGNALS</h2><p>档案记录</p></div></div>
+      <div class="archive-filters" aria-label="Archive categories / 档案分类">
+        <button class="archive-filter is-active" type="button" data-archive-filter="all">All / 全部</button>
+        <button class="archive-filter" type="button" data-archive-filter="Community Discourse">Community / 社区</button>
+        <button class="archive-filter" type="button" data-archive-filter="Product Naming">Product Naming / 产品命名</button>
+        <button class="archive-filter" type="button" data-archive-filter="AI Builder">AI Builder</button>
+        <button class="archive-filter" type="button" data-archive-filter="more">+ More / 更多</button>
+      </div>
+      <div class="archive-record-grid" data-archive-record-grid></div>
+    </section>
+    <footer class="archive-archive-footer">Prototype only - existing Signal Registry - no learning state written - <a class="archive-link" href="./index.html">Return to English Radar</a></footer>
   </main>
   <script src="./js/archive.js"></script>
 </body>

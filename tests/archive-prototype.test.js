@@ -39,6 +39,7 @@ vm.runInContext(read('js/archive-signal.js'), context, { filename: 'js/archive-s
 const archive = context.window.EnglishRadarArchive;
 const index = archive.createIndex(context.window.EnglishRadarContent, context.window.EnglishRadarBundledPackRegistry);
 assert(index.signals.length >= 100);
+assert(index.groups.length < index.signals.length, 'duplicate terms should be grouped for archive presentation');
 for (const term of ['cooked', 'touch grass', 'OP', 'ship it', 'RAG', 'Library', 'Queue']) {
   assert(index.signals.some((signal) => signal.term.toLowerCase() === term.toLowerCase()), term + ' should be indexed');
 }
@@ -54,6 +55,11 @@ const searchIndex = (query) => index.signals.filter((signal) => [
   signal.culturalContextEn, signal.culturalContextZh,
   signal.productMeaningEn, signal.productMeaningZh
 ].filter(Boolean).join(' ').toLowerCase().includes(query.toLowerCase()));
+const touchGrassGroup = index.groups.find((group) => group.key === 'touch grass');
+assert(touchGrassGroup, 'touch grass group should exist');
+assert(touchGrassGroup.variants.length >= 2, 'touch grass should expose duplicate records');
+assert.equal(index.groups.filter((group) => group.variants.some((signal) => signal.term.toLowerCase() === 'touch grass')).length, 1);
+assert.equal(index.groups.filter((group) => group.variants.some((signal) => signal.id === 'pn-library')).length, 1);
 assert(searchIndex('product naming').some((signal) => signal.id === 'pn-library'));
 assert(searchIndex('community discourse').some((signal) => signal.id.startsWith('cd-')));
 assert(searchIndex('collection').some((signal) => signal.id === 'pn-collection'));
@@ -71,5 +77,14 @@ for (const page of ['index.html', 'learn.html', 'dictionary.html', 'quiz.html', 
   assert(!read(page).includes('archive.html'), page + ' should not add Archive to formal navigation');
 }
 assert(read('archive.html').includes('data-archive-search'));
+assert(read('archive.html').includes('搜索档案'));
+assert(read('archive.html').includes('已收录'));
+assert(read('archive.html').includes('档案记录'));
+assert(read('archive.html').includes('data-archive-filter'));
 assert(read('archive-signal.html').includes('archive-signal.js'));
+assert(read('archive-signal.html').includes('返回档案'));
+assert(read('archive-signal.html').includes('data-archive-detail-term-note'));
+assert(read('css/archive.css').includes('grid-template-columns: 1fr'));
+assert(read('css/archive.css').includes('@media (min-width: 700px)'));
+assert(read('css/archive.css').includes('@media (min-width: 1050px)'));
 console.log('PASS: Archive prototype registry index, record mapping, generic detail contract and isolation');
