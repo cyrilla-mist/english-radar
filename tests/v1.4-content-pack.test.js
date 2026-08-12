@@ -89,9 +89,9 @@ for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html',
   assert(!html.includes('./js/quiz-registry.js?v=1.3.0'), `${page} must not use stale quiz registry cache key`);
   assert(!html.includes('./js/me.js?v=1.3.0'), `${page} must not use stale me.js cache key`);
   assert(!/English Radar v1\.3\.0|ENGLISH RADAR \/ V1\.3\.0|>V1\.3\.0</.test(html), `${page} must not expose stale current release metadata`);
-  assert(/v1\.7\.0/i.test(html), `${page} must expose V1.7.0 metadata`);
+  assert(/v1\.8\.0/i.test(html), `${page} must expose V1.8.0 metadata`);
 }
-assert(/English Radar v1\.7\.0 signal not found\./.test(read('404.html')));
+assert(/English Radar v1\.8\.0 signal not found\./.test(read('404.html')));
 for (const page of ['index.html', 'learn.html', 'quiz.html']) {
   const html = read(page);
   assert(html.includes('./data/content-pack-02-quizzes.js?v=1.4.0'), `${page} should load Pack 02 quizzes`);
