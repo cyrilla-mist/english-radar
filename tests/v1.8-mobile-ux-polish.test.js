@@ -1,0 +1,45 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+
+const root = path.resolve(__dirname, '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const learn = read('learn.html');
+const archive = read('archive.html');
+const archiveDetail = read('archive-signal.html');
+const polish = read('js/mobile-ux-polish.js');
+
+assert(polish.includes('UI vocabulary') && polish.includes('界面词'));
+assert(polish.includes('aria-label'));
+assert(!polish.includes('Interface mode off'));
+assert(learn.includes('data-speak-example'));
+assert(learn.includes('aria-label="Listen to example / 朗读例句"'));
+assert(learn.includes('<svg') && learn.includes('class="sr-only"'));
+assert(!learn.includes('>Listen to example</button>'));
+assert(archive.includes('id="main-content"') && archiveDetail.includes('id="main-content"'));
+assert(read('css/archive.css').includes('.archive-page .skip-link'));
+assert(read('css/archive.css').includes('.archive-page .skip-link:focus'));
+assert(read('js/ui-copy.js').includes("Archive: '档案'"));
+assert(read('js/ui-copy.js').includes("href.indexOf('archive')"));
+for (const page of ['archive.html', 'archive-signal.html']) assert(read(page).includes('ui-copy.js?v=1.8.0'));
+assert(!/englishRadar\.interfaceLearningMode|setItem\(|removeItem\(/.test(read('js/mobile-ux-polish.js')));
+
+const context = { window: {}, document: { addEventListener() {} }, console, Date, Object, Array, String, Number, Math, URLSearchParams };
+vm.createContext(context);
+for (const file of ['js/bundled-pack-registry.js', 'data/signals.js', 'data/content-pack-01.js', 'data/content-pack-02.js', 'data/content-pack-03.js', 'data/content-pack-04.js', 'data/content-pack-05.js', 'js/content-registry.js', 'js/archive.js', 'js/archive-signal.js']) vm.runInContext(read(file), context, { filename: file });
+const archiveApi = context.window.EnglishRadarArchive;
+const index = archiveApi.createIndex(context.window.EnglishRadarContent, context.window.EnglishRadarBundledPackRegistry);
+archiveApi.findGroup = (id) => index.catalogGroups.find((group) => group.variants.some((entry) => entry.signal.id === id)) || null;
+archiveApi.index = index;
+archiveApi.normalizeTerm = archiveApi.normalizeTerm || ((value) => String(value || '').trim().toLowerCase().replace(/\s+/g, ' '));
+const simple = index.catalogEntries.find((entry) => entry.signal.id === 'product-mvp');
+const rich = index.catalogEntries.find((entry) => entry.signal.id === 'pn-library');
+const simpleHtml = context.window.EnglishRadarArchiveDetail.render(simple, archiveApi);
+const richHtml = context.window.EnglishRadarArchiveDetail.render(rich, archiveApi);
+assert(!simpleHtml.includes('>DEEP DIVE</summary>'));
+assert(richHtml.includes('>DEEP DIVE</summary>'));
+assert(richHtml.includes('ORIGINAL MEANING'));
+assert(simpleHtml.includes('RECORD INFO'));
+assert(!/localStorage|englishRadar_[A-Za-z]+/.test(read('js/mobile-ux-polish.js')));
+console.log('PASS: v1.8 mobile UX polish control, audio, skip-link, Deep Dive and Archive nav regressions');

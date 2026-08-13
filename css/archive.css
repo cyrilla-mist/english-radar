@@ -136,6 +136,12 @@ body.archive-page {
 .archive-archive-footer span { text-align: right; }
 .archive-result-status { display: none; }
 .archive-result-status.is-visible { display: block; }
+.archive-page .skip-link { position: fixed; z-index: 40; top: 8px; left: 8px; transform: translateY(-150%); padding: 8px 12px; color: var(--archive-paper); background: var(--archive-ink); font-family: var(--archive-mono); font-size: .78rem; }
+.archive-page .skip-link:focus, .archive-page .skip-link:focus-visible { transform: translateY(0); outline: 3px solid var(--archive-accent); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.example-listen { display: inline-grid; place-items: center; width: 44px; height: 44px; margin-top: 12px; padding: 0; border: 1px solid var(--line-light); border-radius: 50%; color: var(--forest); background: transparent; cursor: pointer; }
+.example-listen svg { width: 21px; height: 21px; }
+.archive-page .mobile-nav .zh-helper { display: block; color: inherit; font-family: var(--archive-sans); font-size: .62rem; font-weight: 400; letter-spacing: 0; }
 
 body.archive-page { display: flex; min-height: 100vh; }
 body.archive-page .archive-product-sidebar { display: block; flex: 0 0 220px; }
