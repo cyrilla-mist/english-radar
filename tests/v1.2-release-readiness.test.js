@@ -40,8 +40,8 @@ for (const page of mainPages) {
 }
 
 const readme = read('README.md');
-assert.match(readme, /English Radar v1\.8\.0 is the current development version/);
-assert.doesNotMatch(readme, /PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
+assert.match(readme, /English Radar v1\.8\.1 is the current maintenance release on `main`/);
+assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
 assert.ok(fs.existsSync(path.join(root, 'docs/v1.2.1-release-notes.md')));
 assert.ok(fs.existsSync(path.join(root, 'docs/production-release-checklist.md')));
 
