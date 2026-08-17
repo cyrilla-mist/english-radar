@@ -26,7 +26,7 @@ window.ENGLISH_RADAR_CONTENT_PACK_04 = {
   },
   "signals": [
     {
-      "id": "cd-op", "term": "OP", "displayTerm": "OP", "speechText": "O P", "pronunciation": "/ˌoʊ ˈpiː/", "category": "Community Discourse",
+      "id": "cd-op", "term": "OP", "displayTerm": "OP", "fullForm": "original poster", "speechText": "O P", "pronunciation": "/ˌoʊ ˈpiː/", "category": "Community Discourse",
       "platforms": ["Reddit", "Forums", "Comment sections"], "tone": ["Neutral", "Community-specific"], "status": "Established", "formality": "Very informal",
       "meaningEn": "The person who originally created a post or discussion.", "meaningZh": "发帖人；最初创建这条帖子或讨论的人。",
       "exampleEn": "OP, could you add the steps that fixed the issue?", "exampleZh": "楼主，你能补充一下解决问题的步骤吗？",

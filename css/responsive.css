@@ -104,3 +104,11 @@
   .import-preview { max-width: 100%; }
   .reset-area .backup-actions { flex-wrap: wrap; }
 }
+
+.full-form-block { padding-top: 18px; padding-bottom: 18px; }
+.full-form-block .block-label { color: var(--clay); }
+.full-form-value { margin: 0; color: var(--forest); font: 20px/1.4 var(--serif); }
+.dictionary-term-group { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.dictionary-full-form { color: var(--clay); font: 11px var(--mono); letter-spacing: .03em; }
+.archive-card-full-form { margin: 0 0 8px; color: var(--archive-accent); font-family: var(--archive-mono); font-size: .68rem; letter-spacing: .04em; }
+.archive-detail-full-form { margin: 9px 0 0; color: var(--archive-accent); font-family: var(--archive-mono); font-size: .76rem; letter-spacing: .04em; }

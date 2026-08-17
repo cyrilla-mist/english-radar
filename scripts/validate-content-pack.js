@@ -79,6 +79,7 @@ signals.forEach((signal, index) => {
   if (signal.quizStatus && !['none', 'draft', 'ready'].includes(signal.quizStatus)) errors.push(`signals[${index}].quizStatus is invalid`);
   if (signal.platforms !== undefined && !Array.isArray(signal.platforms)) errors.push(`signals[${index}].platforms must be an array`);
   if (signal.tone !== undefined && !Array.isArray(signal.tone)) errors.push(`signals[${index}].tone must be an array`);
+  if (signal.fullForm !== undefined && !text(signal.fullForm)) errors.push(`signals[${index}].fullForm must be a non-empty string when present`);
 
   const category = String(signal.category || '').trim();
   if (category === 'Product Naming') {
