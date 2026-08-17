@@ -1,12 +1,12 @@
-# English Radar v1.8.0
+# English Radar v1.8.1
 
 English Radar is a local-first learning tool for real internet English. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation and personal mastery rather than a traditional word list.
 
 ## Release status
 
-English Radar v1.8.0 is the current development version on `feat/v1.8-archive-mode`; v1.7.0 remains the latest protected release on `main`.
+English Radar v1.8.1 is the current maintenance release on `main`. v1.8.0 remains the final feature release of the original English Radar product line; v1.8.1 adds backward-compatible Full Form support for abbreviation, acronym and initialism Signals plus release cache hygiene.
 
-V1.2 introduced Interface Learning Mode, the UI Vocabulary Core Pack, Interface Check and the complete interface-vocabulary learning loop. V1.2.1 finalized release metadata, cache consistency and production verification. V1.3.0 added the optional audited Content Pack 01 for Product Interface & Builder Workflow. V1.4.0 added the optional audited Content Pack 02 for AI Foundations. V1.5.0 added the optional audited Content Pack 03 for Interface Structure & Overlays. V1.6.0 added the optional audited Content Pack 04 for Community Discourse and generalized rich semantic Signal fields. V1.7.0 adds the optional audited Content Pack 05 for Product Naming and a self-registering bundled pack registry.
+V1.2 introduced Interface Learning Mode, the UI Vocabulary Core Pack, Interface Check and the complete interface-vocabulary learning loop. V1.2.1 finalized release metadata, cache consistency and production verification. V1.3.0 added the optional audited Content Pack 01 for Product Interface & Builder Workflow. V1.4.0 added the optional audited Content Pack 02 for AI Foundations. V1.5.0 added the optional audited Content Pack 03 for Interface Structure & Overlays. V1.6.0 added the optional audited Content Pack 04 for Community Discourse and generalized rich semantic Signal fields. V1.7.0 added the optional audited Content Pack 05 for Product Naming and a self-registering bundled pack registry. V1.8.0 added Archive Mode. V1.8.1 adds Full Form metadata, rendering and search support while preserving the existing local-first data model.
 
 The release baseline includes 60 Core Signals and 120 Core Quizzes; UI Vocabulary Core has 10 Signals and 20 quizzes; optional Content Pack 01 has 24 Signals and 48 quizzes; optional Content Pack 02 has 10 Signals and 20 quizzes; optional Content Pack 03 has 10 Signals and 20 quizzes; optional Content Pack 04 has 10 Signals and 20 quizzes; and optional Content Pack 05 has 10 Signals and 20 quizzes. The bundled Cyrilla Notion Archive remains separate optional local content, and optional packs are not active until installed in a browser.
 

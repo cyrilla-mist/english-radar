@@ -69,7 +69,7 @@ assert(read('js/learning-engine.js').includes("'Community Discourse'"));
 assert(read('js/session.js').includes('data-rich-signal-section'));
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html']) {
   const html = read(page);
-  assert(html.includes('./data/content-pack-04.js?v=1.6.0'), `${page} should load Pack 04 Signals`);
+  assert(html.includes('./data/content-pack-04.js?v=1.8.1'), `${page} should load Pack 04 Signals`);
   assert(html.includes('./data/content-pack-04-quizzes.js?v=1.6.0'), `${page} should load Pack 04 quizzes`);
 }
 

@@ -53,13 +53,13 @@ for (const page of ['index.html', 'learn.html', 'quiz.html', 'dictionary.html', 
   assert(html.includes('bundled-pack-registry.js?v=1.7.0'));
   assert(html.includes('content-pack-05.js?v=1.7.0'));
   assert(html.includes('content-pack-05-quizzes.js?v=1.7.0'));
-  assert.match(html, /v1\.8\.0/i);
+  assert.match(html, /v1\.8\.1/i);
 }
 assert(read('README.md').includes('Content Pack 05'));
 assert(fs.existsSync(path.join(root, 'docs/v1.7.0-product-naming.md')));
 assert(fs.existsSync(path.join(root, 'docs/v1.7.0-release-notes.md')));
 const notFound = read('404.html');
-assert.match(notFound, /<meta name="version" content="v1\.8\.0">/i);
-assert.match(notFound, /<meta name="description" content="English Radar v1\.8\.0 signal not found\.">/i);
+assert.match(notFound, /<meta name="version" content="v1\.8\.1">/i);
+assert.match(notFound, /<meta name="description" content="English Radar v1\.8\.1 signal not found\.">/i);
 assert.doesNotMatch(notFound, /<meta name="description"[^>]*v1\.6\.0/i);
 console.log('PASS: v1.7 Product Naming registry, schema, Learn semantics, quiz coverage and page wiring');

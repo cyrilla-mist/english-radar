@@ -10,15 +10,15 @@ const pageFiles = ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 
 
 for (const file of pageFiles) {
   const html = read(file);
-  assert.match(html, /v1\.8\.0/i, `${file} should expose V1.8.0`);
+  assert.match(html, /v1\.8\.1/i, `${file} should expose V1.8.1`);
   assert.doesNotMatch(html, /v1\.4\.0|v1\.2\.1|v1\.2\.0|v1\.1\.1/i, `${file} contains stale user-visible version text`);
 }
 
 const mainHtml = pageFiles.slice(0, 6).map(read).join('\n');
-assert.equal((mainHtml.match(/ENGLISH RADAR \/ V1\.8\.0/g) || []).length, 4);
+assert.equal((mainHtml.match(/ENGLISH RADAR \/ V1\.8\.1/g) || []).length, 4);
 const readme = read('README.md');
-assert.match(readme, /English Radar v1\.8\.0 is the current development version/);
-assert.doesNotMatch(readme, /release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
+assert.match(readme, /English Radar v1\.8\.1 is the current maintenance release on `main`/);
+assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
 
 const workflow = read('.github/workflows/v1.1-checks.yml');
 assert.match(workflow, /name:\s*English Radar v1\.2 checks/);
