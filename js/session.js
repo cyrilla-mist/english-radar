@@ -156,7 +156,15 @@
     if (interfaceFields[zhKey]) interfaceFields[zhKey].textContent = zh;
     if (interfaceSections[sectionName]) interfaceSections[sectionName].hidden = !(en || zh);
   }
+  function renderFullForm(signal) {
+    var section = document.querySelector('[data-full-form-section]');
+    var field = document.querySelector('[data-full-form]');
+    var value = hasText(signal.fullForm) ? signal.fullForm.trim() : '';
+    if (field) field.textContent = value;
+    if (section) section.hidden = !value;
+  }
   function renderInterfaceSignal(signal) {
+    renderFullForm(signal);
     clearInterfaceContent();
     renderInterfacePair('original', 'originalMeaningEn', 'originalMeaningZh', signal);
     renderInterfacePair('product', 'productMeaningEn', 'productMeaningZh', signal);
@@ -172,6 +180,7 @@
     renderInterfacePair('boundary', 'usageBoundaryEn', 'usageBoundaryZh', signal);
   }
   function renderStandardSignal(signal) {
+    renderFullForm(signal);
     renderRichSignal(signal); setText(refs.meaningEn, signal.meaningEn); setText(refs.meaningZh, signal.meaningZh); setText(refs.exampleEn, '“' + text(signal.exampleEn) + '”'); setText(refs.exampleZh, signal.exampleZh); setText(refs.platforms, list(signal.platforms)); setText(refs.tone, list(signal.tone)); setText(refs.status, signal.status); setText(refs.formality, signal.formality); setText(refs.useWhen, signal.useWhen); setText(refs.avoidWhen, signal.avoidWhen); setText(refs.chineseFeeling, signal.chineseFeeling); renderBilingual(signal);
   }
   function renderSignal() {

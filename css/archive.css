@@ -178,3 +178,5 @@ body.archive-page .archive-shell { flex: 1 1 auto; min-width: 0; }
   .archive-usage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .archive-comparison-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.archive-card-full-form { margin: 0 0 8px; color: var(--archive-accent); font-family: var(--archive-mono); font-size: .68rem; letter-spacing: .04em; }
+.archive-detail-full-form { margin: 9px 0 0; color: var(--archive-accent); font-family: var(--archive-mono); font-size: .76rem; letter-spacing: .04em; }
