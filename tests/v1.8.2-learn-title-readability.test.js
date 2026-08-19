@@ -8,6 +8,8 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const session = read('js/session.js');
 const layout = read('css/layout.css');
 const responsive = read('css/responsive.css');
+const dictionary = read('js/dictionary.js');
+const components = read('css/components.css');
 
 assert.match(session, /function displayTerm\(value\) \{ return hasText\(value\) \? String\(value\)\.trim\(\) : ''; \}/);
 assert.match(session, /function getLearnDisplayTerm\(signal\) \{ if \(!signal\) return ''; return hasText\(signal\.term\) \? String\(signal\.term\)\.trim\(\) : displayTerm\(signal\.displayTerm\); \}/);
@@ -23,6 +25,11 @@ assert.match(session, /isLookup/);
 assert.match(session, /function renderStandardSignal\(signal\)/);
 assert.match(session, /function renderInterfaceSignal\(signal\)/);
 assert.match(session, /data-full-form-section|fullForm/);
+assert.match(session, /var value = hasText\(signal\.fullForm\) \? signal\.fullForm\.trim\(\) : '';/);
+assert.match(session, /if \(section\) section\.hidden = !value;/);
+assert.match(dictionary, /var fullForm = typeof signal\.fullForm === 'string' && signal\.fullForm\.trim\(\) \? signal\.fullForm\.trim\(\) : '';/);
+assert.match(dictionary, /if \(fullForm\) termGroup\.appendChild\(element\('small', 'dictionary-full-form'/);
+assert.match(components, /\.full-form-block\[hidden\] \{ display: none; \}/);
 
 assert.match(layout, /\.signal-heading\s*\{[^}]*min-width:\s*0/);
 assert.match(layout, /\.signal-heading h1\s*\{[^}]*max-width:\s*100%/);
