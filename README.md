@@ -1,10 +1,10 @@
-# English Radar v1.8.2
+# English Radar v1.8.3
 
 English Radar is a local-first learning tool for real internet English. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation and personal mastery rather than a traditional word list.
 
 ## Release status
 
-English Radar v1.8.2 is the current maintenance release on `main`. v1.8.0 remains the final feature release of the original English Radar product line; v1.8.1 added backward-compatible Full Form support for abbreviation, acronym and initialism Signals, and v1.8.2 improves Learn Signal title readability without changing the local-first data model.
+English Radar v1.8.3 is the current maintenance release on `main`. v1.8.0 remains the final feature release of the original English Radar product line; v1.8.1 added backward-compatible Full Form support for abbreviation, acronym and initialism Signals, v1.8.2 improved Learn Signal title readability, and v1.8.3 simplifies the mobile Me page and improves context audio UX without changing the local-first data model.
 
 V1.2 introduced Interface Learning Mode, the UI Vocabulary Core Pack, Interface Check and the complete interface-vocabulary learning loop. V1.2.1 finalized release metadata, cache consistency and production verification. V1.3.0 added the optional audited Content Pack 01 for Product Interface & Builder Workflow. V1.4.0 added the optional audited Content Pack 02 for AI Foundations. V1.5.0 added the optional audited Content Pack 03 for Interface Structure & Overlays. V1.6.0 added the optional audited Content Pack 04 for Community Discourse and generalized rich semantic Signal fields. V1.7.0 added the optional audited Content Pack 05 for Product Naming and a self-registering bundled pack registry. V1.8.0 added Archive Mode. V1.8.1 adds Full Form metadata, rendering and search support while preserving the existing local-first data model.
 
