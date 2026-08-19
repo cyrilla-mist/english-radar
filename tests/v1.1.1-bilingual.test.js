@@ -97,7 +97,7 @@ const action = new FakeElement('button', 'Start Library Session'); dom.appendChi
 ['CONTENT LIBRARY', 'NOTION SYNC', 'PREFERENCES', 'DATA & BACKUP'].forEach((title) => { const section = new FakeElement('section', '', ['me-section']); const label = new FakeElement('div', title, ['section-label']); const content = new FakeElement('div'); content.appendChild(new FakeElement('button', 'Save settings')); if (title === 'CONTENT LIBRARY') { const packs = new FakeElement('strong', '0'); packs.setAttribute('data-library', 'packs'); content.appendChild(packs); } if (title === 'NOTION SYNC') { const enabled = new FakeElement('input'); enabled.checked = false; enabled.setAttribute('data-sync-enabled', ''); content.appendChild(enabled); } if (title === 'PREFERENCES') { const sessionSize = new FakeElement('select'); sessionSize.value = '5'; sessionSize.setAttribute('name', 'defaultSessionSize'); content.appendChild(sessionSize); } section.appendChild(label); section.appendChild(content); dom.appendChild(section); });
 const uiContext = { document: dom, window: {}, console };
 vm.runInNewContext(copy, uiContext);
-assert.equal(nav.children.find((child) => child.classList.contains('zh-helper')).textContent, '今日学习');
+assert.equal(nav.children.find((child) => child.classList.contains('zh-helper')).textContent, '雷达');
 assert.equal(action.children.find((child) => child.classList.contains('zh-helper')).textContent, '开始学习');
 assert(read('js/session.js').includes('暂无标准中文标签'));
 const compactSections = dom.querySelectorAll('.me-section');

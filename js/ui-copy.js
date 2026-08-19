@@ -29,7 +29,7 @@
   }
   function decorateActions() {
     document.querySelectorAll('button, a.primary-button, .context-check-list > a, .signal-actions button, .audio-controls button').forEach(function (element) {
-      if (element.classList.contains('me-collapse-toggle')) return;
+      if (element.classList.contains('me-collapse-toggle') || element.classList.contains('example-listen')) return;
       var visible = element.textContent.replace(/[→↗←▶×]/g, ' ').replace(/\s+/g, ' ').trim();
       var key = Object.keys(actionCopy).find(function (candidate) { return visible === candidate || visible.indexOf(candidate) === 0; });
       if (key) addHelper(element, actionCopy[key]);
@@ -37,7 +37,7 @@
   }
   function navKey(link) {
     var href = link.getAttribute('href') || '';
-    return href.indexOf('dictionary') !== -1 ? 'Dictionary' : href.indexOf('archive') !== -1 ? 'Archive' : href.indexOf('inbox') !== -1 ? 'Inbox' : href.indexOf('me') !== -1 ? 'Me' : href.indexOf('learn') !== -1 ? 'Review' : 'Today';
+    return href.indexOf('dictionary') !== -1 ? 'Dictionary' : href.indexOf('archive') !== -1 ? 'Archive' : href.indexOf('inbox') !== -1 ? 'Inbox' : href.indexOf('me') !== -1 ? 'Me' : href.indexOf('learn') !== -1 ? 'Review' : 'Radar';
   }
   function apply() {
     document.querySelectorAll('.side-nav .nav-item, .mobile-nav a').forEach(function (link) {
