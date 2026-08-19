@@ -65,7 +65,7 @@
   if (storage) { var settingsRaw = storage.read(storage.keys.settings, null); if (!settingsRaw || Number(settingsRaw.dataVersion) !== 1 || Number(settingsRaw.contentVersion) !== 1) storage.setSettings(storage.getSettings()); }
 
   function text(value) { return value === undefined || value === null || value === '' ? '—' : String(value); }
-  function displayTerm(value) { return hasText(value) ? String(value).trim().toUpperCase() : ''; }
+  function displayTerm(value) { return hasText(value) ? String(value).trim() : ''; }
   function list(value) { return Array.isArray(value) && value.length ? value.join(' · ') : '—'; }
   function hasText(value) { return typeof value === 'string' && value.trim() && value.trim() !== '—'; }
   function setText(element, value) { if (element) element.textContent = text(value); }
@@ -186,10 +186,10 @@
   function renderSignal() {
     var signal = sessionSignals[currentIndex]; if (!signal) return;
     if (archiveSecondaryLink) { archiveSecondaryLink.hidden = !isLookup; if (isLookup) archiveSecondaryLink.href = './archive-signal.html?id=' + encodeURIComponent(signal.id); }
-    var position = currentIndex + 1; var total = sessionSignals.length; var displayTerm = text(signal.displayTerm || signal.term).toUpperCase(); var interfaceMode = isInterfaceSignal(signal);
+    var position = currentIndex + 1; var total = sessionSignals.length; var displayTerm = text(signal.displayTerm || signal.term); var interfaceMode = isInterfaceSignal(signal);
     refs.title.textContent = text(signal.term) + ' — English Radar'; setText(refs.meta, isLookup ? 'DICTIONARY ENTRY' : (mode === 'review' ? 'Review ' : 'SIGNAL ') + String(position).padStart(2, '0') + ' / ' + total); setText(refs.category, interfaceMode ? 'UI VOCABULARY' : isLookup ? signal.category : mode === 'review' ? 'REVIEW' : signal.category);
     if (refs.progress) refs.progress.style.width = (total ? position / total * 100 : 0) + '%'; if (refs.progressTrack) refs.progressTrack.setAttribute('aria-label', position + ' of ' + total + ' signals'); setText(refs.stamp, interfaceMode ? 'UI / ' + String(position).padStart(2, '0') : (isLookup ? categoryCode(signal.category) : mode === 'review' ? 'REVIEW' : categoryCode(signal.category)) + ' / ' + String(position).padStart(2, '0'));
-    setText(refs.term, displayTerm); refs.term.classList.toggle('is-long', displayTerm.length > 10); setText(refs.pronunciation, signal.pronunciation); setTemplateMode(signal); if (interfaceMode) renderInterfaceSignal(signal); else renderStandardSignal(signal);
+    setText(refs.term, displayTerm); setText(refs.pronunciation, signal.pronunciation); setTemplateMode(signal); if (interfaceMode) renderInterfaceSignal(signal); else renderStandardSignal(signal);
     var interfaceExample = interfaceMode && Array.isArray(signal.realInterfaceExamples) ? signal.realInterfaceExamples.find(function (item) { return item && hasText(item.exampleEn); }) : null; if (refs.listen) { refs.listen.dataset.speak = text(signal.speechText || signal.term); refs.listen.disabled = !!(window.EnglishRadarSpeech && !window.EnglishRadarSpeech.supported); } if (refs.exampleListen) { refs.exampleListen.dataset.speakExample = text(interfaceExample ? interfaceExample.exampleEn : signal.exampleEn); refs.exampleListen.disabled = !!(window.EnglishRadarSpeech && !window.EnglishRadarSpeech.supported); } if (refs.practice) { var practiceAvailable = signal.quizStatus !== 'none' && hasQuiz(signal.id); refs.practice.hidden = !isLookup || signal.sourceType === 'personal' || !practiceAvailable; refs.practice.href = './quiz.html?mode=signal&signal=' + encodeURIComponent(signal.id); } if (refs.previous) refs.previous.disabled = currentIndex === 0; updateMasteryButtons(signal); updateFavorite(signal); updateSessionObject(); setFeedback(storageFailure ? 'Progress could not be saved in this browser.' : '');
   }
   function showSummary() {
