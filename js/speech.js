@@ -7,19 +7,26 @@
   var listenButton = document.querySelector('[data-speak-signal]');
   var exampleButton = document.querySelector('[data-speak-example]');
   var note = document.querySelector('[data-speech-note]');
+  var allVoices = [];
   var voices = [];
 
   function refreshVoices() {
-    if (!supported || !window.speechSynthesis || typeof window.speechSynthesis.getVoices !== 'function') { voices = []; return voices; }
-    try { voices = window.speechSynthesis.getVoices().filter(function (voice) { return voice && /^en(?:-|$)/i.test(String(voice.lang || '')); }); } catch (error) { voices = []; }
+    if (!supported || !window.speechSynthesis || typeof window.speechSynthesis.getVoices !== 'function') { allVoices = []; voices = []; return voices; }
+    try {
+      allVoices = window.speechSynthesis.getVoices();
+      if (!Array.isArray(allVoices)) allVoices = [];
+      voices = allVoices.filter(function (voice) { return voice && /^en(?:-|$)/i.test(String(voice.lang || '')); });
+    } catch (error) { allVoices = []; voices = []; }
     return voices;
   }
 
   function preferredVoice() {
     var suitable = refreshVoices(); if (!suitable.length) return null;
     return suitable.slice().sort(function (a, b) {
-      function rank(voice) { var lang = String(voice.lang || '').toLowerCase(); if (lang === 'en-us') return 0; if (voice.default === true) return 1; if (/(natural|neural|enhanced|premium)/i.test(String(voice.name || ''))) return 2; return 3; }
-      return rank(a) - rank(b) || String(a.name || '').localeCompare(String(b.name || '')) || String(a.lang || '').localeCompare(String(b.lang || ''));
+      function languageTier(voice) { return String(voice.lang || '').toLowerCase() === 'en-us' ? 0 : 1; }
+      function qualityTier(voice) { return /(natural|neural|enhanced|premium)/i.test(String(voice.name || '')) ? 0 : 1; }
+      function booleanTier(value) { return value === true ? 0 : 1; }
+      return languageTier(a) - languageTier(b) || qualityTier(a) - qualityTier(b) || booleanTier(a.default) - booleanTier(b.default) || booleanTier(a.localService) - booleanTier(b.localService) || String(a.name || '').localeCompare(String(b.name || '')) || String(a.lang || '').localeCompare(String(b.lang || ''));
     })[0] || null;
   }
 
@@ -45,7 +52,7 @@
     try { window.speechSynthesis.speak(utterance); } catch (error) { button.classList.remove('is-speaking'); }
   }
 
-  window.EnglishRadarSpeech = { cancel: cancel, speak: speak, supported: supported, getVoiceDiagnostics: function () { var current = preferredVoice(); return { total: voices.length, english: voices.map(function (voice) { return { name: voice.name || '', lang: voice.lang || '', localService: voice.localService === true, default: voice.default === true }; }), selected: current ? { name: current.name || '', lang: current.lang || '', localService: current.localService === true, default: current.default === true } : null }; } };
+  window.EnglishRadarSpeech = { cancel: cancel, speak: speak, supported: supported, getVoiceDiagnostics: function () { var current = preferredVoice(); return { totalVoices: allVoices.length, englishVoices: voices.map(function (voice) { return { name: voice.name || '', lang: voice.lang || '', localService: voice.localService === true, default: voice.default === true }; }), selected: current ? { name: current.name || '', lang: current.lang || '', localService: current.localService === true, default: current.default === true } : null }; } };
 
   document.querySelectorAll('[data-rate]').forEach(function (button) { button.classList.toggle('is-active', Number(button.getAttribute('data-rate')) === currentRate); });
 
