@@ -1,6 +1,22 @@
 (function () {
   'use strict';
 
+  function resolveSessionStatus(current, dailyMix) {
+    var mix = Array.isArray(dailyMix) ? dailyMix : [];
+    if (!current || current.mode !== 'learn' || !Array.isArray(current.signalIds) || !current.signalIds.length) return null;
+    var ids = current.signalIds;
+    var isDailyMix = ids.length === mix.length && ids.every(function (id, index) { return mix[index] && id === mix[index].id; });
+    return { current: current, isDailyMix: isDailyMix, index: Math.min(Math.max(Number(current.currentIndex) || 0, 0), Math.max(ids.length - 1, 0)) };
+  }
+  function resolveSessionPresentation(current, dailyMix) {
+    var mix = Array.isArray(dailyMix) ? dailyMix : [];
+    var status = resolveSessionStatus(current, mix);
+    if (!status) return { cta: 'Start Daily Mix', href: './learn.html?feed=daily-mix&size=5', state: '', recoveryVisible: false, status: null };
+    if (status.isDailyMix) return { cta: 'Continue Daily Mix', href: './learn.html?resume=1', state: 'IN PROGRESS · ' + (status.index + 1) + ' / ' + mix.length, recoveryVisible: false, status: status };
+    return { cta: 'Start Daily Mix', href: './learn.html?feed=daily-mix&size=5', state: '', recoveryVisible: true, status: status };
+  }
+  window.SideglanceRadarHome = { resolveSessionStatus: resolveSessionStatus, resolveSessionPresentation: resolveSessionPresentation };
+
   var engine = window.EnglishRadarLearningEngine;
   var registry = window.EnglishRadarContent;
   var storage = window.EnglishRadarStorage;
@@ -26,28 +42,21 @@
   function clear(node) { if (node) node.textContent = ''; }
   function makeLink(signal, label) { var link = document.createElement('a'); link.href = signalHref(signal); link.className = 'radar-signal-link'; var name = document.createElement('strong'); name.textContent = signalName(signal); var meta = document.createElement('span'); meta.textContent = label || text(signal.category); var arrow = document.createElement('span'); arrow.className = 'signal-arrow'; arrow.textContent = '↗'; link.appendChild(name); link.appendChild(meta); link.appendChild(arrow); return link; }
   function renderList(selector, items, label) { var target = document.querySelector(selector); if (!target) return; clear(target); items.forEach(function (signal) { target.appendChild(makeLink(signal, label)); }); }
-  function currentSessionStatus() {
-    var current = storage ? storage.getCurrentSession() : null;
-    if (!current || current.mode !== 'learn' || !Array.isArray(current.signalIds) || !current.signalIds.length) return null;
-    var ids = current.signalIds;
-    var isDailyMix = ids.length === mix.length && ids.every(function (id, index) { return id === mix[index].id; });
-    return { current: current, isDailyMix: isDailyMix, index: Math.min(Math.max(Number(current.currentIndex) || 0, 0), Math.max(ids.length - 1, 0)) };
-  }
   function renderSessionStatus() {
-    var status = currentSessionStatus(); var state = document.querySelector('[data-daily-mix-state]'); var area = document.querySelector('[data-session-recovery]');
-    if (state) state.textContent = status && status.isDailyMix ? 'IN PROGRESS · ' + (status.index + 1) + ' / ' + mix.length : '';
+    var current = storage ? storage.getCurrentSession() : null; var presentation = resolveSessionPresentation(current, mix); var status = presentation.status; var state = document.querySelector('[data-daily-mix-state]'); var area = document.querySelector('[data-session-recovery]');
+    if (state) state.textContent = presentation.state;
     if (!area) return;
-    area.hidden = !status;
-    if (!status) return;
-    setText('[data-recovery-kicker]', status.isDailyMix ? 'DAILY MIX' : 'SESSION NOTE');
-    setText('[data-recovery-copy]', status.isDailyMix ? 'Your Daily Mix is waiting.' : 'You have an unfinished library session.');
-    setText('[data-recovery-progress]', status.isDailyMix ? 'Signal ' + (status.index + 1) + ' of ' + mix.length : 'Continue where you left off');
+    area.hidden = !presentation.recoveryVisible;
+    if (!presentation.recoveryVisible || !status) return;
+    setText('[data-recovery-kicker]', 'SESSION NOTE');
+    setText('[data-recovery-copy]', 'You have an unfinished library session.');
+    setText('[data-recovery-progress]', 'Continue where you left off');
   }
-  function renderMix() { var target = document.querySelector('[data-daily-mix-preview]'); if (!target) return; clear(target); mix.forEach(function (signal) { var item = document.createElement('span'); item.textContent = signalName(signal); target.appendChild(item); }); setText('[data-daily-mix-count]', String(mix.length).padStart(2, '0')); var link = document.querySelector('[data-daily-mix-link]'); var status = currentSessionStatus(); if (link && status && status.isDailyMix) { link.href = './learn.html?resume=1'; link.firstChild.textContent = 'Continue Daily Mix '; } }
+  function renderMix() { var target = document.querySelector('[data-daily-mix-preview]'); if (!target) return; clear(target); mix.forEach(function (signal) { var item = document.createElement('span'); item.textContent = signalName(signal); target.appendChild(item); }); setText('[data-daily-mix-count]', String(mix.length).padStart(2, '0')); var link = document.querySelector('[data-daily-mix-link]'); var current = storage ? storage.getCurrentSession() : null; var presentation = resolveSessionPresentation(current, mix); if (link) { link.href = presentation.href; link.firstChild.textContent = presentation.cta + ' '; } }
   function renderOnRadar() { var candidates = signals.filter(function (signal) { return !mixIds[signal.id] && isUnseen(signal); }).sort(function (a, b) { return hash('on-radar|' + a.id) - hash('on-radar|' + b.id); }).slice(0, 3); var section = document.querySelector('[data-radar-section="on-radar"]'); if (!candidates.length) { if (section) section.hidden = true; return; } if (section) section.hidden = false; renderList('[data-on-radar-list]', candidates, 'UNSEEN'); }
   function renderWorthAnotherLook() { var section = document.querySelector('[data-radar-section="worth-another-look"]'); var candidates = signals.filter(function (signal) { return !mixIds[signal.id] && isDueOrWeak(signal); }).sort(function (a, b) { var ad = progress[a.id] && progress[a.id].nextReviewAt || ''; var bd = progress[b.id] && progress[b.id].nextReviewAt || ''; return String(ad).localeCompare(String(bd)) || hash(a.id) - hash(b.id); }).slice(0, 1); if (!candidates.length) { if (section) section.hidden = true; return; } if (section) section.hidden = false; renderList('[data-worth-list]', candidates, 'REVIEW'); }
   function relationTerms(signal) { var values = Array.isArray(signal.relatedTerms) ? signal.relatedTerms.slice() : []; if (Array.isArray(signal.confusedWith)) values = values.concat(signal.confusedWith.map(function (item) { return item && item.term; })); return values.map(norm).filter(Boolean); }
   function renderConnection() { var section = document.querySelector('[data-radar-section="connection"]'); var preferred = mix.concat(signals.filter(function (signal) { return !mixIds[signal.id]; })); var chosen = null; var related = null; preferred.some(function (signal) { var terms = relationTerms(signal); var match = preferred.find(function (candidate) { return candidate.id !== signal.id && (terms.indexOf(norm(candidate.term)) !== -1 || terms.indexOf(norm(candidate.id)) !== -1); }); if (match) { chosen = signal; related = match; return true; } return false; }); if (!chosen) { if (section) section.hidden = true; return; } if (section) section.hidden = false; var target = document.querySelector('[data-connection-list]'); clear(target); var item = document.createElement('div'); item.className = 'radar-connection'; item.appendChild(makeLink(chosen, 'PRIMARY SIGNAL')); var connector = document.createElement('span'); connector.className = 'radar-connection-mark'; connector.textContent = 'connected to'; item.appendChild(connector); item.appendChild(makeLink(related, 'RELATED SIGNAL')); target.appendChild(item); }
-  function renderDates() { var dates = formatDate(); document.querySelectorAll('[data-date-mobile]').forEach(function (node) { node.textContent = dates.short; }); document.querySelectorAll('[data-date-label]').forEach(function (node) { node.textContent = dates.long; }); setText('[data-radar-date]', dates.long); }
+  function renderDates() { var dates = formatDate(); document.querySelectorAll('[data-date-mobile]').forEach(function (node) { node.textContent = dates.short; }); document.querySelectorAll('[data-date-label]').forEach(function (node) { node.textContent = dates.long; }); }
   renderDates(); renderMix(); renderOnRadar(); renderWorthAnotherLook(); renderConnection(); renderSessionStatus();
 }());
