@@ -69,11 +69,11 @@ for (const page of ['index.html', 'learn.html', 'quiz.html']) {
 
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
   const html = read(page);
-  assert(/v1\.8\.1/i.test(html), `${page} should expose V1.8.1 metadata`);
-  if (html.includes('page-footer')) assert(html.includes('ENGLISH RADAR / V1.8.1'), `${page} footer should expose V1.8.1`);
+  assert(/v1\.8\.2/i.test(html), `${page} should expose V1.8.2 metadata`);
+  if (html.includes('page-footer')) assert(html.includes('ENGLISH RADAR / V1.8.2'), `${page} footer should expose V1.8.2`);
 }
-assert(read('README.md').includes('# English Radar v1.8.1'));
-assert(read('README.md').includes('English Radar v1.8.1 is the current maintenance release on `main`'));
+assert(read('README.md').includes('# English Radar v1.8.2'));
+assert(read('README.md').includes('English Radar v1.8.2 is the current maintenance release on `main`'));
 assert(read('README.md').includes('Content Pack 03 has 10 Signals and 20 quizzes'));
 assert(read('docs/v1.5.0-release-notes.md').includes('Content Pack 03'));
 assert(importReport.includes('Static registry: 228'));

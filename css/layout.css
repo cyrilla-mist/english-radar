@@ -9,9 +9,9 @@
 .learn-progress { justify-self: end; width: 100px; height: 4px; background: var(--surface-matcha); }
 .learn-progress span { display: block; width: 53%; height: 100%; background: var(--clay); }
 .signal-detail { max-width: 1120px; margin: 0 auto; }
-.signal-heading { padding: 58px 0 46px; text-align: center; }
+.signal-heading { min-width: 0; padding: 58px 0 46px; text-align: center; }
 .signal-stamp { color: var(--clay); font-size: 12px; }
-.signal-heading h1 { margin: 15px 0 2px; color: var(--forest); font: 500 clamp(88px, 9vw, 150px)/.85 var(--serif); letter-spacing: -.055em; }
+.signal-heading h1 { width: 100%; max-width: 100%; min-width: 0; margin: 15px 0 2px; color: var(--forest); font: 500 clamp(72px, 8vw, 136px)/.92 var(--serif); letter-spacing: -.055em; overflow-wrap: anywhere; word-break: normal; }
 .pronunciation { margin: 16px 0 25px; color: var(--ink-soft); font: 19px var(--serif); }
 .audio-controls { display: flex; justify-content: center; align-items: center; gap: 17px; }
 .listen-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--forest); color: var(--forest); background: transparent; cursor: pointer; font-size: 14px; }
