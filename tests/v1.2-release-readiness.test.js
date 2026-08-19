@@ -27,7 +27,8 @@ for (const page of pages) {
   assert.equal(scripts.length, new Set(scripts).size, `${page} should not load duplicate scripts`);
 }
 
-assert.match(read('index.html'), /dashboard\.js\?v=1\.3\.0/);
+assert.match(read('index.html'), /radar-home\.js\?v=0\.1\.0/);
+assert.doesNotMatch(read('index.html'), /dashboard\.js/);
 assert.match(read('learn.html'), /learning-engine\.js\?v=1\.3\.0/);
 assert.match(read('learn.html'), /session\.js\?v=0\.1\.1/);
 assert.match(read('dictionary.html'), /dictionary\.js\?v=1\.8\.1/);
