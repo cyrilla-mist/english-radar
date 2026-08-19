@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const pages = ['index.html', 'learn.html', 'dictionary.html', 'archive.html', 'archive-signal.html', 'quiz.html', 'inbox.html', 'me.html', '404.html'];
-for (const page of pages) assert(read(page).includes('v1.8.3'), `${page} should expose v1.8.3 metadata`);
+for (const page of pages) assert(read(page).includes('v0.1.0'), `${page} should expose current v0.1.0 metadata`);
  for (const page of ['index.html', 'learn.html', 'dictionary.html', 'quiz.html', 'inbox.html', 'me.html']) { const html = read(page); assert(html.includes('formal-nav.js?v=1.8.1'), `${page} should load formal navigation`); assert((html.match(/class="nav-item/g) || []).length >= 5); assert.equal((html.match(/class="mobile-nav/g) || []).length, 1); assert(!html.includes('class="mobile-nav" aria-label="Mobile navigation"><a href="./inbox.html"'), `${page} mobile nav should omit Inbox`); }
 assert(read('index.html').includes('Open Inbox'));
 assert(read('learn.html').includes('data-archive-secondary-link'));

@@ -3,7 +3,7 @@
 
   var copy = {
     Archive: '档案',
-    Today: '今日学习', Review: '复习', Dictionary: '词典', Inbox: '生词收集箱', Me: '我的雷达',
+    Radar: '雷达', Today: '今日学习', Review: '复习', Dictionary: '词典', Inbox: '生词收集箱', Me: '我的雷达',
     'Daily Mix': '每日组合', 'Discovery mode': '发现模式', 'Spaced review': '间隔复习',
     'LEARNING ENGINE': '学习引擎', 'LIBRARY SESSION': '学习 Session', 'TODAY PROGRESS': '今日进度',
     'LIBRARY STATUS': '词库状态', 'CONTEXT CHECK': '语境测试', 'WEAK SIGNALS': '薄弱表达',
