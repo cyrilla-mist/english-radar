@@ -70,7 +70,7 @@ for (const page of ['index.html', 'learn.html', 'quiz.html']) {
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
   const html = read(page);
   assert(/v0\.1\.0/i.test(html), `${page} should expose current V0.1.0 metadata`);
-  if (html.includes('page-footer')) assert(html.includes('sideglance-brand.js?v=0.1.0'), `${page} should load the current Sideglance brand shell`);
+  if (html.includes('page-footer')) assert(html.includes('SIDEGLANCE RADAR / V0.1.0'), `${page} should expose the current Sideglance brand shell`);
 }
 assert(read('README.md').includes('# English Radar v1.8.3'));
 assert(read('README.md').includes('English Radar v1.8.3 is the current maintenance release on `main`'));

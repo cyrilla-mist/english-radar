@@ -29,14 +29,14 @@ for (const page of pages) {
 
 assert.match(read('index.html'), /dashboard\.js\?v=1\.3\.0/);
 assert.match(read('learn.html'), /learning-engine\.js\?v=1\.3\.0/);
-assert.match(read('learn.html'), /session\.js\?v=1\.8\.2/);
+assert.match(read('learn.html'), /session\.js\?v=0\.1\.1/);
 assert.match(read('dictionary.html'), /dictionary\.js\?v=1\.8\.1/);
 assert.match(read('quiz.html'), /quiz-registry\.js\?v=1\.5\.0/);
 assert.match(read('quiz.html'), /quiz\.js\?v=1\.3\.0/);
 assert.match(read('me.html'), /me\.js\?v=1\.8\.3/);
 for (const page of mainPages) {
   const html = read(page);
-  if (html.includes('page-footer')) assert.match(html, /sideglance-brand\.js\?v=0\.1\.0/);
+  if (html.includes('page-footer')) assert.match(html, /SIDEGLANCE RADAR \/ V0\.1\.0/);
 }
 
 const readme = read('README.md');

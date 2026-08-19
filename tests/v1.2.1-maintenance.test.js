@@ -15,7 +15,7 @@ for (const file of pageFiles) {
 }
 
 const mainHtml = pageFiles.slice(0, 6).map(read).join('\n');
-assert.match(mainHtml, /sideglance-brand\.js\?v=0\.1\.0/);
+assert.match(mainHtml, /SIDEGLANCE RADAR \/ V0\.1\.0/);
 const readme = read('README.md');
 assert.match(readme, /English Radar v1\.8\.3 is the current maintenance release on `main`/);
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
