@@ -79,10 +79,10 @@ const meHtml = read('me.html');
 assert.match(meHtml, /data-pack-id="cyrilla-notion-archive-v1"/);
 for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 'quiz.html', 'me.html', '404.html']) {
   const html = read(page);
-  assert.match(html, /v1\.8\.2/i, `${page} should expose V1.8.2`);
+  assert.match(html, /v1\.8\.3/i, `${page} should expose V1.8.3`);
   assert.doesNotMatch(html, /v1\.2\.1/i, `${page} should not expose stale V1.2.1 metadata`);
 }
-assert.match(meHtml, /me\.js\?v=1\.5\.0/);
+assert.match(meHtml, /me\.js\?v=1\.8\.3/);
 assert.match(read('quiz.html'), /quiz-registry\.js\?v=1\.5\.0/);
 assert(fs.existsSync(path.join(root, 'docs/v1.3.0-release-notes.md')));
 
