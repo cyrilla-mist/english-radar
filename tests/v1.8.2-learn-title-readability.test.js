@@ -10,11 +10,13 @@ const layout = read('css/layout.css');
 const responsive = read('css/responsive.css');
 
 assert.match(session, /function displayTerm\(value\) \{ return hasText\(value\) \? String\(value\)\.trim\(\) : ''; \}/);
+assert.match(session, /function getLearnDisplayTerm\(signal\) \{ if \(!signal\) return ''; return hasText\(signal\.term\) \? String\(signal\.term\)\.trim\(\) : displayTerm\(signal\.displayTerm\); \}/);
 assert(!session.includes('String(value).trim().toUpperCase()'), 'displayTerm must preserve canonical casing');
-assert.match(session, /var displayTerm = text\(signal\.displayTerm \|\| signal\.term\);/);
-assert(!session.includes('text(signal.displayTerm || signal.term).toUpperCase()'), 'Learn title must not force uppercase');
+assert.match(session, /var learnDisplayTerm = getLearnDisplayTerm\(signal\);/);
+assert.match(session, /setText\(refs\.term, learnDisplayTerm\)/);
+assert(!session.includes('signal.displayTerm || signal.term'), 'Learn title must not prefer legacy displayTerm');
+assert(!session.includes('toLowerCase()'), 'Learn title must not infer casing globally');
 assert(!session.includes('displayTerm.length > 10'), 'title sizing must not depend on the old character-count safeguard');
-assert.match(session, /setText\(refs\.term, displayTerm\)/);
 assert.match(session, /function renderSignal\(\)/);
 assert.match(session, /mode === 'review'/);
 assert.match(session, /isLookup/);
@@ -51,13 +53,20 @@ const find = (value) => records.concat(signals).find((signal) => String(signal.t
 for (const term of ['fr', 'OP', 'MVP', 'NGL', 'workflow', 'settings', 'prototype', 'collection', 'discover', 'touch grass', 'ship it', 'TL;DR', 'IYKYK']) {
   assert(find(term), `expected audited Signal ${term}`);
 }
-assert(find('workflow').displayTerm === 'WORKFLOW');
-assert(find('touch grass').displayTerm === 'TOUCH GRASS');
-assert(find('TL;DR').displayTerm === 'TL;DR');
-assert(find('IYKYK').displayTerm === 'IYKYK');
-assert(find('NGL').fullForm === 'not gonna lie');
-assert(find('MVP').fullForm === 'minimum viable product');
-assert(find('OP').fullForm === 'original poster');
+const expectedTitles = { workflow: 'workflow', 'touch grass': 'touch grass', 'chronically online': 'chronically online', fr: 'fr', ngl: 'ngl', MVP: 'MVP', RAG: 'RAG', 'TL;DR': 'TL;DR', IYKYK: 'IYKYK' };
+for (const [term, expected] of Object.entries(expectedTitles)) assert.equal(find(term).term, expected, `${term} should use its canonical term as the Learn title`);
+assert.equal(find('workflow').displayTerm, 'WORKFLOW');
+assert.equal(find('touch grass').displayTerm, 'TOUCH GRASS');
+assert.equal(find('chronically online').displayTerm, 'CHRONICALLY ONLINE');
+assert.equal(find('fr').displayTerm, 'FR');
+assert.equal(find('ngl').displayTerm, 'NGL');
+assert.equal(find('MVP').displayTerm, 'MVP');
+assert.equal(find('RAG').displayTerm, 'RAG');
+assert.equal(find('TL;DR').displayTerm, 'TL;DR');
+assert.equal(find('IYKYK').displayTerm, 'IYKYK');
+assert.equal(find('NGL').fullForm, 'not gonna lie');
+assert.equal(find('MVP').fullForm, 'minimum viable product');
+assert.equal(find('OP').fullForm, 'original poster');
 assert(allSource.includes('GitHub'), 'content audit should retain mixed-case platform references');
 
 console.log('PASS: v1.8.2 Learn title casing, fit safeguards, shared renderer and Signal audit checks');
