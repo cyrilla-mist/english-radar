@@ -3,7 +3,7 @@
 
   var copy = {
     Archive: '档案',
-    Today: '今日学习', Review: '复习', Dictionary: '词典', Inbox: '生词收集箱', Me: '我的雷达',
+    Radar: '雷达', Today: '今日学习', Review: '复习', Dictionary: '词典', Inbox: '生词收集箱', Me: '我的雷达',
     'Daily Mix': '每日组合', 'Discovery mode': '发现模式', 'Spaced review': '间隔复习',
     'LEARNING ENGINE': '学习引擎', 'LIBRARY SESSION': '学习 Session', 'TODAY PROGRESS': '今日进度',
     'LIBRARY STATUS': '词库状态', 'CONTEXT CHECK': '语境测试', 'WEAK SIGNALS': '薄弱表达',
@@ -29,7 +29,7 @@
   }
   function decorateActions() {
     document.querySelectorAll('button, a.primary-button, .context-check-list > a, .signal-actions button, .audio-controls button').forEach(function (element) {
-      if (element.classList.contains('me-collapse-toggle')) return;
+      if (element.classList.contains('me-collapse-toggle') || element.classList.contains('example-listen')) return;
       var visible = element.textContent.replace(/[→↗←▶×]/g, ' ').replace(/\s+/g, ' ').trim();
       var key = Object.keys(actionCopy).find(function (candidate) { return visible === candidate || visible.indexOf(candidate) === 0; });
       if (key) addHelper(element, actionCopy[key]);
@@ -37,7 +37,7 @@
   }
   function navKey(link) {
     var href = link.getAttribute('href') || '';
-    return href.indexOf('dictionary') !== -1 ? 'Dictionary' : href.indexOf('archive') !== -1 ? 'Archive' : href.indexOf('inbox') !== -1 ? 'Inbox' : href.indexOf('me') !== -1 ? 'Me' : href.indexOf('learn') !== -1 ? 'Review' : 'Today';
+    return href.indexOf('dictionary') !== -1 ? 'Dictionary' : href.indexOf('archive') !== -1 ? 'Archive' : href.indexOf('inbox') !== -1 ? 'Inbox' : href.indexOf('me') !== -1 ? 'Me' : href.indexOf('learn') !== -1 ? 'Review' : 'Radar';
   }
   function apply() {
     document.querySelectorAll('.side-nav .nav-item, .mobile-nav a').forEach(function (link) {

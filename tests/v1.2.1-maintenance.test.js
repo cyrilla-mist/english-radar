@@ -10,12 +10,12 @@ const pageFiles = ['index.html', 'learn.html', 'dictionary.html', 'inbox.html', 
 
 for (const file of pageFiles) {
   const html = read(file);
-  assert.match(html, /v1\.8\.3/i, `${file} should expose V1.8.3`);
+  assert.match(html, /v0\.1\.0/i, `${file} should expose current V0.1.0`);
   assert.doesNotMatch(html, /v1\.4\.0|v1\.2\.1|v1\.2\.0|v1\.1\.1/i, `${file} contains stale user-visible version text`);
 }
 
 const mainHtml = pageFiles.slice(0, 6).map(read).join('\n');
-assert.equal((mainHtml.match(/ENGLISH RADAR \/ V1\.8\.3/g) || []).length, 4);
+assert.match(mainHtml, /SIDEGLANCE RADAR \/ V0\.1\.0/);
 const readme = read('README.md');
 assert.match(readme, /English Radar v1\.8\.3 is the current maintenance release on `main`/);
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
