@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
@@ -40,6 +41,9 @@ assert.equal((home.match(/querySelector\('\[data-daily-mix-preview\]'\)/g) || []
 const context = { window: {} };
 vm.runInNewContext(home, context, { filename: 'js/radar-home.js' });
 const presentation = context.window.SideglanceRadarHome.resolveSessionPresentation;
+const resolveCue = context.window.SideglanceRadarHome.resolveDailyMixContextCue;
+const allowedTypes = new Set(['NEW', 'REVISIT', 'CONNECTED', 'CONTRAST', 'RADAR PICK']);
+const assertCue = (actual, type, detail) => { assert.equal(actual.type, type); assert.equal(actual.detail, detail); };
 const dailyMix = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
 const exact = presentation({ mode: 'learn', signalIds: ['a', 'b', 'c', 'd', 'e'], currentIndex: 2 }, dailyMix);
 assert.equal(exact.cta, 'Continue Daily Mix');
@@ -56,6 +60,29 @@ const none = presentation(null, dailyMix);
 assert.equal(none.cta, 'Start Daily Mix');
 assert.equal(none.state, '');
 assert.equal(none.recoveryVisible, false);
+
+const contrast = resolveCue({ id: 'a', term: 'affect', confusedWith: [{ id: 'b' }] }, [{ id: 'a', term: 'affect', confusedWith: [{ id: 'b' }] }, { id: 'b', term: 'effect' }], {});
+assertCue(contrast, 'CONTRAST', 'Easy to confuse with "effect".');
+const connectedByTerm = resolveCue({ id: 'a', term: 'agent', relatedTerms: ['workflow'] }, [{ id: 'a', term: 'agent', relatedTerms: ['workflow'] }, { id: 'b', term: 'workflow' }], {});
+assertCue(connectedByTerm, 'CONNECTED', 'Notice it alongside "workflow".');
+const connectedByReverseId = resolveCue({ id: 'a', term: 'agent' }, [{ id: 'a', term: 'agent' }, { id: 'b', term: 'workflow', relatedTerms: ['a'] }], {});
+assertCue(connectedByReverseId, 'CONNECTED', 'Notice it alongside "workflow".');
+const outsideMix = resolveCue({ id: 'a', term: 'agent', relatedTerms: ['workflow'] }, [{ id: 'a', term: 'agent', relatedTerms: ['workflow'] }], {});
+assertCue(outsideMix, 'NEW', 'First time on your Radar.');
+const revisit = resolveCue({ id: 'a', term: 'agent' }, [{ id: 'a', term: 'agent' }], { a: { firstLearnedAt: '2026-08-20T00:00:00.000Z' } });
+assertCue(revisit, 'REVISIT', 'Worth another look.');
+const unseen = resolveCue({ id: 'a', term: 'agent', category: 'AI Builder' }, [{ id: 'a', term: 'agent', category: 'AI Builder' }, { id: 'b', term: 'workflow', category: 'AI Builder' }], {});
+assertCue(unseen, 'NEW', 'First time on your Radar.');
+const fallback = resolveCue(null, [], {});
+assertCue(fallback, 'RADAR PICK', 'Worth noticing in context.');
+for (const cue of [contrast, connectedByTerm, connectedByReverseId, outsideMix, revisit, unseen, fallback]) assert(allowedTypes.has(cue.type), `Unexpected Daily Mix cue type: ${cue.type}`);
+assert.deepEqual(dailyMix.map((signal) => signal.id), ['a', 'b', 'c', 'd', 'e']);
+assert.equal(dailyMix.length, 5);
+assert.match(home, /daily-mix-cue/);
+assert.match(home, /daily-mix-detail/);
+assert.doesNotMatch(home, /localStorage|setItem|removeItem/);
+assert.doesNotMatch(home, /selected this|algorithm|trending|popular|AI PICK/i);
+assert.doesNotMatch(childProcess.execFileSync('git', ['diff', '--', 'js/learning-engine.js'], { encoding: 'utf8' }), /./, 'learning-engine.js must have no diff.');
 
 const keys = [...storage.matchAll(/englishRadar_[A-Za-z]+/g)].map((match) => match[0]);
 assert.deepEqual([...new Set(keys)].sort(), ['englishRadar_currentSession', 'englishRadar_customSignals', 'englishRadar_inbox', 'englishRadar_progress', 'englishRadar_quizHistory', 'englishRadar_settings', 'englishRadar_syncHistory', 'englishRadar_syncSettings'].sort());

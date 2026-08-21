@@ -15,7 +15,31 @@
     if (status.isDailyMix) return { cta: 'Continue Daily Mix', href: './learn.html?resume=1', state: 'IN PROGRESS · ' + (status.index + 1) + ' / ' + mix.length, recoveryVisible: false, status: status };
     return { cta: 'Start Daily Mix', href: './learn.html?feed=daily-mix&size=5', state: '', recoveryVisible: true, status: status };
   }
-  window.SideglanceRadarHome = { resolveSessionStatus: resolveSessionStatus, resolveSessionPresentation: resolveSessionPresentation };
+  function relationValues(signal, field) {
+    var values = signal && Array.isArray(signal[field]) ? signal[field] : [];
+    return values.map(function (value) { return value && typeof value === 'object' ? [value.id, value.term] : [value]; }).reduce(function (all, value) { return all.concat(value); }, []).map(norm).filter(Boolean);
+  }
+  function relationResolves(source, target, field) {
+    var targets = [norm(target && target.id), norm(target && target.term)].filter(Boolean);
+    return relationValues(source, field).some(function (value) { return targets.indexOf(value) !== -1; });
+  }
+  function findCurrentMixRelation(signal, currentMix, field) {
+    return (Array.isArray(currentMix) ? currentMix : []).find(function (candidate) {
+      return candidate && candidate.id !== signal.id && (relationResolves(signal, candidate, field) || relationResolves(candidate, signal, field));
+    }) || null;
+  }
+  function resolveDailyMixContextCue(signal, currentMix, progress) {
+    if (!signal || !signal.id) return { type: 'RADAR PICK', detail: 'Worth noticing in context.' };
+    var contrast = findCurrentMixRelation(signal, currentMix, 'confusedWith');
+    if (contrast) return { type: 'CONTRAST', detail: 'Easy to confuse with "' + text(contrast.term) + '".' };
+    var connected = findCurrentMixRelation(signal, currentMix, 'relatedTerms');
+    if (connected) return { type: 'CONNECTED', detail: 'Notice it alongside "' + text(connected.term) + '".' };
+    var record = progress && progress[signal.id];
+    if (record && record.firstLearnedAt) return { type: 'REVISIT', detail: 'Worth another look.' };
+    if (!progress || !record || !record.firstLearnedAt) return { type: 'NEW', detail: 'First time on your Radar.' };
+    return { type: 'RADAR PICK', detail: 'Worth noticing in context.' };
+  }
+  window.SideglanceRadarHome = { resolveSessionStatus: resolveSessionStatus, resolveSessionPresentation: resolveSessionPresentation, resolveDailyMixContextCue: resolveDailyMixContextCue };
 
   var engine = window.EnglishRadarLearningEngine;
   var registry = window.EnglishRadarContent;
@@ -52,7 +76,7 @@
     setText('[data-recovery-copy]', 'You have an unfinished library session.');
     setText('[data-recovery-progress]', 'Continue where you left off');
   }
-  function renderMix() { var target = document.querySelector('[data-daily-mix-preview]'); if (!target) return; clear(target); mix.forEach(function (signal) { var item = document.createElement('span'); item.textContent = signalName(signal); target.appendChild(item); }); setText('[data-daily-mix-count]', String(mix.length).padStart(2, '0')); var link = document.querySelector('[data-daily-mix-link]'); var current = storage ? storage.getCurrentSession() : null; var presentation = resolveSessionPresentation(current, mix); if (link) { link.href = presentation.href; link.firstChild.textContent = presentation.cta + ' '; } }
+  function renderMix() { var target = document.querySelector('[data-daily-mix-preview]'); if (!target) return; clear(target); mix.forEach(function (signal) { var cue = resolveDailyMixContextCue(signal, mix, progress); var item = document.createElement('span'); item.className = 'daily-mix-signal'; var term = document.createElement('strong'); term.className = 'daily-mix-term'; term.textContent = signalName(signal); var type = document.createElement('span'); type.className = 'daily-mix-cue'; type.textContent = cue.type; var detail = document.createElement('span'); detail.className = 'daily-mix-detail'; detail.textContent = cue.detail; item.appendChild(term); item.appendChild(type); item.appendChild(detail); target.appendChild(item); }); setText('[data-daily-mix-count]', String(mix.length).padStart(2, '0')); var link = document.querySelector('[data-daily-mix-link]'); var current = storage ? storage.getCurrentSession() : null; var presentation = resolveSessionPresentation(current, mix); if (link) { link.href = presentation.href; link.firstChild.textContent = presentation.cta + ' '; } }
   function renderOnRadar() { var candidates = signals.filter(function (signal) { return !mixIds[signal.id] && isUnseen(signal); }).sort(function (a, b) { return hash('on-radar|' + a.id) - hash('on-radar|' + b.id); }).slice(0, 3); var section = document.querySelector('[data-radar-section="on-radar"]'); if (!candidates.length) { if (section) section.hidden = true; return; } if (section) section.hidden = false; renderList('[data-on-radar-list]', candidates, 'UNSEEN'); }
   function renderWorthAnotherLook() { var section = document.querySelector('[data-radar-section="worth-another-look"]'); var candidates = signals.filter(function (signal) { return !mixIds[signal.id] && isDueOrWeak(signal); }).sort(function (a, b) { var ad = progress[a.id] && progress[a.id].nextReviewAt || ''; var bd = progress[b.id] && progress[b.id].nextReviewAt || ''; return String(ad).localeCompare(String(bd)) || hash(a.id) - hash(b.id); }).slice(0, 1); if (!candidates.length) { if (section) section.hidden = true; return; } if (section) section.hidden = false; renderList('[data-worth-list]', candidates, 'REVIEW'); }
   function relationTerms(signal) { var values = Array.isArray(signal.relatedTerms) ? signal.relatedTerms.slice() : []; if (Array.isArray(signal.confusedWith)) values = values.concat(signal.confusedWith.map(function (item) { return item && item.term; })); return values.map(norm).filter(Boolean); }
