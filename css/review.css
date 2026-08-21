@@ -1,0 +1,12 @@
+.context-review-block { border-top: 1px solid var(--line, #d9ddd5); border-bottom: 1px solid var(--line, #d9ddd5); display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 24px; padding: 22px 0; margin: 0 0 24px; }
+.context-review-copy { min-width: 0; }
+.context-review-lead, .context-review-copy blockquote, .context-review-copy h2 { margin: 0; }
+.context-review-lead { color: var(--muted, #68736c); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+.context-review-copy blockquote { color: var(--forest, #1f2c27); font-family: Georgia, serif; font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.45; margin: 8px 0 18px; }
+.context-review-copy h2 { font-size: 1rem; font-weight: 500; line-height: 1.5; }
+.context-review-reveal, .context-review-return { display: inline-block; margin-top: 18px; }
+.context-review-reveal { background: transparent; border: 0; border-bottom: 1px solid currentColor; color: var(--matcha, #607b61); cursor: pointer; font: inherit; padding: 0 0 3px; }
+.context-review-answer { border-left: 2px solid var(--matcha, #607b61); margin-top: 18px; padding-left: 14px; }
+.context-review-answer p { margin: 0 0 6px; }
+.context-review-return { color: inherit; font-size: .9rem; }
+@media (max-width: 700px) { .context-review-block { display: block; padding: 18px 0; } .context-review-block .block-label { margin-bottom: 14px; } .context-review-copy blockquote { font-size: 1.2rem; } }
