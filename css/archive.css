@@ -57,9 +57,14 @@ body.archive-page {
 .archive-link { color: var(--archive-ink); text-decoration: none; }
 .archive-link:hover { color: var(--archive-accent); }
 .archive-card-meaning { margin: 0; font-size: 1rem; line-height: 1.5; }
+.archive-card-category { margin: 0 0 8px; color: var(--archive-ink-soft); font-family: var(--archive-mono); font-size: .68rem; letter-spacing: .04em; }
+.archive-card-context { margin: 10px 0 0; color: var(--archive-ink-soft); font-size: .88rem; line-height: 1.45; }
 .archive-card-zh { margin: 6px 0 0; color: var(--archive-ink-soft); font-size: .94rem; line-height: 1.55; }
 .archive-card-footer { align-items: flex-start; margin-top: 22px; padding-top: 10px; border-top: 1px solid rgba(23, 53, 47, .1); }
 .archive-meta { color: var(--archive-ink-soft); font-size: .6rem; letter-spacing: .02em; }
+.archive-mastery { color: var(--archive-ink-soft); font-family: var(--archive-mono); font-size: .65rem; letter-spacing: .04em; }
+.archive-open-link { color: var(--archive-ink); font-size: .84rem; text-decoration: none; }
+.archive-open-link:hover { color: var(--archive-accent); }
 .archive-empty { padding: 24px 0; color: var(--archive-ink-soft); }
 .archive-back { display: inline-block; color: var(--archive-ink-soft); font-size: .88rem; text-decoration: none; }
 .archive-detail-header { margin: 28px 0 24px; }
