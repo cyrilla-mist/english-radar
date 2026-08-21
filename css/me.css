@@ -1,0 +1,24 @@
+.personal-radar { min-width: 0; }
+.personal-radar-lead { margin: 0 0 14px; color: var(--ink-soft); font-family: var(--serif); font-size: 1.15rem; }
+.personal-radar-categories { display: grid; gap: 0; }
+.personal-radar-category { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line-light); }
+.personal-radar-category:first-child { border-top: 0; }
+.personal-radar-category strong { color: var(--forest); font: 18px var(--serif); }
+.personal-radar-category span, .personal-radar-category b { color: var(--ink-soft); font-size: 13px; }
+.personal-radar-category b { min-width: 60px; text-align: right; font-family: var(--mono); font-weight: 400; }
+.personal-radar-category .me-bar { min-width: 0; }
+.personal-radar-footprint { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line-light); }
+.personal-radar-footprint div { display: flex; flex-direction: column; gap: 5px; }
+.personal-radar-footprint strong { color: var(--forest); font: 28px var(--serif); }
+.personal-radar-footprint span { color: var(--ink-soft); font-size: 13px; }
+.personal-radar-empty { padding: 4px 0; }
+.personal-radar-empty strong { display: block; color: var(--forest); font: 24px var(--serif); }
+.personal-radar-empty span { display: block; margin-top: 6px; color: var(--ink-soft); font-size: 14px; }
+@media (max-width: 767px) {
+  .personal-radar-category { grid-template-columns: minmax(0, 1fr) auto; gap: 7px 10px; }
+  .personal-radar-category .me-bar { grid-column: 1 / -1; grid-row: 2; }
+  .personal-radar-category b { min-width: auto; }
+  .personal-radar-footprint { gap: 12px; }
+  .personal-radar-footprint strong { font-size: 25px; }
+  .personal-radar-footprint span { font-size: 12px; line-height: 1.3; }
+}
