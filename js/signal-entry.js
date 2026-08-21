@@ -1,0 +1,36 @@
+(function () {
+  'use strict';
+
+  function text(value) { return String(value === undefined || value === null ? '' : value).trim(); }
+  function list(value) { return Array.isArray(value) ? value.map(text).filter(Boolean) : []; }
+  function first(value) { return list(Array.isArray(value) ? value : [value])[0] || ''; }
+  function identityValue(value) { return first(value); }
+  function hasText(value) { return !!text(value); }
+  function setText(selector, value) { var node = document.querySelector(selector); if (node) node.textContent = text(value); }
+  function metadata(signal) { return signal && signal.signalIdentity && typeof signal.signalIdentity === 'object' ? signal.signalIdentity : signal && signal.identity && typeof signal.identity === 'object' ? signal.identity : {}; }
+  function resolveIdentity(signal) {
+    var meta = metadata(signal); var parts = [meta.signalType || meta.type || meta.category || signal && signal.signalType || signal && signal.category, meta.usageContext || signal && signal.usageContext, meta.context, meta.communityContext || signal && signal.communityContext, meta.productContext || signal && signal.productContext, meta.developerContext || signal && signal.developerContext, meta.platform || meta.platforms || signal && signal.platforms, meta.tone || signal && signal.tone, meta.relationshipHint || signal && signal.relationshipHint].map(identityValue).filter(function (value, index, values) { return value && value.length <= 80 && values.indexOf(value) === index; }).slice(0, 4); return parts.join(' · '); }
+  function relationValue(value) { return value && typeof value === 'object' ? { id: text(value.id), term: text(value.term) } : { id: text(value), term: text(value) }; }
+  function relationTarget(value, signals) { var ref = relationValue(value); return signals.find(function (candidate) { return (ref.id && candidate.id === ref.id) || (ref.term && normalize(candidate.term) === normalize(ref.term)); }) || null; }
+  function normalize(value) { return text(value).toLowerCase().replace(/\s+/g, ' '); }
+  function signalRelations(signal, signals) {
+    var values = (Array.isArray(signal.relatedTerms) ? signal.relatedTerms.slice() : []).concat(Array.isArray(signal.confusedWith) ? signal.confusedWith.map(function (item) { return item && item.term; }) : []); var seen = {};
+    return values.map(function (value) { var target = relationTarget(value, signals); if (!target || target.id === signal.id || seen[target.id]) return null; seen[target.id] = true; return target; }).filter(Boolean).slice(0, 6);
+  }
+  function saveState(signal) {
+    var storage = window.EnglishRadarStorage; var progress = storage ? storage.getProgress() : {}; var record = progress[signal.id] && typeof progress[signal.id] === 'object' ? progress[signal.id] : { signalId: signal.id, mastery: null, firstLearnedAt: null, lastReviewedAt: null, nextReviewAt: null, reviewCount: 0, errorCount: 0, favorite: false }; record.favorite = !record.favorite; progress[signal.id] = record; return storage && storage.setProgress(progress) ? record.favorite : null;
+  }
+  function renderTags(selector, values) { var target = document.querySelector(selector); if (!target) return; target.textContent = ''; list(values).forEach(function (value) { var tag = document.createElement('span'); tag.textContent = value; target.appendChild(tag); }); }
+  function render(signal, signals) {
+    var content = document.querySelector('[data-entry-content]'); var empty = document.querySelector('[data-entry-empty]'); if (!signal) { if (empty) empty.hidden = false; return; }
+    if (content) content.hidden = false; setText('[data-entry-title]', signal.term); setText('[data-entry-pronunciation]', signal.pronunciation || signal.ipa || '—'); var identity = resolveIdentity(signal); var identityNode = document.querySelector('[data-entry-identity]'); if (identityNode) { identityNode.textContent = identity; identityNode.hidden = !identity; }
+    var fullForm = text(signal.fullForm); var fullFormSection = document.querySelector('[data-entry-section="full-form"]'); setText('[data-entry-full-form]', fullForm); if (fullFormSection) fullFormSection.hidden = !fullForm;
+    setText('[data-entry-meaning]', signal.meaningEn || signal.meaning || 'A language signal worth noticing in context.'); setText('[data-entry-meaning-zh]', signal.meaningZh); var context = first(signal.usageContext) || text(signal.culturalContextEn) || text(signal.useWhen) || text(metadata(signal).context) || 'How people use this expression online.'; setText('[data-entry-context]', context); setText('[data-entry-example]', signal.exampleEn ? '“' + signal.exampleEn + '”' : ''); setText('[data-entry-example-zh]', signal.exampleZh); renderTags('[data-entry-platforms]', list(signal.platforms).concat(list(metadata(signal).communityContext || metadata(signal).productContext || metadata(signal).developerContext)));
+    setText('[data-entry-tone]', list(signal.tone).concat(list(metadata(signal).tone)).join(' · ') || '—'); var related = signalRelations(signal, signals); var relatedSection = document.querySelector('[data-entry-section="related"]'); var relatedTarget = document.querySelector('[data-entry-related]'); if (relatedTarget) { relatedTarget.textContent = ''; related.forEach(function (target) { var link = document.createElement('a'); link.href = './signal-entry.html?id=' + encodeURIComponent(target.id); link.innerHTML = '<strong></strong><span>↔</span>'; link.querySelector('strong').textContent = target.term; relatedTarget.appendChild(link); }); } if (relatedSection) relatedSection.hidden = !related.length;
+    var save = document.querySelector('[data-entry-save]'); var progress = window.EnglishRadarStorage ? window.EnglishRadarStorage.getProgress() : {}; var active = !!(progress[signal.id] && progress[signal.id].favorite === true); if (save) { save.textContent = active ? '★ Saved signal' : '☆ Save this signal'; save.setAttribute('aria-pressed', active ? 'true' : 'false'); save.classList.toggle('is-saved', active); save.onclick = function () { var state = saveState(signal); if (state === null) { setText('[data-entry-feedback]', 'Could not save in this browser.'); return; } save.textContent = state ? '★ Saved signal' : '☆ Save this signal'; save.setAttribute('aria-pressed', state ? 'true' : 'false'); save.classList.toggle('is-saved', state); setText('[data-entry-feedback]', state ? 'Saved for later.' : 'Removed from saved signals.'); }; }
+    var review = document.querySelector('[data-entry-review]'); if (review) review.href = './learn.html?mode=lookup&signal=' + encodeURIComponent(signal.id); var back = document.querySelector('[data-entry-back]'); if (back) back.href = './index.html';
+  }
+  function boot() { var archive = window.EnglishRadarArchive; var id = new URLSearchParams(window.location.search).get('id') || ''; var entry = archive && archive.findSignal ? archive.findSignal(id) : null; var signal = entry && entry.signal ? entry.signal : entry; var signals = archive && archive.index ? archive.index.catalogSignals : []; render(signal, signals); }
+  window.SideglanceSignalEntry = { resolveIdentity: resolveIdentity, signalRelations: signalRelations };
+  window.addEventListener('DOMContentLoaded', boot);
+}());
