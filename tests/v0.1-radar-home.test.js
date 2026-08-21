@@ -42,6 +42,7 @@ const context = { window: {} };
 vm.runInNewContext(home, context, { filename: 'js/radar-home.js' });
 const presentation = context.window.SideglanceRadarHome.resolveSessionPresentation;
 const resolveCue = context.window.SideglanceRadarHome.resolveDailyMixContextCue;
+const resolveIdentity = context.window.SideglanceRadarHome.resolveSignalIdentity;
 const allowedTypes = new Set(['NEW', 'REVISIT', 'CONNECTED', 'CONTRAST', 'RADAR PICK']);
 const assertCue = (actual, type, detail) => { assert.equal(actual.type, type); assert.equal(actual.detail, detail); };
 const dailyMix = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
@@ -80,9 +81,16 @@ assert.deepEqual(dailyMix.map((signal) => signal.id), ['a', 'b', 'c', 'd', 'e'])
 assert.equal(dailyMix.length, 5);
 assert.match(home, /daily-mix-cue/);
 assert.match(home, /daily-mix-detail/);
+assert.match(home, /daily-mix-identity/);
 assert.doesNotMatch(home, /localStorage|setItem|removeItem/);
 assert.doesNotMatch(home, /selected this|algorithm|trending|popular|AI PICK/i);
 assert.doesNotMatch(childProcess.execFileSync('git', ['diff', '--', 'js/learning-engine.js'], { encoding: 'utf8' }), /./, 'learning-engine.js must have no diff.');
+
+assert.equal(resolveIdentity({ id: 'a', category: 'Community Discourse', platforms: ['Reddit'], tone: ['Casual'] }), 'Community Discourse · Reddit · Casual');
+assert.equal(resolveIdentity({ id: 'b', signalIdentity: { type: 'Developer', usageContext: 'code review', developerContext: 'GitHub', tone: 'direct', relationshipHint: 'review language' } }), 'Developer · code review · GitHub · direct');
+assert.equal(resolveIdentity({ id: 'b2', category: 'Product', productContext: 'Roadmap language' }), 'Product · Roadmap language');
+assert.equal(resolveIdentity({ id: 'c', productContext: 'A long legacy product description that should not become a dense metadata line because it belongs in the detailed Signal record.' }), '');
+assert.equal(resolveIdentity({ id: 'd' }), '');
 
 const keys = [...storage.matchAll(/englishRadar_[A-Za-z]+/g)].map((match) => match[0]);
 assert.deepEqual([...new Set(keys)].sort(), ['englishRadar_currentSession', 'englishRadar_customSignals', 'englishRadar_inbox', 'englishRadar_progress', 'englishRadar_quizHistory', 'englishRadar_settings', 'englishRadar_syncHistory', 'englishRadar_syncSettings'].sort());
