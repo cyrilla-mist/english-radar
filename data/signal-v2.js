@@ -53,7 +53,7 @@
       usage: { commonPatterns: ['ship it', 'let’s ship it', 'ready to ship', 'just ship it'] },
       examples: [{ text: 'The last blocker is fixed. Ship it.', zh: '最后一个阻塞问题修好了，可以发了。', context: 'Informal release decision' }],
       boundaries: { natural: ['product chat', 'engineering chat', 'informal release decisions'], avoid: ['formal release authorization'] },
-      relations: [{ target: 'product-ship', type: 'similar' }, { target: 'product-mvp', type: 'same-context' }, { target: 'github-lgtm', type: 'often-paired' }]
+      relations: [{ target: 'github-ship', type: 'similar' }, { target: 'product-mvp', type: 'same-context' }, { target: 'github-lgtm', type: 'often-paired' }]
     },
     'ai-agent': {
       identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI products', 'Engineering', 'Agent systems'], tone: ['Technical', 'Current', 'Often ambiguous'] },

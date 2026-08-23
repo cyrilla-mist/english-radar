@@ -65,6 +65,8 @@ const goldSnapshots = new Map(['internet-lowkey', 'github-lgtm', 'ai-agent'].map
 const lowkey = resolver.resolve(byId.get('internet-lowkey'));
 const lgtm = resolver.resolve(byId.get('github-lgtm'));
 const agent = resolver.resolve(byId.get('ai-agent'));
+assert.equal(byId.has('github-ship'), true);
+assert(context.window.SIDEGLANCE_SIGNAL_V2['product-ship-it'].relations.some((relation) => relation.target === 'github-ship' && relation.type === 'similar'));
 assert.equal(lowkey.meaning.core, context.window.SIDEGLANCE_SIGNAL_V2['internet-lowkey'].meaning.core);
 assert.deepEqual(Array.from(lowkey.identity.collections), ['everyday-internet-tone']);
 assert.equal(lowkey.examples[0].text, 'I lowkey want to rebuild the whole homepage.');
