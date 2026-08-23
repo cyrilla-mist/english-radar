@@ -93,9 +93,5 @@
     }
   };
 
-  var signals = (window.ENGLISH_RADAR_SIGNALS || []);
-  signals.forEach(function (signal) {
-    if (v2[signal.id]) signal.signalV2 = v2[signal.id];
-  });
   window.SIDEGLANCE_SIGNAL_V2 = v2;
 }());

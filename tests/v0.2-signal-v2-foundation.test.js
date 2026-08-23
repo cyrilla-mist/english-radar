@@ -6,7 +6,10 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const context = { window: {}, console };
-for (const file of ['data/signals.js', 'data/signal-v2.js', 'data/context-collections.js', 'js/signal-resolver.js']) {
+vm.runInNewContext(read('data/signal-v2.js'), context, { filename: 'data/signal-v2.js' });
+assert.equal(typeof context.window.SIDEGLANCE_SIGNAL_V2, 'object');
+assert.equal(typeof context.window.ENGLISH_RADAR_SIGNALS, 'undefined', 'overlay must initialize without legacy signals');
+for (const file of ['data/signals.js', 'data/context-collections.js', 'js/signal-resolver.js']) {
   vm.runInNewContext(read(file), context, { filename: file });
 }
 
@@ -20,24 +23,27 @@ const goldIds = [
 const relationTypes = new Set(['similar', 'contrast', 'often-paired', 'same-context']);
 
 assert.equal(typeof resolver.resolve, 'function');
+assert.equal(typeof resolver.normalize, 'undefined');
 assert.equal(new Set(goldIds).size, 10);
 for (const id of goldIds) {
   assert.equal(signals.filter((signal) => signal.id === id).length, 1, `${id} must exist exactly once`);
   const signal = byId.get(id);
-  assert(signal.signalV2, `${id} missing additive Signal v2 data`);
+  assert.equal(typeof signal.signalV2, 'undefined', `${id} legacy record must not be mutated`);
+  const overlay = context.window.SIDEGLANCE_SIGNAL_V2[id];
+  assert(overlay, `${id} missing from Signal v2 overlay`);
   for (const section of ['identity', 'meaning', 'context', 'usage', 'examples', 'boundaries', 'relations']) {
-    assert(signal.signalV2[section], `${id}.${section} missing`);
+    assert(overlay[section], `${id}.${section} missing`);
   }
-  assert(signal.signalV2.identity.category);
-  assert(signal.signalV2.identity.collections.length);
-  assert(signal.signalV2.identity.contexts.length);
-  assert(signal.signalV2.identity.tone.length);
-  assert(signal.signalV2.meaning.core && signal.signalV2.meaning.zh && signal.signalV2.meaning.feeling);
-  assert(signal.signalV2.context.whyPeopleUseIt);
-  assert(signal.signalV2.usage.commonPatterns.length);
-  assert(signal.signalV2.examples[0].text && signal.signalV2.examples[0].zh);
-  assert(signal.signalV2.boundaries.natural.length && signal.signalV2.boundaries.avoid.length);
-  signal.signalV2.relations.forEach((relation) => assert(relationTypes.has(relation.type), `${id} has invalid relation type`));
+  assert(overlay.identity.category);
+  assert(overlay.identity.collections.length);
+  assert(overlay.identity.contexts.length);
+  assert(overlay.identity.tone.length);
+  assert(overlay.meaning.core && overlay.meaning.zh && overlay.meaning.feeling);
+  assert(overlay.context.whyPeopleUseIt);
+  assert(overlay.usage.commonPatterns.length);
+  assert(overlay.examples[0].text && overlay.examples[0].zh);
+  assert(overlay.boundaries.natural.length && overlay.boundaries.avoid.length);
+  overlay.relations.forEach((relation) => assert(relationTypes.has(relation.type), `${id} has invalid relation type`));
   for (const legacyField of ['meaningEn', 'meaningZh', 'exampleEn', 'exampleZh', 'useWhen', 'avoidWhen']) {
     assert(signal[legacyField], `${id} lost legacy field ${legacyField}`);
   }
@@ -55,11 +61,17 @@ assert.deepEqual(Array.from(legacyNormalized.boundaries.natural), [legacy.useWhe
 assert.deepEqual(Array.from(legacyNormalized.boundaries.avoid), [legacy.avoidWhen]);
 assert.equal(JSON.stringify(legacy), before, 'resolver must not mutate source Signal');
 
+const goldSnapshots = new Map(['internet-lowkey', 'github-lgtm', 'ai-agent'].map((id) => [id, JSON.stringify(byId.get(id))]));
 const lowkey = resolver.resolve(byId.get('internet-lowkey'));
-assert.equal(lowkey.meaning.core, byId.get('internet-lowkey').signalV2.meaning.core);
+const lgtm = resolver.resolve(byId.get('github-lgtm'));
+const agent = resolver.resolve(byId.get('ai-agent'));
+assert.equal(lowkey.meaning.core, context.window.SIDEGLANCE_SIGNAL_V2['internet-lowkey'].meaning.core);
 assert.deepEqual(Array.from(lowkey.identity.collections), ['everyday-internet-tone']);
 assert.equal(lowkey.examples[0].text, 'I lowkey want to rebuild the whole homepage.');
 assert.equal(lowkey.relations[0].target, 'internet-highkey');
+assert.equal(lgtm.meaning.core, context.window.SIDEGLANCE_SIGNAL_V2['github-lgtm'].meaning.core);
+assert.equal(agent.meaning.core, context.window.SIDEGLANCE_SIGNAL_V2['ai-agent'].meaning.core);
+goldSnapshots.forEach((snapshot, id) => assert.equal(JSON.stringify(byId.get(id)), snapshot, `${id} legacy Signal mutated`));
 
 const collections = context.window.SIDEGLANCE_CONTEXT_COLLECTIONS;
 assert.equal(collections.length, 6);

@@ -4,7 +4,6 @@
     if (Array.isArray(value)) return value.slice();
     return value == null || value === '' ? [] : [value];
   }
-  function first(value) { return Array.isArray(value) ? (value[0] || '') : (value || ''); }
   function relation(value, defaultType) {
     return (Array.isArray(value) ? value : []).map(function (item) {
       if (typeof item === 'string') return { target: item, type: defaultType || 'same-context' };
@@ -13,7 +12,8 @@
   }
   function resolve(raw) {
     var signal = raw || {};
-    var v2 = signal.signalV2 || signal.v2 || {};
+    var overlay = (window.SIDEGLANCE_SIGNAL_V2 || {})[signal.id] || {};
+    var v2 = signal.signalV2 || signal.v2 || overlay || {};
     var identity = v2.identity || {};
     var meaning = v2.meaning || {};
     var context = v2.context || {};
@@ -40,5 +40,5 @@
       relations: relation(v2.relations).concat(relation(signal.relatedTerms)).concat(relation(signal.confusedWith, 'contrast'))
     };
   }
-  window.SideglanceSignalResolver = { resolve: resolve, normalize: resolve };
+  window.SideglanceSignalResolver = { resolve: resolve };
 }());
