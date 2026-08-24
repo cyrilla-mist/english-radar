@@ -131,7 +131,69 @@ function testMixRelationsFallbackAndSafety() {
   assert.equal(new Set(fallbackMix.map((item) => item.id)).size, 5);
 }
 
+function testReverseRelationBoundaries() {
+  const focusIds = ['focus-a', 'focus-b', 'focus-c'];
+  const collections = [collection('focus', focusIds)];
+  const baseSignals = focusIds.concat(['revisit', 'candidate', 'unrelated']).map((id) => signal(id));
+  const progress = {
+    revisit: { firstLearnedAt: '2026-01-01T00:00:00.000Z', lastReviewedAt: '2026-01-02T00:00:00.000Z', nextReviewAt: '2026-01-03T00:00:00.000Z', mastery: 'fuzzy' },
+    candidate: { firstLearnedAt: '2026-01-01T00:00:00.000Z', mastery: 'clear' }
+  };
+
+  const reverseFocus = createContext({
+    date: '2026-08-24T12:00:00.000Z',
+    signals: baseSignals,
+    collections,
+    progress,
+    overlay: { candidate: { relations: [{ target: 'focus-a', type: 'same-context' }] } }
+  });
+  assert.ok(reverseFocus.engine.getDailyMix().includes(baseSignals.find((item) => item.id === 'candidate')), 'A reverse relation pointing to Focus must qualify as Connection.');
+
+  const reverseRevisit = createContext({
+    date: '2026-08-24T12:00:00.000Z',
+    signals: baseSignals,
+    collections,
+    progress,
+    overlay: { candidate: { relations: [{ target: 'revisit', type: 'same-context' }] } }
+  });
+  const rejected = reverseRevisit.engine.getDailyMix();
+  assert.ok(rejected.some((item) => item.id === 'unrelated'), 'An unrelated unseen Signal should fill the slot when no Focus relation exists.');
+  assert.ok(!rejected.some((item) => item.id === 'candidate'), 'A relation to Revisit must not qualify as Connection.');
+}
+
+function testMetadataDoesNotCreateConnection() {
+  const focusIds = ['meta-a', 'meta-b', 'meta-c'];
+  const signals = focusIds.concat(['meta-revisit', 'metadata-only', 'meta-unrelated']).map((id) => signal(id));
+  signals.slice(0, 3).forEach((item) => { item.category = 'Shared Context'; item.tone = ['Casual']; item.platforms = ['Discord']; });
+  const metadataOnly = signals.find((item) => item.id === 'metadata-only');
+  metadataOnly.category = 'Shared Context';
+  metadataOnly.tone = ['Casual'];
+  metadataOnly.platforms = ['Discord'];
+  const progress = {
+    'meta-revisit': { firstLearnedAt: '2026-01-01T00:00:00.000Z', nextReviewAt: '2026-01-03T00:00:00.000Z', mastery: 'fuzzy' },
+    'metadata-only': { firstLearnedAt: '2026-01-01T00:00:00.000Z', mastery: 'clear' }
+  };
+  const result = createContext({ date: '2026-08-24T12:00:00.000Z', signals, collections: [collection('metadata-focus', focusIds)], progress }).engine.getDailyMix();
+  assert.ok(result.some((item) => item.id === 'meta-unrelated'), 'Ordinary fallback should remain available.');
+  assert.ok(!result.some((item) => item.id === 'metadata-only'), 'Shared category/tone/platform metadata must not create a Connection.');
+}
+
+function testSameDayDailyMixDeterminism() {
+  const ids = ['day-a', 'day-b', 'day-c', 'day-review', 'day-other', 'day-fallback'];
+  const signals = ids.map((id) => signal(id));
+  const collections = [collection('day-focus', ['day-a', 'day-b', 'day-c'])];
+  const progress = {
+    'day-review': { firstLearnedAt: '2026-01-01T00:00:00', lastReviewedAt: '2026-08-01T00:00:00', nextReviewAt: '2026-08-24T18:00:00', mastery: 'clear' }
+  };
+  const beforeCutoff = createContext({ date: '2026-08-24T12:00:00', signals, collections, progress }).engine.getDailyMix().map((item) => item.id);
+  const afterCutoff = createContext({ date: '2026-08-24T20:00:00', signals, collections, progress }).engine.getDailyMix().map((item) => item.id);
+  assert.equal(JSON.stringify(afterCutoff), JSON.stringify(beforeCutoff), 'Daily Mix must remain stable across review cutoff changes on one local day.');
+}
+
 testRealCollections();
 testFocusRotationAndPriority();
 testMixRelationsFallbackAndSafety();
+testReverseRelationBoundaries();
+testMetadataDoesNotCreateConnection();
+testSameDayDailyMixDeterminism();
 console.log('PASS: Sideglance v0.2 Phase 2B1 Daily Radar selection checks');

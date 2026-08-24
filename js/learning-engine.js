@@ -123,6 +123,11 @@
     return Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
   }
 
+  function localDayEnd() {
+    var now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  }
+
   function cloneFocus(collection, signals) {
     if (!collection) return null;
     var result = {
@@ -185,6 +190,8 @@
     var resolver = window.SideglanceSignalResolver;
     if (!resolver || typeof resolver.resolve !== 'function') return null;
     var signalById = {}; var signalByTerm = {};
+    var focusIds = {};
+    selectedFocus.forEach(function (signal) { if (signal && signal.id) focusIds[signal.id] = true; });
     allSignals.forEach(function (signal) {
       signalById[signal.id] = signal;
       signalByTerm[text(signal.term).toLowerCase().replace(/\s+/g, ' ')] = signal;
@@ -203,14 +210,14 @@
       var reverseRelations = resolver.resolve(reverse).relations || [];
       for (var reverseRelationIndex = 0; reverseRelationIndex < reverseRelations.length; reverseRelationIndex += 1) {
         var target = relationTarget(reverse, reverseRelations[reverseRelationIndex].target, signalById, signalByTerm);
-        if (target && selectedIds[target.id]) return reverse;
+        if (target && focusIds[target.id]) return reverse;
       }
     }
     return null;
   }
 
   function buildDailyMixV2(allSignals, progress, focusEntry) {
-    var now = new Date();
+    var now = localDayEnd();
     var selected = []; var selectedIds = {};
     function add(signal) { if (signal && !selectedIds[signal.id] && selected.length < 5) { selected.push(signal); selectedIds[signal.id] = true; } }
     var focusSignals = rankFocusSignals(focusEntry.signals, focusEntry.collection.id, progress);
