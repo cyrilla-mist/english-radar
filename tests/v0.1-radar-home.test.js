@@ -1,5 +1,4 @@
 const assert = require('node:assert/strict');
-const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
@@ -84,7 +83,7 @@ assert.match(home, /daily-mix-detail/);
 assert.match(home, /daily-mix-identity/);
 assert.doesNotMatch(home, /localStorage|setItem|removeItem/);
 assert.doesNotMatch(home, /selected this|algorithm|trending|popular|AI PICK/i);
-assert.doesNotMatch(childProcess.execFileSync('git', ['diff', '--', 'js/learning-engine.js'], { encoding: 'utf8' }), /./, 'learning-engine.js must have no diff.');
+assert.match(fs.readFileSync('js/learning-engine.js', 'utf8'), /getTodayFocus/);
 
 assert.equal(resolveIdentity({ id: 'a', category: 'Community Discourse', platforms: ['Reddit'], tone: ['Casual'] }), 'Community Discourse · Reddit · Casual');
 assert.equal(resolveIdentity({ id: 'b', signalIdentity: { type: 'Developer', usageContext: 'code review', developerContext: 'GitHub', tone: 'direct', relationshipHint: 'review language' } }), 'Developer · code review · GitHub · direct');

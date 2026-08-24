@@ -12,6 +12,7 @@
   var baseSignalsCache = null;
   var progressCache = null;
   var todaySnapshotCache = null;
+  var todayFocusCache = null;
   var params = new URLSearchParams(window.location.search);
   var dateKey = (function () {
     var now = new Date();
@@ -117,6 +118,115 @@
     return best;
   }
 
+  function localDayOrdinal() {
+    var now = new Date();
+    return Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  }
+
+  function cloneFocus(collection, signals) {
+    if (!collection) return null;
+    var result = {
+      id: collection.id,
+      title: collection.title,
+      description: collection.description,
+      signalIds: Array.isArray(collection.signalIds) ? collection.signalIds.slice() : []
+    };
+    return result;
+  }
+
+  function getContextCollections() {
+    return Array.isArray(window.SIDEGLANCE_CONTEXT_COLLECTIONS) ? window.SIDEGLANCE_CONTEXT_COLLECTIONS : [];
+  }
+
+  function getEligibleCollections(allSignals) {
+    var signalMap = {};
+    allSignals.forEach(function (signal) { if (signal && signal.id) signalMap[signal.id] = signal; });
+    return getContextCollections().map(function (collection) {
+      var resolvedSignals = Array.isArray(collection && collection.signalIds) ? collection.signalIds.map(function (id) { return signalMap[id]; }).filter(Boolean) : [];
+      return { collection: collection, signals: resolvedSignals };
+    }).filter(function (entry) { return entry.signals.length >= 3; });
+  }
+
+  function getTodayFocusEntry() {
+    var eligible = getEligibleCollections(getBaseSignals());
+    if (!eligible.length) return null;
+    return eligible[localDayOrdinal() % eligible.length];
+  }
+
+  function getTodayFocus() {
+    if (todayFocusCache) return cloneFocus(todayFocusCache.collection, todayFocusCache.signals);
+    var entry = getTodayFocusEntry();
+    if (!entry) return null;
+    todayFocusCache = { collection: entry.collection, signals: entry.signals };
+    return cloneFocus(entry.collection, entry.signals);
+  }
+
+  function masteryTier(signal, progress) {
+    var record = progress[signal.id];
+    if (!record || !record.firstLearnedAt) return 0;
+    return record.mastery === 'clear' ? 2 : 1;
+  }
+
+  function rankFocusSignals(signals, focusId, progress) {
+    return signals.map(function (signal, index) {
+      return { signal: signal, index: index, tier: masteryTier(signal, progress), rank: hash(dateKey + '|' + focusId + '|' + text(signal.id)) };
+    }).sort(function (a, b) {
+      return a.tier - b.tier || a.rank - b.rank || a.index - b.index;
+    }).map(function (entry) { return entry.signal; });
+  }
+
+  function relationTarget(signal, target, signalById, signalByTerm) {
+    var id = text(target);
+    var normalized = id.toLowerCase().replace(/\s+/g, ' ');
+    return signalById[id] || signalByTerm[normalized] || null;
+  }
+
+  function findExplicitConnection(selectedFocus, allSignals, selectedIds) {
+    var resolver = window.SideglanceSignalResolver;
+    if (!resolver || typeof resolver.resolve !== 'function') return null;
+    var signalById = {}; var signalByTerm = {};
+    allSignals.forEach(function (signal) {
+      signalById[signal.id] = signal;
+      signalByTerm[text(signal.term).toLowerCase().replace(/\s+/g, ' ')] = signal;
+    });
+    for (var focusIndex = 0; focusIndex < selectedFocus.length; focusIndex += 1) {
+      var focus = selectedFocus[focusIndex];
+      var relations = resolver.resolve(focus).relations || [];
+      for (var relationIndex = 0; relationIndex < relations.length; relationIndex += 1) {
+        var candidate = relationTarget(focus, relations[relationIndex].target, signalById, signalByTerm);
+        if (candidate && !selectedIds[candidate.id]) return candidate;
+      }
+    }
+    for (var candidateIndex = 0; candidateIndex < allSignals.length; candidateIndex += 1) {
+      var reverse = allSignals[candidateIndex];
+      if (selectedIds[reverse.id]) continue;
+      var reverseRelations = resolver.resolve(reverse).relations || [];
+      for (var reverseRelationIndex = 0; reverseRelationIndex < reverseRelations.length; reverseRelationIndex += 1) {
+        var target = relationTarget(reverse, reverseRelations[reverseRelationIndex].target, signalById, signalByTerm);
+        if (target && selectedIds[target.id]) return reverse;
+      }
+    }
+    return null;
+  }
+
+  function buildDailyMixV2(allSignals, progress, focusEntry) {
+    var now = new Date();
+    var selected = []; var selectedIds = {};
+    function add(signal) { if (signal && !selectedIds[signal.id] && selected.length < 5) { selected.push(signal); selectedIds[signal.id] = true; } }
+    var focusSignals = rankFocusSignals(focusEntry.signals, focusEntry.collection.id, progress);
+    focusSignals.slice(0, 3).forEach(add);
+    add(pickOldest(allSignals.filter(function (signal) { return !selectedIds[signal.id] && dueOrWeak(signal, progress, now); }), progress, selectedIds));
+    add(findExplicitConnection(selected.slice(0, 3), allSignals, selectedIds));
+    var fallbackGroups = [
+      allSignals.filter(function (signal) { return !selectedIds[signal.id] && dueOrWeak(signal, progress, now); }),
+      allSignals.filter(function (signal) { return !selectedIds[signal.id] && progress[signal.id] && masteryTier(signal, progress) === 1; }),
+      allSignals.filter(function (signal) { return !selectedIds[signal.id] && isUnseen(signal, progress); }),
+      allSignals.filter(function (signal) { return !selectedIds[signal.id]; })
+    ];
+    fallbackGroups.forEach(function (group) { if (selected.length < 5) add(pickDeterministic(group, selectedIds, 'daily-radar-fallback')); });
+    return unique(selected).slice(0, 5);
+  }
+
   function buildDailyMix(allSignals, progress) {
     var now = new Date();
     var unseen = [];
@@ -154,7 +264,11 @@
   }
 
   function getDailyMix() {
-    var build = function () { return buildDailyMix(getBaseSignals(), progressMap()); };
+    var build = function () {
+      var signals = getBaseSignals();
+      var focusEntry = getTodayFocusEntry();
+      return focusEntry ? buildDailyMixV2(signals, progressMap(), focusEntry) : buildDailyMix(signals, progressMap());
+    };
     return window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.dailyMixCalculation', build) : build();
   }
 
@@ -180,9 +294,10 @@
     var build = function () {
       var signals = getBaseSignals();
       var progress = progressMap();
+      var todayFocus = getTodayFocus();
       var dailyMix = getDailyMix();
       var statistics = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.statisticsCalculation', function () { return buildStatistics(signals, progress); }) : buildStatistics(signals, progress);
-      return { signals: signals, progress: progress, dailyMix: dailyMix, statistics: statistics, quizReadyCount: statistics.quizReady };
+      return { signals: signals, progress: progress, todayFocus: todayFocus, dailyMix: dailyMix, statistics: statistics, quizReadyCount: statistics.quizReady };
     };
     todaySnapshotCache = window.EnglishRadarPerformanceDebug ? window.EnglishRadarPerformanceDebug.measure('today.snapshotBuild', build) : build();
     return todaySnapshotCache;
@@ -221,12 +336,13 @@
     getBaseSignals: getBaseSignals,
     getFilteredSignals: getLearningSignals,
     getSignals: getLearningSignals,
+    getTodayFocus: getTodayFocus,
     getDailyMix: getDailyMix,
     getTodaySnapshot: getTodaySnapshot,
     getProgress: progressMap,
     getUnseenCount: function () { var progress = progressMap(); return getBaseSignals().filter(function (signal) { return isUnseen(signal, progress); }).length; },
     interestCategories: interestCategories.slice(),
     dateKey: dateKey,
-    _resetForTests: function () { baseSignalsCache = null; progressCache = null; todaySnapshotCache = null; }
+    _resetForTests: function () { baseSignalsCache = null; progressCache = null; todaySnapshotCache = null; todayFocusCache = null; }
   };
 }());
