@@ -64,4 +64,9 @@ const requiredMembership = {
 };
 collections.forEach((collection) => assert.deepEqual(Array.from(collection.signalIds), requiredMembership[collection.id]));
 
+assert.equal(byId.has('product-ship-it'), true);
+assert(context.window.SIDEGLANCE_SIGNAL_V2['github-breaking-change'].relations.some((relation) => relation.target === 'product-ship-it' && relation.type === 'same-context'));
+assert.equal(byId.has('internet-eli5'), true);
+assert(context.window.SIDEGLANCE_SIGNAL_V2['internet-yapping'].relations.some((relation) => relation.target === 'internet-eli5' && relation.type === 'contrast'));
+
 console.log('PASS: v0.2 Phase 2A context content expansion, ELI5 compatibility, overlay immutability and collection coverage');

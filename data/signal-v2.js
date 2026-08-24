@@ -152,7 +152,7 @@
       usage: { commonPatterns: ['breaking change', 'breaking API change', 'document the breaking change'] },
       examples: [{ text: 'Renaming this response field is a breaking change for our clients.', zh: '重命名这个响应字段会让我们的客户端需要适配。', context: 'API review' }],
       boundaries: { natural: ['API design', 'release notes', 'dependency discussions'], avoid: ['calling an internal refactor breaking when the public contract is unchanged'] },
-      relations: [{ target: 'github-pr', type: 'same-context' }, { target: 'github-merge', type: 'same-context' }, { target: 'github-ship', type: 'contrast' }]
+      relations: [{ target: 'github-pr', type: 'same-context' }, { target: 'github-merge', type: 'same-context' }, { target: 'product-ship-it', type: 'same-context' }]
     },
     'ai-tool-calling': {
       identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI tools', 'Engineering chat', 'Product teams'], tone: ['Technical', 'Precise', 'Work-casual'] },
@@ -188,7 +188,7 @@
       usage: { commonPatterns: ['I’m yapping', 'stop yapping', 'all that yapping', 'let me stop yapping'] },
       examples: [{ text: 'I’ve been yapping for five minutes; the actual point is that the test passed.', zh: '我已经说了五分钟，重点其实是测试通过了。', context: 'Casual team chat' }],
       boundaries: { natural: ['casual chat', 'comments', 'self-mocking posts'], avoid: ['sensitive conversations', 'using it to dismiss someone who needs to be heard'] },
-      relations: [{ target: 'internet-tldr', type: 'same-context' }, { target: 'internet-touch-grass', type: 'same-context' }, { target: 'internet-no-notes', type: 'contrast' }]
+      relations: [{ target: 'internet-tldr', type: 'same-context' }, { target: 'internet-touch-grass', type: 'same-context' }, { target: 'internet-eli5', type: 'contrast' }]
     },
     'internet-eli5': {
       identity: { category: 'Community Language', collections: ['community-forum-conventions'], contexts: ['Reddit', 'Forums', 'Chat'], tone: ['Curious', 'Informal', 'Sometimes playful'] },
