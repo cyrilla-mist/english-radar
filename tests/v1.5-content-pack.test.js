@@ -41,7 +41,7 @@ context.window.EnglishRadarStorage = storage;
 vm.runInNewContext(read('js/content-registry.js'), context, { filename: 'js/content-registry.js' });
 vm.runInNewContext(read('js/quiz-registry.js'), context, { filename: 'js/quiz-registry.js' });
 const registry = context.window.EnglishRadarQuizRegistry;
-assert.equal(registry.getStaticQuizzes().length, 228);
+assert.equal(registry.getStaticQuizzes().length, 230);
 assert.equal(registry.getInterfaceQuizzes().length, 70);
 assert.equal(registry.getContentPack03Quizzes().length, 20);
 assert.equal(registry.getInterfaceQuizzes().filter((quiz) => pack03Ids.has(quiz.signalId)).length, 20);
@@ -76,6 +76,6 @@ assert(read('README.md').includes('# English Radar v1.8.3'));
 assert(read('README.md').includes('English Radar v1.8.3 is the current maintenance release on `main`'));
 assert(read('README.md').includes('Content Pack 03 has 10 Signals and 20 quizzes'));
 assert(read('docs/v1.5.0-release-notes.md').includes('Content Pack 03'));
-assert(importReport.includes('Static registry: 228'));
+assert(importReport.includes('Static registry: 232'));
 
 console.log('PASS: v1.5 Content Pack 03 metadata, validator, static/interface registry, bundled loading and learning-target boundary checks');

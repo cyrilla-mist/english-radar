@@ -49,7 +49,7 @@ for (const id of goldIds) {
   }
 }
 
-const legacy = byId.get('internet-based');
+const legacy = byId.get('internet-valid');
 const before = JSON.stringify(legacy);
 const legacyNormalized = resolver.resolve(legacy);
 assert.equal(legacyNormalized.identity.category, legacy.category);
