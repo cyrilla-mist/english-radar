@@ -12,7 +12,7 @@ const errors = [];
 const signalIds = new Set();
 const terms = new Set();
 const requiredSignal = ['id','term','displayTerm','speechText','pronunciation','category','platforms','tone','status','formality','meaningEn','meaningZh','exampleEn','exampleZh','useWhen','avoidWhen','chineseFeeling'];
-if (!Array.isArray(signals) || signals.length !== 60) errors.push(`Expected 60 signals, found ${signals && signals.length}.`);
+if (!Array.isArray(signals) || signals.length !== 61) errors.push(`Expected 61 signals, found ${signals && signals.length}.`);
 (signals || []).forEach((signal, index) => {
   requiredSignal.forEach((field) => { if (signal[field] === undefined || signal[field] === null || signal[field] === '') errors.push(`Signal ${index + 1} missing ${field}.`); });
   if (signalIds.has(signal.id)) errors.push(`Duplicate Signal ID: ${signal.id}`); signalIds.add(signal.id);
@@ -22,7 +22,7 @@ if (!Array.isArray(signals) || signals.length !== 60) errors.push(`Expected 60 s
 });
 const quizIds = new Set(); const pairs = new Set(); const counts = {};
 const types = new Set(['meaning-in-context','natural-usage','tone','community','formality']); const difficulties = new Set(['easy','medium','hard']);
-if (!Array.isArray(quizzes) || quizzes.length !== 120) errors.push(`Expected 120 quizzes, found ${quizzes && quizzes.length}.`);
+if (!Array.isArray(quizzes) || quizzes.length !== 122) errors.push(`Expected 122 quizzes, found ${quizzes && quizzes.length}.`);
 (quizzes || []).forEach((quiz, index) => {
   if (quizIds.has(quiz.id)) errors.push(`Duplicate Quiz ID: ${quiz.id}`); quizIds.add(quiz.id);
   if (!signalIds.has(quiz.signalId)) errors.push(`Quiz ${quiz.id} references unknown Signal ${quiz.signalId}`);
@@ -36,4 +36,4 @@ if (!Array.isArray(quizzes) || quizzes.length !== 120) errors.push(`Expected 120
   const pair = `${quiz.question}\u0000${quiz.context}`; if (pairs.has(pair)) errors.push(`Duplicate question/context: ${quiz.id}`); pairs.add(pair);
 });
 signalIds.forEach((id) => { if (counts[id] !== 2) errors.push(`Signal ${id} has ${counts[id] || 0} quizzes; expected 2.`); });
-if (errors.length) { console.error('English Radar data validation failed.'); errors.forEach((error) => console.error(`- ${error}`)); process.exitCode = 1; } else { console.log('English Radar data validation passed.'); console.log('60 signals'); console.log('120 quizzes'); console.log('All signal and quiz IDs are valid.'); }
+if (errors.length) { console.error('English Radar data validation failed.'); errors.forEach((error) => console.error(`- ${error}`)); process.exitCode = 1; } else { console.log('English Radar data validation passed.'); console.log('61 signals'); console.log('122 quizzes'); console.log('All signal and quiz IDs are valid.'); }

@@ -12,7 +12,7 @@
 - Signals: 10
 - Dedicated quizzes: 20
 - Interface Signals: 10
-- Static registry: 228
+- Static registry: 232
 - Interface registry: 70
 - Pack 03 quizzes in the Interface registry: 20
 

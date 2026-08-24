@@ -61,7 +61,7 @@ assert.equal(registry.getActiveLearningSignals().filter((signal) => signal.sourc
 vm.runInNewContext(read('js/quiz-registry.js'), context, { filename: 'js/quiz-registry.js' });
 const quizRegistry = context.window.EnglishRadarQuizRegistry;
 assert.equal(quizRegistry.getContentPack04Quizzes().length, 20);
-assert.equal(quizRegistry.getStaticQuizzes().length, 248);
+assert.equal(quizRegistry.getStaticQuizzes().length, 250);
 assert.equal(quizRegistry.getInterfaceQuizzes().length, 70);
 
 assert(read('js/dictionary.js').includes('culturalContextEn'));
