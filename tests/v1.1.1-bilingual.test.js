@@ -32,11 +32,11 @@ vm.runInNewContext(read('data/signals.js'), dataContext);
 vm.runInNewContext(read('data/quizzes.js'), dataContext);
 const coreSignals = dataContext.window.ENGLISH_RADAR_SIGNALS;
 const staticQuizzes = dataContext.window.ENGLISH_RADAR_QUIZZES;
-assert.equal(coreSignals.length, 61);
+assert.equal(coreSignals.length, 62);
 assert(coreSignals.every((signal) => signal.useWhenZh && signal.avoidWhenZh));
-assert.equal(new Set(coreSignals.map((signal) => signal.useWhenZh)).size, 61);
-assert.equal(new Set(coreSignals.map((signal) => signal.avoidWhenZh)).size, 61);
-assert.equal(staticQuizzes.length, 122);
+assert.equal(new Set(coreSignals.map((signal) => signal.useWhenZh)).size, 62);
+assert.equal(new Set(coreSignals.map((signal) => signal.avoidWhenZh)).size, 62);
+assert.equal(staticQuizzes.length, 124);
 assert(staticQuizzes.every((question) => question.explanationZh && question.explanationZh !== (coreSignals.find((signal) => signal.id === question.signalId) || {}).meaningZh));
 
 const notion = read('js/notion-sync.js');

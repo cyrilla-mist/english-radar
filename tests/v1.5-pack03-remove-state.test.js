@@ -38,7 +38,7 @@ install(pack01);
 install(pack02);
 install(pack03);
 assert.equal(custom.packs.length, 3);
-assert.equal(content.getActiveLearningSignals().length, 105);
+assert.equal(content.getActiveLearningSignals().length, 106);
 
 // Hard-reload equivalent: state is reconstructed from persisted custom pack records.
 custom = JSON.parse(JSON.stringify(custom));

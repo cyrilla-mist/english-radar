@@ -41,7 +41,7 @@ context.window.EnglishRadarStorage = storage;
 vm.runInNewContext(read('js/content-registry.js'), context, { filename: 'js/content-registry.js' });
 vm.runInNewContext(read('js/quiz-registry.js'), context, { filename: 'js/quiz-registry.js' });
 const registry = context.window.EnglishRadarQuizRegistry;
-assert.equal(registry.getStaticQuizzes().length, 230);
+assert.equal(registry.getStaticQuizzes().length, 232);
 assert.equal(registry.getInterfaceQuizzes().length, 70);
 assert.equal(registry.getContentPack03Quizzes().length, 20);
 assert.equal(registry.getInterfaceQuizzes().filter((quiz) => pack03Ids.has(quiz.signalId)).length, 20);

@@ -43,11 +43,11 @@ vm.runInNewContext(read('js/content-registry.js'), context, { filename: 'js/cont
 vm.runInNewContext(read('js/quiz-registry.js'), context, { filename: 'js/quiz-registry.js' });
 const content = context.window.EnglishRadarContent;
 const quizzes = context.window.EnglishRadarQuizRegistry;
-assert.equal(quizzes.getStaticQuizzes().length, 190);
+assert.equal(quizzes.getStaticQuizzes().length, 192);
 assert.equal(quizzes.getContentPack01Quizzes().length, 48);
 assert.equal(quizzes.getInterfaceQuizzes().length, 50);
 assert.equal(quizzes.getStaticQuizzes().filter((quiz) => packQuizzes.some((candidate) => candidate.id === quiz.id)).length, 48);
-assert.equal(content.getActiveLearningSignals().length, 61);
+assert.equal(content.getActiveLearningSignals().length, 62);
 assert.equal(quizzes.getStaticQuizzes().filter((quiz) => content.getSignalById(quiz.signalId)).filter((quiz) => quiz.id.startsWith('cp01-')).length, 0);
 
 const progress = { 'ui-dashboard': { signalId: 'ui-dashboard', mastery: 'clear' } };
@@ -59,7 +59,7 @@ function install(ids) {
 }
 install(pack.signals.map((signal) => signal.id));
 assert.equal(Object.keys(custom.signals).length, 24);
-assert.equal(content.getActiveLearningSignals().length, 85);
+assert.equal(content.getActiveLearningSignals().length, 86);
 assert.equal(quizzes.getStaticQuizzes().filter((quiz) => content.getSignalById(quiz.signalId)).filter((quiz) => quiz.id.startsWith('cp01-')).length, 48);
 install(pack.signals.slice(0, 12).map((signal) => signal.id));
 assert.equal(Object.keys(custom.signals).length, 24);
@@ -67,7 +67,7 @@ pack.signals.slice(12).forEach((signal) => delete custom.signals[signal.id]);
 custom.packs = custom.packs.filter((item) => item.id !== pack.pack.id);
 content.invalidate();
 assert.equal(Object.keys(custom.signals).length, 12);
-assert.equal(content.getActiveLearningSignals().length, 73);
+assert.equal(content.getActiveLearningSignals().length, 74);
 assert.equal(progress['ui-dashboard'].mastery, 'clear');
 
 const meSource = read('js/me.js');
