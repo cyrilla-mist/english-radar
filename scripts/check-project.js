@@ -51,6 +51,6 @@ if (!/payload\.ok === true && Array\.isArray\(payload\.records\)/.test(syncScrip
 const frontendScripts = fs.readdirSync(path.join(root, 'js')).filter((file) => file.endsWith('.js'));
 frontendScripts.forEach((file) => { const source = read(path.join('js', file)); if (file !== 'notion-sync.js' && /\bfetch\s*\(/i.test(source)) errors.push(`js/${file}: only js/notion-sync.js may use fetch`); if (/api\.notion\.com|NOTION_TOKEN\s*[:=]\s*['"][^'"]+|SYNC_ADMIN_TOKEN\s*[:=]\s*['"][^'"]+/i.test(source)) errors.push(`js/${file}: frontend contains a Notion endpoint or credential`); });
 const dataCheck = childProcess.spawnSync(process.execPath, ['scripts/validate-data.js'], { cwd: root, encoding: 'utf8' });
-if (dataCheck.status !== 0 || !/61 signals[\s\S]*122 quizzes/i.test(dataCheck.stdout || '')) errors.push('Core data validation did not confirm 61 Signals / 122 Quizzes.');
+if (dataCheck.status !== 0 || !/62 signals[\s\S]*124 quizzes/i.test(dataCheck.stdout || '')) errors.push('Core data validation did not confirm 62 Signals / 124 Quizzes.');
 if (/file:\/\/\/|C:\\Users\\|<iframe|\balert\s*\(|\bconfirm\s*\(|\beval\s*\(|new\s+Function\s*\(|\bfetch\s*\(|sessionStorage|indexedDB|document\.cookie/i.test(all)) errors.push('Project contains a forbidden marker.');
 if (errors.length) { console.error('English Radar project check failed.'); errors.forEach((error) => console.error(`- ${error}`)); process.exitCode = 1; } else console.log('English Radar project check passed.');
