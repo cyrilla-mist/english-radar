@@ -73,6 +73,13 @@ const expectedRelations = [
   ['internet-iykyk', 'internet-lore', 'same-context']
 ];
 expectedRelations.forEach(([source, target, type]) => assert(context.window.SIDEGLANCE_SIGNAL_V2[source].relations.some((relation) => relation.target === target && relation.type === type), `${source} -> ${target} (${type}) missing`));
+assert(!context.window.SIDEGLANCE_SIGNAL_V2['internet-chronically-online'].relations.some((relation) => relation.target === 'internet-touch-grass' && relation.type === 'often-paired'));
+assert(!context.window.SIDEGLANCE_SIGNAL_V2['internet-we-are-so-back'].relations.some((relation) => relation.target === 'internet-cooked' && relation.type === 'contrast'));
+
+const phase3a1PlatformlessIds = phase3a1Ids;
+phase3a1PlatformlessIds.forEach((id) => assert.equal(Object.prototype.hasOwnProperty.call(context.window.SIDEGLANCE_SIGNAL_V2[id].identity, 'platforms'), false, `${id} should not define v2 platforms in Phase 3A.1`));
+assert(!context.window.SIDEGLANCE_SIGNAL_V2['internet-no-cap'].usage.commonPatterns.includes('that was no cap'));
+assert(context.window.SIDEGLANCE_SIGNAL_V2['internet-no-cap'].usage.commonPatterns.includes('... no cap'));
 
 const highkeyQuizzes = context.window.ENGLISH_RADAR_QUIZZES.filter((quiz) => quiz.signalId === 'internet-highkey');
 assert.equal(highkeyQuizzes.length, 2);

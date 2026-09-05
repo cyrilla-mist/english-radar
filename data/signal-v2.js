@@ -200,7 +200,7 @@
       relations: [{ target: 'internet-tldr', type: 'same-context' }, { target: 'ai-context-window', type: 'same-context' }, { target: 'internet-yapping', type: 'contrast' }]
     },
     'internet-highkey': {
-      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Casual opinions', 'Personal preferences', 'Comments', 'Social chat'], platforms: ['Comments', 'Casual chat', 'Social media'], tone: ['Emphatic', 'Direct', 'Casual'] },
+      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Casual opinions', 'Personal preferences', 'Comments', 'Social chat'], tone: ['Emphatic', 'Direct', 'Casual'] },
       meaning: { core: 'Used to openly and emphatically admit a strong opinion, preference, or feeling.', zh: '明确地表达强烈的看法、偏好或感受', feeling: 'I am just going to admit this openly and strongly.' },
       context: { whyPeopleUseIt: 'It marks an admission as deliberate and unhidden, often making a strong personal reaction feel playful rather than formal.', culturalNote: 'Highkey works as a contrast to lowkey, which deliberately softens or downplays an admission.' },
       usage: { commonPatterns: ['I highkey want…', 'highkey obsessed', 'I highkey love it', 'highkey the best'] },
@@ -209,16 +209,16 @@
       relations: []
     },
     'internet-no-cap': {
-      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Comments', 'Casual chat', 'Social media'], platforms: ['Comments', 'Casual chat', 'Social media'], tone: ['Direct', 'Emphatic', 'Casual'] },
+      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Comments', 'Casual chat', 'Social media'], tone: ['Direct', 'Emphatic', 'Casual'] },
       meaning: { core: 'Emphasizes that the speaker is not exaggerating, bluffing, or dressing up the truth.', zh: '强调没有夸张、没有吹牛，接下来是实话', feeling: 'I am being completely serious about this.' },
       context: { whyPeopleUseIt: 'It reassures an informal audience that a strong claim is meant sincerely rather than as hype or performance.', culturalNote: 'No cap can sound emphatic or playful; it is not a neutral substitute for honestly in every setting.' },
-      usage: { commonPatterns: ['no cap', 'no cap, this is…', 'I’m serious, no cap', 'that was no cap'] },
+      usage: { commonPatterns: ['no cap', 'no cap, this is…', 'I’m serious, no cap', '... no cap'] },
       examples: [{ text: 'No cap, this is the cleanest fix we’ve shipped all month.', zh: '不夸张，这是我们这个月发出的最干净的修复。', context: 'Developer chat' }, { text: 'No cap, I replayed that clip five times.', zh: '真的不夸张，我把那段视频重播了五遍。', context: 'Casual reaction' }],
       boundaries: { natural: ['casual reactions', 'comments', 'informal team chat'], avoid: ['formal reports', 'situations where plain wording is clearer'], note: 'Use it to reject exaggeration or bluffing, not simply to mean “very.”' },
       relations: [{ target: 'internet-fr', type: 'similar' }]
     },
     'internet-its-giving': {
-      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Comments', 'Fandom', 'Social media'], platforms: ['Comments', 'Fandom', 'Social media'], tone: ['Playful', 'Evaluative', 'Casual'] },
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Comments', 'Fandom', 'Social media'], tone: ['Playful', 'Evaluative', 'Casual'] },
       meaning: { core: 'Reads something as carrying a recognizable vibe, reference, archetype, era, or aesthetic.', zh: '看出某种熟悉的氛围、风格或参照感', feeling: 'This reminds me of a recognizable type of energy.' },
       context: { whyPeopleUseIt: 'It compresses a longer cultural comparison into a quick vibe reading that other online users can recognize.', culturalNote: 'The expression depends on the audience understanding the reference or vibe named after “giving.”' },
       usage: { commonPatterns: ["it’s giving…", 'this is giving…', 'the whole look is giving…', 'it’s giving main character'] },
@@ -227,7 +227,7 @@
       relations: [{ target: 'internet-ate', type: 'same-context' }]
     },
     'internet-delulu': {
-      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Fandom', 'Comments', 'Casual chat'], platforms: ['Fandom', 'Comments', 'Casual chat'], tone: ['Playful', 'Self-mocking', 'Teasing'] },
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Fandom', 'Comments', 'Casual chat'], tone: ['Playful', 'Self-mocking', 'Teasing'] },
       meaning: { core: 'A playful, self-aware label for unrealistic optimism, fantasy, or wishful thinking.', zh: '带自知之明地说自己有点不切实际、在幻想', feeling: 'I know this hope is unrealistic, but I am entertaining it anyway.' },
       context: { whyPeopleUseIt: 'It lets people mock their own hopeful fantasies in a compact, humorous way, especially in fandom and stan culture.', culturalNote: 'The slang grew from fandom language and spread into broader self-mocking internet speech.' },
       usage: { commonPatterns: ['I’m being delulu', 'delulu is the solulu', 'a little delulu', 'delulu but hopeful'] },
@@ -236,25 +236,25 @@
       relations: [{ target: 'internet-chronically-online', type: 'same-context' }]
     },
     'internet-chronically-online': {
-      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Comments', 'Social media', 'Casual chat'], platforms: ['Comments', 'Social media', 'Casual chat'], tone: ['Teasing', 'Critical', 'Observational'] },
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Comments', 'Social media', 'Casual chat'], tone: ['Teasing', 'Critical', 'Observational'] },
       meaning: { core: 'Describes thinking, behavior, references, or interpretations shaped so deeply by internet culture that ordinary offline perspective seems distant.', zh: '思维、表达或判断被网络文化深度塑造，甚至脱离普通线下视角', feeling: 'This reaction makes sense inside the internet, but feels strange or detached offline.' },
       context: { whyPeopleUseIt: 'It gives people a compact way to point out when online norms or references have started shaping someone’s worldview unusually strongly.', culturalNote: 'It can be observational or self-deprecating, but when aimed at someone in an argument it can dismiss their perspective.' },
       usage: { commonPatterns: ['so chronically online', 'that’s chronically online', 'chronically online take', 'I’m chronically online'] },
       examples: [{ text: 'That take is so chronically online that nobody in the room understood it.', zh: '这个观点太网络化了，房间里没人听懂。', context: 'Offline conversation' }, { text: 'I know I’m chronically online when I recognize every niche reference in this thread.', zh: '我连这个帖子里的每个冷门梗都认识时，就知道自己真的泡网太深了。', context: 'Self-observation' }],
       boundaries: { natural: ['self-deprecation', 'light observations about internet-shaped behavior'], avoid: ['treating it as a neutral synonym for using the internet a lot', 'using it to dismiss someone during a serious argument'], note: 'The criticism is about perspective and cultural immersion, not screen time alone.' },
-      relations: [{ target: 'internet-touch-grass', type: 'often-paired' }]
+      relations: []
     },
     'internet-we-are-so-back': {
-      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Sports', 'Fandom', 'Casual chat'], platforms: ['Sports chat', 'Fandom', 'Casual chat'], tone: ['Excited', 'Hopeful', 'Playful'] },
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Sports', 'Fandom', 'Casual chat'], tone: ['Excited', 'Hopeful', 'Playful'] },
       meaning: { core: 'An exaggerated reaction to a positive reversal after things looked bad, uncertain, or over.', zh: '在事情好转或出现转机时夸张地庆祝“我们又行了”', feeling: 'A small comeback makes it feel like everything is restored.' },
       context: { whyPeopleUseIt: 'Meme language turns a minor recovery into a dramatic comeback narrative that a group can celebrate together.', culturalNote: 'The phrase is funniest when there was an implied setback, decline, or “it’s over” moment first.' },
       usage: { commonPatterns: ['we are so back', 'we’re so back', 'WE ARE SO BACK', 'the comeback is real'] },
       examples: [{ text: 'The build passed on the first try. We are so back.', zh: '构建一次就通过了，我们又行了。', context: 'Engineering chat' }, { text: 'The team finally scored in the second half. We are so back.', zh: '球队终于在下半场进球了，我们又行了。', context: 'Sports reaction' }],
       boundaries: { natural: ['comeback jokes', 'sports and fandom reactions', 'casual team chat after a setback'], avoid: ['formal progress reports', 'using it for ordinary good news with no prior reversal'], note: 'The recovery framing is central; it is not just a generic way to say things are good.' },
-      relations: [{ target: 'internet-cooked', type: 'contrast' }]
+      relations: []
     },
     'internet-iykyk': {
-      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Social media', 'Fandom', 'Casual chat'], platforms: ['Social media', 'Fandom', 'Casual chat'], tone: ['Knowing', 'Playful', 'Suggestive'] },
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Social media', 'Fandom', 'Casual chat'], tone: ['Knowing', 'Playful', 'Suggestive'] },
       meaning: { core: 'Signals that a reference or experience is intentionally left unexplained for people who already share the background.', zh: '故意不解释共同背景，让有相关经历的人自行会意', feeling: 'The people who share this history will recognize it without a full explanation.' },
       context: { whyPeopleUseIt: 'It creates a quick feeling of shared recognition and belonging by leaving the accumulated background implicit.', culturalNote: 'That same insider feeling can become gatekeeping when clarity or access matters more than the joke.' },
       usage: { commonPatterns: ['IYKYK', 'that place, IYKYK', 'the old days, IYKYK', 'if you know, you know'] },
