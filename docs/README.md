@@ -1,6 +1,6 @@
 # English Radar Documentation
 
-This directory contains product-release notes, content-system documentation, Notion sync documentation, QA / release checklists, and historical implementation reports for English Radar.
+This directory contains product-release notes, content-system documentation, Notion sync documentation, QA / release checklists, migration assets, and historical implementation reports for English Radar.
 
 ## Project Status
 
@@ -17,12 +17,19 @@ See the Sideglance direction document:
 ## Start Here
 
 1. [`../README.md`](../README.md) — current release overview and feature inventory.
-2. [`RELEASE_NOTES.md`](RELEASE_NOTES.md) — release history.
-3. [`CONTENT_GUIDE.md`](CONTENT_GUIDE.md) — Signal/content authoring guidance.
-4. [`CONTENT_PIPELINE.md`](CONTENT_PIPELINE.md) — content ingestion and maintenance workflow.
-5. [`QA_CHECKLIST.md`](QA_CHECKLIST.md) — quality checks for the standalone app.
+2. [`SIDEGLANCE_RADAR_MIGRATION_ASSETS.md`](SIDEGLANCE_RADAR_MIGRATION_ASSETS.md) — verified branch inventory for unmerged Sideglance Radar work; read this before deleting Radar branches or beginning migration.
+3. [`RELEASE_NOTES.md`](RELEASE_NOTES.md) — release history.
+4. [`CONTENT_GUIDE.md`](CONTENT_GUIDE.md) — Signal/content authoring guidance.
+5. [`CONTENT_PIPELINE.md`](CONTENT_PIPELINE.md) — content ingestion and maintenance workflow.
+6. [`QA_CHECKLIST.md`](QA_CHECKLIST.md) — quality checks for the standalone app.
 
 ## Documentation Classes
+
+### Sideglance Radar Migration Assets
+
+`SIDEGLANCE_RADAR_MIGRATION_ASSETS.md` records which Sideglance Radar branches still contain commits that are **not present on `main`** and what kind of product asset each branch contains.
+
+This is the authoritative cleanup reference for the current branch set. In particular, several v0.1 / v0.2 Radar branches must be preserved until their useful behavior and content are migrated into a canonical destination.
 
 ### Current Content System
 
