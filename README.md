@@ -4,11 +4,15 @@
 
 English Radar is a **local-first learning system for real internet English**. Instead of treating expressions as isolated vocabulary, it organizes them around meaning, context, tone, usage boundaries, pronunciation, and personal mastery.
 
-- **Current release:** `v1.8.3`
-- **Standalone status:** maintenance
-- **Long-term role:** learning-system foundation for the future Sideglance **Radar** surface
+This repository currently carries two related product states:
 
-[Live site](https://cyrilla-mist.github.io/english-radar/) · [Documentation](docs/README.md) · [Release notes](docs/RELEASE_NOTES.md)
+- **Latest standalone English Radar release:** `v1.8.3`
+- **Default branch / live Pages:** Sideglance **Radar** `v0.1.0` migration preview
+- **Repository role:** preserve the standalone learning system while testing how its strongest assets may become the future Sideglance Radar surface
+
+The preview on `main` does **not** mean the `sideglance` and `english-radar` repositories have been physically merged, and it does not replace the `v1.8.3` standalone release history.
+
+[Live Radar preview](https://cyrilla-mist.github.io/english-radar/) · [Standalone v1.8.3 source](https://github.com/cyrilla-mist/english-radar/tree/v1.8.3) · [Documentation](docs/README.md) · [Release notes](docs/RELEASE_NOTES.md)
 
 ## What It Does
 
@@ -94,8 +98,6 @@ See [Notion Sync Setup](docs/NOTION_SYNC_SETUP.md) and the [Notion migration rep
 
 ## Relationship to Sideglance
 
-English Radar remains a separate, independently usable product today.
-
 The long-term Sideglance direction is:
 
 ```text
@@ -107,7 +109,9 @@ Sideglance
 
 English Radar is the main existing learning-system foundation for the future **Radar** surface.
 
-This relationship is a product direction, not a claim that the codebases, user data, or learning flows have already been integrated.
+The stable standalone product remains preserved in the `v1.8.3` release line. The current `main` branch experiments with the future Radar presentation and learning loop under the Sideglance brand, but that is still a migration preview hosted in this repository.
+
+The `sideglance` repository remains separate. User data, runtime behavior, and the codebases have not been merged into one product repository.
 
 Migration should preserve working learning behavior and data meaning rather than mechanically copy pages into Sideglance. Key reusable assets include the Signal model, Daily Mix and review logic, mastery states, quizzes, Personal Signals, content-pack validation, and local backup compatibility.
 
@@ -171,4 +175,6 @@ Start with [`docs/README.md`](docs/README.md). Release history is maintained in 
 
 ## Status
 
-English Radar `v1.8.3` is a maintenance release of the standalone product line. New standalone feature expansion is not the current priority; future work should focus on preserving and migrating the strongest learning-system assets into the broader Sideglance direction when that integration is intentionally resumed.
+English Radar `v1.8.3` is the latest stable maintenance release of the standalone product line. The default branch currently hosts a Sideglance Radar `v0.1.0` migration preview derived from that learning system.
+
+New standalone English Radar feature expansion is not the current priority. Future work should preserve the strongest learning-system assets and move them toward a canonical Sideglance Radar destination only when that integration is intentionally resumed.
