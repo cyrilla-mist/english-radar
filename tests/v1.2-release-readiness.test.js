@@ -48,9 +48,14 @@ const hasStructuredMaintenanceStatus =
 /Current release:\*\* `v1\.8\.3`/.test(readme) &&
 /(?:Standalone product status|Standalone status):\*\* maintenance/.test(readme);
 
+const hasExplicitDualProductStatus =
+/Latest standalone English Radar release:\*\* `v1\.8\.3`/.test(readme) &&
+/Default branch \/ live Pages:\*\* Sideglance \*\*Radar\*\* `v0\.1\.0` migration preview/.test(readme) &&
+/does \*\*not\*\* mean the `sideglance` and `english-radar` repositories have been physically merged/.test(readme);
+
 assert.ok(
-  hasLegacyMaintenanceStatus || hasStructuredMaintenanceStatus,
-  'README should identify v1.8.3 as the current maintenance release'
+  hasLegacyMaintenanceStatus || hasStructuredMaintenanceStatus || hasExplicitDualProductStatus,
+  'README should identify v1.8.3 as the standalone release and describe the current main-branch preview truthfully'
 );
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
 assert.ok(fs.existsSync(path.join(root, 'docs/v1.2.1-release-notes.md')));
