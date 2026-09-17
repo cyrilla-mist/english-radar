@@ -21,11 +21,13 @@ assert.match(readme, /Current release:\*\* `v1\.8\.3`/i, 'README should identify
 assert.match(readme, /Standalone status:\*\* maintenance/i, 'README should identify the standalone product as maintenance');
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
 
-const workflow = read('.github/workflows/v1.1-checks.yml');
-assert.match(workflow, /name:\s*English Radar v1\.2 checks/);
+const workflow = read('.github/workflows/maintenance-checks.yml');
+assert.match(workflow, /name:\s*English Radar maintenance checks/);
 assert.match(workflow, /pull_request:\s*\r?\n\s+branches:\s*\r?\n\s+- main/);
 assert.match(workflow, /push:\s*\r?\n\s+branches:\s*\r?\n\s+- main/);
 assert.match(workflow, /workflow_dispatch:/);
+assert.match(workflow, /node tests\/v1\.2-release-readiness\.test\.js/);
+assert.match(workflow, /node tests\/v1\.2\.1-maintenance\.test\.js/);
 
 const notes = read('docs/v1.2.1-release-notes.md');
 for (const heading of ['## Type', '## Fixed', '## Verified', '## Compatibility', '## Data counts']) assert.match(notes, new RegExp(heading));
