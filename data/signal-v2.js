@@ -261,6 +261,69 @@
       examples: [{ text: 'That late-night noodle shop is the best. IYKYK.', zh: '那家深夜面馆最好吃，懂的都懂。', context: 'Shared local reference' }, { text: 'The old deploy script had a personality. IYKYK.', zh: '以前那个部署脚本很有“个性”，懂的都懂。', context: 'Developer in-joke' }],
       boundaries: { natural: ['shared fandom references', 'inside jokes', 'audiences likely to know the background'], avoid: ['formal instructions', 'situations where people need clear information', 'using it to exclude newcomers'], note: 'It should signal shared context, not replace an explanation that others genuinely need.' },
       relations: [{ target: 'internet-lore', type: 'same-context' }]
+    },
+    'internet-imo': {
+      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Casual opinions', 'Personal preferences', 'Chat'], tone: ['Reflective', 'Casual', 'Qualified'] },
+      meaning: { core: 'Frames what follows as the speaker’s personal judgment or perspective rather than an objective universal fact.', zh: '把后面的话标记为个人看法，而不是客观定论', feeling: 'This is my take, not an unquestionable fact.' },
+      context: { whyPeopleUseIt: 'It gives people a compact way to mark personal stance without writing a longer disclaimer.' },
+      usage: { commonPatterns: ['IMO, …', 'imo this is…', 'that’s better imo', 'but imo…'] },
+      examples: [{ text: 'IMO, the shorter intro gets to the point faster.', zh: '我个人觉得，较短的开场更快切入重点。', context: 'Casual product opinion' }, { text: 'imo this is the best version so far.', zh: '我觉得这是目前最好的版本。', context: 'Informal reaction' }],
+      boundaries: { natural: ['casual opinions', 'personal preferences', 'informal posts'], avoid: ['formal writing', 'assuming it automatically makes a harsh opinion polite'], note: 'It softens certainty, not necessarily the interpersonal force of the opinion.' },
+      relations: [{ target: 'internet-idk', type: 'same-context' }]
+    },
+    'internet-idk': {
+      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Chat', 'Casual replies', 'Comments'], tone: ['Uncertain', 'Hesitant', 'Sometimes Dismissive'] },
+      meaning: { core: 'Can express genuine uncertainty, softening, hesitation, emotional distance, reluctance to commit, or mild dismissal depending on placement and tone.', zh: '可表示不确定、缓和、犹豫、疏离、不愿表态或轻微的敷衍', feeling: 'I am unsure—or I may be keeping some distance from this conversation.' },
+      context: { whyPeopleUseIt: 'It lets people manage uncertainty and commitment quickly; punctuation and surrounding words can make the reply open, hesitant, or closed.' },
+      usage: { commonPatterns: ['idk, maybe', 'idk man', 'idk.', 'idk if…'] },
+      examples: [{ text: 'idk, maybe we should wait until tomorrow.', zh: '我也不确定，要不我们等到明天？', context: 'Hesitant suggestion' }, { text: 'idk man, that explanation still feels off.', zh: '我说不好，但那个解释还是让人觉得不太对。', context: 'Skeptical reply' }],
+      boundaries: { natural: ['casual uncertainty', 'softened replies', 'informal disagreement'], avoid: ['formal decisions needing a clear answer', 'assuming it always means literal lack of knowledge'], note: '“idk.” can sound much more closed or dismissive than “idk, maybe”.' },
+      relations: []
+    },
+    'internet-rn': {
+      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Chat', 'Casual updates', 'Comments'], tone: ['Casual', 'Immediate', 'Conversational'] },
+      meaning: { core: 'Compresses immediacy into casual digital conversation, marking a current state, feeling, priority, or temporary condition.', zh: '在随意数字交流中压缩“现在”的即时感，可标记当前状态、感受、优先事项或暂时情况', feeling: 'This is what is true or important at this exact moment.' },
+      context: { whyPeopleUseIt: 'The abbreviation keeps chat moving quickly and makes the timing of a feeling or priority feel immediate.' },
+      usage: { commonPatterns: ["I can't deal with this rn.", 'what are you doing rn?', 'rn I just need coffee.'] },
+      examples: [{ text: "I can't deal with this rn.", zh: '我现在真的顾不上这个。', context: 'Immediate frustration' }, { text: 'what are you doing rn?', zh: '你现在在干什么？', context: 'Casual chat' }],
+      boundaries: { natural: ['casual digital language', 'quick updates', 'informal chat'], avoid: ['formal prose', 'treating it as a universal written replacement for “right now”'] },
+      relations: []
+    },
+    'internet-ikr': {
+      identity: { category: 'Internet Culture', collections: ['everyday-internet-tone'], contexts: ['Chat', 'Comments', 'Shared reactions'], tone: ['Agreeing', 'Aligned', 'Emphatic'] },
+      meaning: { core: 'Signals shared recognition and emotional alignment: the other person noticed exactly the same thing, not merely that they agree with a fact.', zh: '表示共同注意到同一件事并产生情绪上的同步，不只是普通同意', feeling: 'You noticed exactly the same thing I did.' },
+      context: { whyPeopleUseIt: 'It quickly builds interpersonal alignment around a complaint, reaction, excitement, or obvious shared observation.' },
+      usage: { commonPatterns: ['IKR?', 'ikr this part is perfect', 'I know, right?', 'ikr!'] },
+      examples: [{ text: 'That ending came out of nowhere. IKR?', zh: '那个结局太突然了，你也这么觉得吧？', context: 'Shared reaction' }, { text: 'IKR! The tiny detail is what makes it work.', zh: '对吧！就是那个小细节让它成立了。', context: 'Enthusiastic agreement' }],
+      boundaries: { natural: ['shared reactions', 'casual complaints', 'informal excitement'], avoid: ['formal communication', 'using it as a neutral yes without shared emotional context'] },
+      relations: [{ target: 'internet-fr', type: 'similar' }]
+    },
+    'internet-rent-free': {
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Comments', 'Fandom', 'Casual chat'], tone: ['Playful', 'Teasing', 'Dramatic'] },
+      meaning: { core: 'Uses a housing metaphor to frame a person, scene, joke, song, moment, or idea as occupying mental space without paying for it.', zh: '用“免租住进脑子”的比喻表示某人、某事或某个念头持续占据注意力', feeling: 'This keeps coming back into my head whether I asked for it or not.' },
+      context: { whyPeopleUseIt: 'The housing metaphor makes persistent attention vivid, playful, and slightly self-aware.' },
+      usage: { commonPatterns: ['living rent-free in my head', 'that scene lives rent-free', 'rent-free in my brain'] },
+      examples: [{ text: 'That one plot twist is living rent-free in my head.', zh: '那个反转一直白住在我脑子里。', context: 'Media reaction' }, { text: 'The way she said “okay” is living rent-free in my brain.', zh: '她说“好吧”的那个语气一直在我脑内循环。', context: 'Playful personal reaction' }],
+      boundaries: { natural: ['playful self-directed comments', 'memorable media reactions', 'casual chat'], avoid: ['serious mental-health discussion', 'formal communication', 'mocking someone else for being fixated'], note: '“X lives rent-free in your head” can tease or criticize another person’s obsession.' },
+      relations: []
+    },
+    'internet-left-no-crumbs': {
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Comments', 'Fandom', 'Social media'], tone: ['Dramatic', 'Approving', 'Playful'] },
+      meaning: { core: 'Extends the food metaphor in “ate” to praise a performance so completely that nothing was left behind.', zh: '把 ate 的食物比喻进一步加强，夸某人的表现彻底到一点可挑剔之处都不剩', feeling: 'That was so complete and impressive that there is nothing left to criticize.' },
+      context: { whyPeopleUseIt: 'The intensified metaphor turns praise into a high-energy, meme-like social reaction.' },
+      usage: { commonPatterns: ['left no crumbs', 'ate and left no crumbs', 'she left no crumbs'] },
+      examples: [{ text: 'The final chorus? She left no crumbs.', zh: '最后那段副歌？她发挥得无可挑剔。', context: 'Fandom praise' }, { text: 'That explanation ate and left no crumbs.', zh: '那个解释讲得太漂亮了，一点漏洞都没留下。', context: 'Casual praise' }],
+      boundaries: { natural: ['enthusiastic social praise', 'fandom reactions', 'meme-like comments'], avoid: ['measured professional evaluation', 'formal performance reviews'], note: 'It is an intensified extension of “ate”, not a separate literal food comment.' },
+      relations: []
+    },
+    'internet-ratio': {
+      identity: { category: 'Internet Culture', collections: ['online-reactions-meme-culture'], contexts: ['Social media', 'Comments', 'Online arguments'], tone: ['Competitive', 'Teasing', 'Public'] },
+      meaning: { core: 'Turns a visible imbalance in platform engagement between an original post and a reply or counter-response into a public social judgment.', zh: '把原帖与回复之间公开可见的互动量差异转化为一种社会评价', feeling: 'The crowd’s visible response has become part of the argument.' },
+      context: { whyPeopleUseIt: 'It compresses engagement metrics, public imbalance, and the feeling of a social verdict into one short reaction.', culturalNote: 'Platform mechanics and slang usage can evolve, so the concept is broader than one platform’s exact metric rule.' },
+      usage: { commonPatterns: ['ratio', 'you got ratioed', 'the reply ratioed the post'] },
+      examples: [{ text: 'The reply got far more engagement than the original post. Ratio.', zh: '那条回复的互动量远超原帖，评论区公开压过去了。', context: 'Public platform reaction' }, { text: 'People are calling it a ratio, but that does not settle who is right.', zh: '大家都说这是被 ratio 了，但这并不能决定谁才是对的。', context: 'Online argument' }],
+      boundaries: { natural: ['discussing visible engagement dynamics', 'casual platform commentary'], avoid: ['formal analysis', 'treating popularity as proof of factual correctness'], note: 'A ratio reports public engagement dynamics, not truth.' },
+      relations: []
     }
   };
 
