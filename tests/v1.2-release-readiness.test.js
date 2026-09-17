@@ -41,7 +41,17 @@ for (const page of mainPages) {
 }
 
 const readme = read('README.md');
-assert.match(readme, /English Radar v1\.8\.3 is the current maintenance release on `main`/);
+const hasLegacyMaintenanceStatus =
+/English Radar v1\.8\.3 is the current maintenance release on `main`/.test(readme);
+
+const hasStructuredMaintenanceStatus =
+/Current release:\*\* `v1\.8\.3`/.test(readme) &&
+/(?:Standalone product status|Standalone status):\*\* maintenance/.test(readme);
+
+assert.ok(
+  hasLegacyMaintenanceStatus || hasStructuredMaintenanceStatus,
+  'README should identify v1.8.3 as the current maintenance release'
+);
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
 assert.ok(fs.existsSync(path.join(root, 'docs/v1.2.1-release-notes.md')));
 assert.ok(fs.existsSync(path.join(root, 'docs/production-release-checklist.md')));
