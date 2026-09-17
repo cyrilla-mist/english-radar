@@ -55,8 +55,8 @@ collections.forEach((collection) => {
 });
 
 const requiredMembership = {
-  'everyday-internet-tone': ['internet-lowkey', 'internet-ngl', 'internet-fr', 'internet-tbh', 'internet-highkey', 'internet-no-cap'],
-  'online-reactions-meme-culture': ['internet-cooked', 'internet-locked-in', 'internet-touch-grass', 'internet-based', 'internet-ate', 'internet-its-giving', 'internet-delulu', 'internet-chronically-online', 'internet-we-are-so-back', 'internet-iykyk'],
+  'everyday-internet-tone': ['internet-lowkey', 'internet-ngl', 'internet-fr', 'internet-tbh', 'internet-highkey', 'internet-no-cap', 'internet-imo', 'internet-idk', 'internet-rn', 'internet-ikr'],
+  'online-reactions-meme-culture': ['internet-cooked', 'internet-locked-in', 'internet-touch-grass', 'internet-based', 'internet-ate', 'internet-its-giving', 'internet-delulu', 'internet-chronically-online', 'internet-we-are-so-back', 'internet-iykyk', 'internet-rent-free', 'internet-left-no-crumbs', 'internet-ratio'],
   'developer-communication': ['github-lgtm', 'github-pr', 'product-ship-it', 'github-breaking-change'],
   'building-with-ai': ['ai-agent', 'ai-rag', 'ai-tool-calling', 'ai-hallucination'],
   'building-products-online': ['product-mvp', 'product-poc', 'product-ship-it'],

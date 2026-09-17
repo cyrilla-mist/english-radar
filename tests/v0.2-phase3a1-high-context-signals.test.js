@@ -54,8 +54,8 @@ snapshots.forEach((snapshot, id) => assert.equal(JSON.stringify(byId.get(id)), s
 const collections = context.window.SIDEGLANCE_CONTEXT_COLLECTIONS;
 const everyDay = collections.find((collection) => collection.id === 'everyday-internet-tone');
 const reactions = collections.find((collection) => collection.id === 'online-reactions-meme-culture');
-assert.equal(everyDay.signalIds.length, 6);
-assert.equal(reactions.signalIds.length, 10);
+assert.equal(everyDay.signalIds.length, 10);
+assert.equal(reactions.signalIds.length, 13);
 assert(everyDay.signalIds.includes('internet-highkey') && everyDay.signalIds.includes('internet-no-cap'));
 ['internet-its-giving', 'internet-delulu', 'internet-chronically-online', 'internet-we-are-so-back', 'internet-iykyk'].forEach((id) => assert(reactions.signalIds.includes(id), `missing ${id} from reactions collection`));
 collections.forEach((collection) => {
@@ -87,6 +87,6 @@ assert(highkeyQuizzes.some((quiz) => quiz.type === 'meaning-in-context'));
 assert(highkeyQuizzes.some((quiz) => quiz.type === 'tone' || quiz.type === 'natural-usage'));
 highkeyQuizzes.forEach((quiz) => assert(byId.has(quiz.signalId)));
 
-assert.equal(signals.length, 62);
-assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 124);
+assert.equal(signals.length, 66);
+assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 132);
 console.log('PASS: v0.2 Phase 3A.1 high-context Signal v2 content, highkey compatibility, collections, relations and quizzes');

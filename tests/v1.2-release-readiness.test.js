@@ -41,8 +41,17 @@ for (const page of mainPages) {
 }
 
 const readme = read('README.md');
-assert.match(readme, /Current release:\*\* `v1\.8\.3`/i, 'README should identify v1.8.3 as the current release');
-assert.match(readme, /Standalone status:\*\* maintenance/i, 'README should identify the standalone product as maintenance');
+const hasLegacyMaintenanceStatus =
+/English Radar v1\.8\.3 is the current maintenance release on `main`/.test(readme);
+
+const hasStructuredMaintenanceStatus =
+/Current release:\*\* `v1\.8\.3`/.test(readme) &&
+/(?:Standalone product status|Standalone status):\*\* maintenance/.test(readme);
+
+assert.ok(
+  hasLegacyMaintenanceStatus || hasStructuredMaintenanceStatus,
+  'README should identify v1.8.3 as the current maintenance release'
+);
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
 assert.ok(fs.existsSync(path.join(root, 'docs/v1.2.1-release-notes.md')));
 assert.ok(fs.existsSync(path.join(root, 'docs/production-release-checklist.md')));
@@ -58,11 +67,11 @@ const coreQuizzes = context.window.ENGLISH_RADAR_QUIZZES;
 const uiQuizzes = context.window.ENGLISH_RADAR_UI_VOCABULARY_QUIZZES;
 const uiPack = context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK;
 const registry = context.window.EnglishRadarQuizRegistry;
-assert.equal(coreSignals.length, 62, 'Core Signal count must remain 62');
-assert.equal(coreQuizzes.length, 124, 'runtime Core Quiz count must remain 124');
+assert.equal(coreSignals.length, 66, 'Core Signal count must remain 66');
+assert.equal(coreQuizzes.length, 132, 'runtime Core Quiz count must remain 132');
 assert.equal(uiQuizzes.length, 20, 'UI Quiz count must remain 20');
 assert.equal(uiPack.signals.length, 10, 'UI Vocabulary Signal count must remain 10');
-assert.equal(registry.getStaticQuizzes().length, 144, 'static Quiz registry count must remain 144');
+assert.equal(registry.getStaticQuizzes().length, 152, 'static Quiz registry count must remain 152');
 
 const storageSource = read('js/storage.js');
 for (const key of ['englishRadar_progress', 'englishRadar_currentSession', 'englishRadar_settings', 'englishRadar_inbox', 'englishRadar_quizHistory', 'englishRadar_customSignals', 'englishRadar_syncSettings', 'englishRadar_syncHistory']) {
