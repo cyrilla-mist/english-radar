@@ -1,6 +1,6 @@
 # English Radar Documentation
 
-This directory contains product-release notes, content-system documentation, Notion sync documentation, QA / release checklists, migration assets, and historical implementation reports for English Radar.
+This directory contains product-release notes, content-system documentation, Notion sync documentation, QA / release checklists, migration assets, branch-maintenance records, and historical implementation reports for English Radar.
 
 ## Project Status
 
@@ -17,19 +17,34 @@ See the Sideglance direction document:
 ## Start Here
 
 1. [`../README.md`](../README.md) — current release overview and feature inventory.
-2. [`SIDEGLANCE_RADAR_MIGRATION_ASSETS.md`](SIDEGLANCE_RADAR_MIGRATION_ASSETS.md) — verified branch inventory for unmerged Sideglance Radar work; read this before deleting Radar branches or beginning migration.
-3. [`RELEASE_NOTES.md`](RELEASE_NOTES.md) — release history.
-4. [`CONTENT_GUIDE.md`](CONTENT_GUIDE.md) — Signal/content authoring guidance.
-5. [`CONTENT_PIPELINE.md`](CONTENT_PIPELINE.md) — content ingestion and maintenance workflow.
-6. [`QA_CHECKLIST.md`](QA_CHECKLIST.md) — quality checks for the standalone app.
+2. [`BRANCH_CLEANUP_AUDIT_2026-09-17.md`](BRANCH_CLEANUP_AUDIT_2026-09-17.md) — complete classification of every non-`main` branch; use this before routine branch deletion.
+3. [`SIDEGLANCE_RADAR_MIGRATION_ASSETS.md`](SIDEGLANCE_RADAR_MIGRATION_ASSETS.md) — product-level inventory of unmerged Sideglance Radar assets; use this before migration work.
+4. [`RELEASE_NOTES.md`](RELEASE_NOTES.md) — release history.
+5. [`CONTENT_GUIDE.md`](CONTENT_GUIDE.md) — Signal/content authoring guidance.
+6. [`CONTENT_PIPELINE.md`](CONTENT_PIPELINE.md) — content ingestion and maintenance workflow.
+7. [`QA_CHECKLIST.md`](QA_CHECKLIST.md) — quality checks for the standalone app.
 
 ## Documentation Classes
 
+### Branch Cleanup Audit
+
+`BRANCH_CLEANUP_AUDIT_2026-09-17.md` records the current branch inventory using a conservative cleanup rule:
+
+```text
+ahead_by = 0
+  → verified safe cleanup candidate
+
+ahead_by > 0
+  → preserve until intentionally reviewed
+```
+
+The audit covers both historical release branches and Sideglance Radar migration branches. It is the operational reference for branch deletion.
+
 ### Sideglance Radar Migration Assets
 
-`SIDEGLANCE_RADAR_MIGRATION_ASSETS.md` records which Sideglance Radar branches still contain commits that are **not present on `main`** and what kind of product asset each branch contains.
+`SIDEGLANCE_RADAR_MIGRATION_ASSETS.md` explains what the Sideglance Radar branches contain and why their product assets matter.
 
-This is the authoritative cleanup reference for the current branch set. In particular, several v0.1 / v0.2 Radar branches must be preserved until their useful behavior and content are migrated into a canonical destination.
+Use it alongside the branch audit. Several v0.1 / v0.2 Radar branches still contain commits that are not present on `main` and must be preserved until their useful behavior and content are migrated into a canonical destination.
 
 ### Current Content System
 
