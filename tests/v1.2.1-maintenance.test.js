@@ -17,8 +17,17 @@ for (const file of pageFiles) {
 const mainHtml = pageFiles.slice(0, 6).map(read).join('\n');
 assert.match(mainHtml, /SIDEGLANCE RADAR \/ V0\.1\.0/);
 const readme = read('README.md');
-assert.match(readme, /Current release:\*\* `v1\.8\.3`/i, 'README should identify v1.8.3 as the current release');
-assert.match(readme, /Standalone status:\*\* maintenance/i, 'README should identify the standalone product as maintenance');
+const hasLegacyMaintenanceStatus =
+  /Current release:\*\* `v1\.8\.3`/i.test(readme) &&
+  /Standalone status:\*\* maintenance/i.test(readme);
+const hasExplicitDualProductStatus =
+  /Latest standalone English Radar release:\*\* `v1\.8\.3`/.test(readme) &&
+  /Default branch \/ live Pages:\*\* Sideglance \*\*Radar\*\* `v0\.1\.0` migration preview/.test(readme) &&
+  /does \*\*not\*\* mean the `sideglance` and `english-radar` repositories have been physically merged/.test(readme);
+assert.ok(
+  hasLegacyMaintenanceStatus || hasExplicitDualProductStatus,
+  'README should distinguish the stable standalone English Radar line from the current Radar preview on main'
+);
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|release candidate|PR #3 remains open|is not merged|feat\/v1\.2-interface-learning/i);
 
 const workflow = read('.github/workflows/maintenance-checks.yml');
