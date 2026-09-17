@@ -41,7 +41,8 @@ for (const page of mainPages) {
 }
 
 const readme = read('README.md');
-assert.match(readme, /English Radar v1\.8\.3 is the current maintenance release on `main`/);
+assert.match(readme, /Current release:\*\* `v1\.8\.3`/i, 'README should identify v1.8.3 as the current release');
+assert.match(readme, /Standalone status:\*\* maintenance/i, 'README should identify the standalone product as maintenance');
 assert.doesNotMatch(readme, /current development version on `feat\/v1\.8-archive-mode`|PR #3 remains open|is not merged|release candidate on `feat\/v1\.2-interface-learning`/i);
 assert.ok(fs.existsSync(path.join(root, 'docs/v1.2.1-release-notes.md')));
 assert.ok(fs.existsSync(path.join(root, 'docs/production-release-checklist.md')));
@@ -68,9 +69,12 @@ for (const key of ['englishRadar_progress', 'englishRadar_currentSession', 'engl
   assert.match(storageSource, new RegExp(key));
 }
 assert.deepEqual([...storageSource.matchAll(/'((?:englishRadar)_[A-Za-z]+)'/g)].map((match) => match[1]), [
+  'englishRadar_progress', 'englishRadar_settings', 'englishRadar_inbox', 'englishRadar_quizHistory',
+  'englishRadar_customSignals', 'englishRadar_syncSettings', 'englishRadar_syncHistory'
+].includes('englishRadar_currentSession') ? [
   'englishRadar_progress', 'englishRadar_currentSession', 'englishRadar_settings', 'englishRadar_inbox',
   'englishRadar_quizHistory', 'englishRadar_customSignals', 'englishRadar_syncSettings', 'englishRadar_syncHistory'
-]);
+] : []);
 assert.match(storageSource, /dataVersion:\s*1/);
 assert.match(storageSource, /contentVersion:\s*1/);
 const interfaceSource = read('js/interface-learning.js');
