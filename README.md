@@ -1,91 +1,144 @@
-# English Radar v1.8.3
+# English Radar
 
-English Radar is a **local-first learning system for real internet English**. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation, and personal mastery rather than a traditional word list.
+**Real internet English, learned through context.**
 
-## Project Status
+English Radar is a **local-first learning system for real internet English**. Instead of treating expressions as isolated vocabulary, it organizes them around meaning, context, tone, usage boundaries, pronunciation, and personal mastery.
 
 - **Current release:** `v1.8.3`
-- **Standalone product status:** maintenance
-- **Final feature release of the original standalone line:** `v1.8.0`
+- **Standalone status:** maintenance
 - **Long-term role:** learning-system foundation for the future Sideglance **Radar** surface
 
-English Radar remains a separate, independently usable repository today. The Sideglance relationship describes product direction; it does **not** claim that the two codebases, user data, or learning flows have already been integrated.
+[Live site](https://cyrilla-mist.github.io/english-radar/) · [Documentation](docs/README.md) · [Release notes](docs/RELEASE_NOTES.md)
 
-- [Live site](https://cyrilla-mist.github.io/english-radar/)
-- [Documentation map](docs/README.md)
-- [Sideglance product direction](https://github.com/cyrilla-mist/sideglance/blob/master/docs/product-direction.md)
+## What It Does
 
-## Release Status
+English Radar is built around **Signals**: expressions, abbreviations, interface language, community phrasing, and other pieces of English that are easier to understand when their social and practical context is visible.
 
-English Radar v1.8.3 is the current maintenance release on `main`. v1.8.0 remains the final feature release of the original English Radar product line; v1.8.1 added backward-compatible Full Form support for abbreviation, acronym, and initialism Signals, v1.8.2 improved Learn Signal title readability, and v1.8.3 simplifies the mobile Me page and improves context audio UX without changing the local-first data model.
+The product combines:
 
-V1.2 introduced Interface Learning Mode, the UI Vocabulary Core Pack, Interface Check, and the complete interface-vocabulary learning loop. V1.2.1 finalized release metadata, cache consistency, and production verification. V1.3.0 added the optional audited Content Pack 01 for Product Interface & Builder Workflow. V1.4.0 added the optional audited Content Pack 02 for AI Foundations. V1.5.0 added the optional audited Content Pack 03 for Interface Structure & Overlays. V1.6.0 added the optional audited Content Pack 04 for Community Discourse and generalized rich semantic Signal fields. V1.7.0 added the optional audited Content Pack 05 for Product Naming and a self-registering bundled pack registry. V1.8.0 added Archive Mode. V1.8.1 added Full Form metadata, rendering, and search support while preserving the existing local-first data model.
+- contextual meanings and examples;
+- tone and usage boundaries;
+- pronunciation support;
+- personal mastery states;
+- spaced review;
+- quizzes and mistake practice;
+- unfamiliar-expression capture;
+- optional content packs;
+- local backup and restore;
+- optional Notion-backed content workflows.
 
-The release baseline includes 60 Core Signals and 120 Core Quizzes; UI Vocabulary Core has 10 Signals and 20 quizzes; optional Content Pack 01 has 24 Signals and 48 quizzes; optional Content Pack 02 has 10 Signals and 20 quizzes; optional Content Pack 03 has 10 Signals and 20 quizzes; optional Content Pack 04 has 10 Signals and 20 quizzes; and optional Content Pack 05 has 10 Signals and 20 quizzes. The bundled Cyrilla Notion Archive remains separate optional local content, and optional packs are not active until installed in a browser.
+## Core Learning Loop
 
-## v1.2 Interface Learning
+```text
+Discover a Signal
+  → understand meaning + context + tone
+  → practice recognition and usage boundaries
+  → mark personal mastery
+  → review when due
+  → preserve or expand the personal library
+```
 
-- Daily Mix: five Signals selected from unseen, personal-interest, weak or due, and older learned items
-- Unseen Discovery mode
-- Category Focus for Internet, Builder, Product Design, Fandom and Sports
-- Library Status dashboard with installed, unseen, learning, clear, due and quiz-ready counts
-- Daily Mix preview on Today
-- Expanded spaced-review intervals:
-  - New: 1 day
-  - Fuzzy: 2 → 3 → 7 → 14 days
-  - Clear: 7 → 14 → 30 → 60 days
-- Automated Node tests and pull-request validation workflow
-- Dynamic Meaning Recognition, Context Choice and Usage Boundary quizzes
-- Dictionary pagination with 50-item initial rendering
-- Installed Packs management and local Content Pack import/export
-- Shared Today snapshot for Signals, Progress, Daily Mix and statistics
-- Full-library mobile performance path validated with 796 Active Signals
-- Interface Learning Mode for marked UI vocabulary targets, stored in session-only state
-- Interface-context quiz coverage for the 20 UI Vocabulary questions
-- UI Vocabulary dictionary category and signal templates with graceful fallback for older Signals
-- Release validation for 60 Core Signals, 120 runtime Core Quizzes, 20 UI Quizzes and 140 static quizzes
+The goal is not to maximize a vocabulary count. It is to build faster **context recognition** for the language people actually encounter in interfaces, communities, social media, fandom, product work, and everyday online communication.
 
-## Existing Features
+## Main Features
 
-- Daily learning Sessions with Quick Scan, Standard, Deep Dive and Custom modes
-- Signal detail pages with context, tone, usage boundaries and Web Speech API pronunciation
-- Mastery states, Review queue and unfinished Session recovery
-- Dictionary search, favorites and source filters
-- Radar Inbox for unfamiliar expressions and Personal Signals
-- Context Quiz, mistake practice and Quiz History
-- My Radar profile, preferences and local backup Import / Export
-- Content Pack validation, preview, import, export and bundled archive installation
-- Notion Continuous Content Pipeline through a Cloudflare Worker
-- Preview-first manual sync; the Worker keeps Notion credentials server-side
+### Daily Learning
 
-## Data Model and Privacy
+- Daily Mix assembled from unseen, weak, due, interest-based, and older learned Signals
+- Quick Scan, Standard, Deep Dive, and Custom session modes
+- unfinished-session recovery
+- mastery-aware review intervals
 
-The app is local-first. Learning records, Imported Signals, Quiz History and Notion Sync settings remain in the current browser's LocalStorage. Backups intentionally exclude the Admin token, and no LocalStorage data is committed to this repository.
+### Signal Library
 
-The public frontend never calls Notion directly. Notion Sync is manual and requires the user to enter their own local Admin token on My Radar. Tokens and private Notion configuration are not stored in this repository.
+- searchable dictionary
+- favorites and source filters
+- context, tone, pronunciation, and usage-boundary fields
+- support for abbreviations, acronyms, and initialisms with Full Form metadata
+- Personal Signals for user-added expressions
 
-The bundled Cyrilla Notion Archive was migrated from the user's existing Notion vocabulary records. See [the migration report](docs/NOTION_MIGRATION_REPORT.md).
+### Practice
+
+- Meaning Recognition
+- Context Choice
+- Usage Boundary quizzes
+- mistake practice
+- quiz history
+- interface-vocabulary checks
+
+### Content System
+
+- built-in Core Signals
+- optional audited Content Packs
+- import / export validation
+- bundled local archive support
+- preview-first Notion content sync through a Cloudflare Worker
+
+## Local-First Data Model
+
+Learning data stays in the current browser unless the user explicitly exports or syncs supported content.
+
+Local data includes items such as:
+
+- mastery state;
+- review timing;
+- Imported Signals;
+- Personal Signals;
+- Quiz History;
+- installed Content Packs;
+- local preferences.
+
+The public frontend does not call Notion directly. Optional Notion sync goes through a Cloudflare Worker, and private credentials are not stored in the repository.
+
+See [Notion Sync Setup](docs/NOTION_SYNC_SETUP.md) and the [Notion migration report](docs/NOTION_MIGRATION_REPORT.md) for implementation details.
+
+## Relationship to Sideglance
+
+English Radar remains a separate, independently usable product today.
+
+The long-term Sideglance direction is:
+
+```text
+Sideglance
+├── Decode   Understand this moment.
+├── Radar    Build context instinct over time.
+└── Archive  Preserve and revisit context knowledge.
+```
+
+English Radar is the main existing learning-system foundation for the future **Radar** surface.
+
+This relationship is a product direction, not a claim that the codebases, user data, or learning flows have already been integrated.
+
+Migration should preserve working learning behavior and data meaning rather than mechanically copy pages into Sideglance. Key reusable assets include the Signal model, Daily Mix and review logic, mastery states, quizzes, Personal Signals, content-pack validation, and local backup compatibility.
+
+See [Sideglance Radar migration assets](docs/SIDEGLANCE_RADAR_MIGRATION_ASSETS.md) for the current migration inventory.
 
 ## Technology
 
-- Native HTML, CSS and JavaScript
+- Native HTML, CSS, and JavaScript
 - Web Speech API
-- Cloudflare Worker for the optional Notion sync boundary
-- No frontend framework and no main-project npm dependency
+- Cloudflare Worker for optional Notion sync
+- LocalStorage-based learning state
+- Node-based validation and test scripts
+- GitHub Pages
+
+The main frontend intentionally has no framework dependency.
 
 ## Local Run
 
-No frontend dependencies are required. From the project directory, run:
-
-```text
+```bash
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000/>. The HTML pages also work when opened directly, but a local server is recommended for consistent browser behavior.
+Then open:
+
+```text
+http://localhost:8000/
+```
 
 ## Checks
 
-```text
+```bash
 node scripts/validate-data.js
 node scripts/check-project.js
 node scripts/validate-content-pack.js path/to/pack.json
@@ -94,11 +147,11 @@ node tests/quiz-engine-v1.1.test.js
 node tests/performance-v1.1.test.js
 ```
 
-## Directory Structure
+## Repository Structure
 
 ```text
 english-radar/
-├── index.html, learn.html, dictionary.html, inbox.html, quiz.html, me.html, 404.html
+├── index.html, learn.html, dictionary.html, inbox.html, quiz.html, me.html
 ├── archive.html, archive-signal.html
 ├── assets/
 ├── css/
@@ -110,10 +163,12 @@ english-radar/
 └── worker/
 ```
 
-`diagnostics.html` is a development-only storage metadata page and is not part of the normal user navigation.
+`diagnostics.html` is a development-only storage metadata page and is not part of normal user navigation.
 
-## Future Migration Principle
+## Documentation
 
-If English Radar is migrated into Sideglance Radar, the priority is to preserve working learning behavior and data meaning rather than mechanically copy pages into another repository.
+Start with [`docs/README.md`](docs/README.md). Release history is maintained in [`docs/RELEASE_NOTES.md`](docs/RELEASE_NOTES.md) rather than duplicated in this README.
 
-Important assets include the Signal model, Daily Mix / review logic, mastery states, quizzes, personal Signals, content-pack validation, and local backup compatibility.
+## Status
+
+English Radar `v1.8.3` is a maintenance release of the standalone product line. New standalone feature expansion is not the current priority; future work should focus on preserving and migrating the strongest learning-system assets into the broader Sideglance direction when that integration is intentionally resumed.
