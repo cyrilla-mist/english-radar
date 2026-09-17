@@ -69,12 +69,9 @@ for (const key of ['englishRadar_progress', 'englishRadar_currentSession', 'engl
   assert.match(storageSource, new RegExp(key));
 }
 assert.deepEqual([...storageSource.matchAll(/'((?:englishRadar)_[A-Za-z]+)'/g)].map((match) => match[1]), [
-  'englishRadar_progress', 'englishRadar_settings', 'englishRadar_inbox', 'englishRadar_quizHistory',
-  'englishRadar_customSignals', 'englishRadar_syncSettings', 'englishRadar_syncHistory'
-].includes('englishRadar_currentSession') ? [
   'englishRadar_progress', 'englishRadar_currentSession', 'englishRadar_settings', 'englishRadar_inbox',
   'englishRadar_quizHistory', 'englishRadar_customSignals', 'englishRadar_syncSettings', 'englishRadar_syncHistory'
-] : []);
+]);
 assert.match(storageSource, /dataVersion:\s*1/);
 assert.match(storageSource, /contentVersion:\s*1/);
 const interfaceSource = read('js/interface-learning.js');
