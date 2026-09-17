@@ -14,6 +14,16 @@ See the Sideglance direction document:
 
 [`cyrilla-mist/sideglance — docs/product-direction.md`](https://github.com/cyrilla-mist/sideglance/blob/master/docs/product-direction.md)
 
+## Release Channels
+
+GitHub release chronology and product version chronology are not the same thing in this repository.
+
+- `English Radar v1.8.3` is the current standalone maintenance release.
+- `Sideglance Radar v0.1.0 — Context Learning Loop` was published later as a **historical migration / product-direction preview** from work hosted in this repository.
+- The Sideglance Radar `v0.1.0` release does **not** supersede English Radar `v1.8.3`, does not mean the repositories have been physically merged, and should not be used as the current English Radar version.
+
+Until Radar migration has a canonical destination, treat the `v0.x` Sideglance Radar tag/release as preserved migration history and the `v1.x` line as the standalone English Radar release line.
+
 ## Start Here
 
 1. [`../README.md`](../README.md) — current release overview and feature inventory.
