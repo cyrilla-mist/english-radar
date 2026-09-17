@@ -1,0 +1,79 @@
+name: English Radar maintenance checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate content data
+        run: node scripts/validate-data.js
+
+      - name: Check project structure
+        run: node scripts/check-project.js
+
+      - name: Test Learning Engine
+        run: node tests/learning-engine-v1.1.test.js
+
+      - name: Test Quiz Engine
+        run: node tests/quiz-engine-v1.1.test.js
+
+      - name: Test Performance Structure
+        run: node tests/performance-v1.1.test.js
+
+      - name: Test v1.1.1 bilingual and sync stability
+        run: node tests/v1.1.1-bilingual.test.js
+
+      - name: Validate UI Vocabulary Content Pack
+        run: node scripts/validate-content-pack.js data/ui-vocabulary-core-pack.js
+
+      - name: Test V1.2 interface schema
+        run: node tests/v1.2-interface-schema.test.js
+
+      - name: Test V1.2 bundled pack
+        run: node tests/v1.2-bundled-pack.test.js
+
+      - name: Test V1.2 interface learning
+        run: node tests/v1.2-interface-learn.test.js
+
+      - name: Test V1.2 interface mode
+        run: node tests/v1.2-interface-mode.test.js
+
+      - name: Test V1.2 UI quiz data
+        run: node tests/v1.2-ui-quiz-data.test.js
+
+      - name: Test V1.2 learning loop
+        run: node tests/v1.2-learning-loop.test.js
+
+      - name: Test V1.2 category collapse
+        run: node tests/v1.2-me-category-collapse.test.js
+
+      - name: Test V1.2 release readiness
+        run: node tests/v1.2-release-readiness.test.js
+
+      - name: Test V1.2.1 maintenance hygiene
+        run: node tests/v1.2.1-maintenance.test.js
+
+      - name: Install Worker test dependencies
+        run: npm ci --prefix worker
+
+      - name: Test Worker Signal ID normalization
+        run: npm test --prefix worker
