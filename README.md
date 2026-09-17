@@ -1,12 +1,25 @@
 # English Radar v1.8.3
 
-English Radar is a local-first learning tool for real internet English. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation and personal mastery rather than a traditional word list.
+English Radar is a **local-first learning system for real internet English**. It organizes expressions around meaning, context, tone, usage boundaries, pronunciation, and personal mastery rather than a traditional word list.
 
-## Release status
+## Project Status
 
-English Radar v1.8.3 is the current maintenance release on `main`. v1.8.0 remains the final feature release of the original English Radar product line; v1.8.1 added backward-compatible Full Form support for abbreviation, acronym and initialism Signals, v1.8.2 improved Learn Signal title readability, and v1.8.3 simplifies the mobile Me page and improves context audio UX without changing the local-first data model.
+- **Current release:** `v1.8.3`
+- **Standalone product status:** maintenance
+- **Final feature release of the original standalone line:** `v1.8.0`
+- **Long-term role:** learning-system foundation for the future Sideglance **Radar** surface
 
-V1.2 introduced Interface Learning Mode, the UI Vocabulary Core Pack, Interface Check and the complete interface-vocabulary learning loop. V1.2.1 finalized release metadata, cache consistency and production verification. V1.3.0 added the optional audited Content Pack 01 for Product Interface & Builder Workflow. V1.4.0 added the optional audited Content Pack 02 for AI Foundations. V1.5.0 added the optional audited Content Pack 03 for Interface Structure & Overlays. V1.6.0 added the optional audited Content Pack 04 for Community Discourse and generalized rich semantic Signal fields. V1.7.0 added the optional audited Content Pack 05 for Product Naming and a self-registering bundled pack registry. V1.8.0 added Archive Mode. V1.8.1 adds Full Form metadata, rendering and search support while preserving the existing local-first data model.
+English Radar remains a separate, independently usable repository today. The Sideglance relationship describes product direction; it does **not** claim that the two codebases, user data, or learning flows have already been integrated.
+
+- [Live site](https://cyrilla-mist.github.io/english-radar/)
+- [Documentation map](docs/README.md)
+- [Sideglance product direction](https://github.com/cyrilla-mist/sideglance/blob/master/docs/product-direction.md)
+
+## Release Status
+
+English Radar v1.8.3 is the current maintenance release on `main`. v1.8.0 remains the final feature release of the original English Radar product line; v1.8.1 added backward-compatible Full Form support for abbreviation, acronym, and initialism Signals, v1.8.2 improved Learn Signal title readability, and v1.8.3 simplifies the mobile Me page and improves context audio UX without changing the local-first data model.
+
+V1.2 introduced Interface Learning Mode, the UI Vocabulary Core Pack, Interface Check, and the complete interface-vocabulary learning loop. V1.2.1 finalized release metadata, cache consistency, and production verification. V1.3.0 added the optional audited Content Pack 01 for Product Interface & Builder Workflow. V1.4.0 added the optional audited Content Pack 02 for AI Foundations. V1.5.0 added the optional audited Content Pack 03 for Interface Structure & Overlays. V1.6.0 added the optional audited Content Pack 04 for Community Discourse and generalized rich semantic Signal fields. V1.7.0 added the optional audited Content Pack 05 for Product Naming and a self-registering bundled pack registry. V1.8.0 added Archive Mode. V1.8.1 added Full Form metadata, rendering, and search support while preserving the existing local-first data model.
 
 The release baseline includes 60 Core Signals and 120 Core Quizzes; UI Vocabulary Core has 10 Signals and 20 quizzes; optional Content Pack 01 has 24 Signals and 48 quizzes; optional Content Pack 02 has 10 Signals and 20 quizzes; optional Content Pack 03 has 10 Signals and 20 quizzes; optional Content Pack 04 has 10 Signals and 20 quizzes; and optional Content Pack 05 has 10 Signals and 20 quizzes. The bundled Cyrilla Notion Archive remains separate optional local content, and optional packs are not active until installed in a browser.
 
@@ -32,7 +45,7 @@ The release baseline includes 60 Core Signals and 120 Core Quizzes; UI Vocabular
 - UI Vocabulary dictionary category and signal templates with graceful fallback for older Signals
 - Release validation for 60 Core Signals, 120 runtime Core Quizzes, 20 UI Quizzes and 140 static quizzes
 
-## Existing features
+## Existing Features
 
 - Daily learning Sessions with Quick Scan, Standard, Deep Dive and Custom modes
 - Signal detail pages with context, tone, usage boundaries and Web Speech API pronunciation
@@ -45,19 +58,13 @@ The release baseline includes 60 Core Signals and 120 Core Quizzes; UI Vocabular
 - Notion Continuous Content Pipeline through a Cloudflare Worker
 - Preview-first manual sync; the Worker keeps Notion credentials server-side
 
-## Data model and privacy
+## Data Model and Privacy
 
 The app is local-first. Learning records, Imported Signals, Quiz History and Notion Sync settings remain in the current browser's LocalStorage. Backups intentionally exclude the Admin token, and no LocalStorage data is committed to this repository.
 
 The public frontend never calls Notion directly. Notion Sync is manual and requires the user to enter their own local Admin token on My Radar. Tokens and private Notion configuration are not stored in this repository.
 
 The bundled Cyrilla Notion Archive was migrated from the user's existing Notion vocabulary records. See [the migration report](docs/NOTION_MIGRATION_REPORT.md).
-
-## Live release
-
-- Live site: <https://cyrilla-mist.github.io/english-radar/>
-- Repository: <https://github.com/cyrilla-mist/english-radar>
-- Worker: <https://english-radar-notion-sync.cyyuhiseeu.workers.dev>
 
 ## Technology
 
@@ -66,7 +73,7 @@ The bundled Cyrilla Notion Archive was migrated from the user's existing Notion 
 - Cloudflare Worker for the optional Notion sync boundary
 - No frontend framework and no main-project npm dependency
 
-## Local run
+## Local Run
 
 No frontend dependencies are required. From the project directory, run:
 
@@ -87,11 +94,12 @@ node tests/quiz-engine-v1.1.test.js
 node tests/performance-v1.1.test.js
 ```
 
-## Directory structure
+## Directory Structure
 
 ```text
 english-radar/
 ├── index.html, learn.html, dictionary.html, inbox.html, quiz.html, me.html, 404.html
+├── archive.html, archive-signal.html
 ├── assets/
 ├── css/
 ├── js/
@@ -101,3 +109,11 @@ english-radar/
 ├── tests/
 └── worker/
 ```
+
+`diagnostics.html` is a development-only storage metadata page and is not part of the normal user navigation.
+
+## Future Migration Principle
+
+If English Radar is migrated into Sideglance Radar, the priority is to preserve working learning behavior and data meaning rather than mechanically copy pages into another repository.
+
+Important assets include the Signal model, Daily Mix / review logic, mastery states, quizzes, personal Signals, content-pack validation, and local backup compatibility.
