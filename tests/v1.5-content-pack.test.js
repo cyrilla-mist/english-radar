@@ -41,7 +41,7 @@ context.window.EnglishRadarStorage = storage;
 vm.runInNewContext(read('js/content-registry.js'), context, { filename: 'js/content-registry.js' });
 vm.runInNewContext(read('js/quiz-registry.js'), context, { filename: 'js/quiz-registry.js' });
 const registry = context.window.EnglishRadarQuizRegistry;
-assert.equal(registry.getStaticQuizzes().length, 240);
+assert.equal(registry.getStaticQuizzes().length, 244);
 assert.equal(registry.getInterfaceQuizzes().length, 70);
 assert.equal(registry.getContentPack03Quizzes().length, 20);
 assert.equal(registry.getInterfaceQuizzes().filter((quiz) => pack03Ids.has(quiz.signalId)).length, 20);
@@ -72,10 +72,13 @@ for (const page of ['index.html', 'learn.html', 'dictionary.html', 'inbox.html',
   assert(/v0\.1\.0/i.test(html), `${page} should expose current V0.1.0 metadata`);
   if (html.includes('page-footer')) assert(html.includes('SIDEGLANCE RADAR / V0.1.0'), `${page} should expose the current Sideglance brand shell`);
 }
-assert(read('README.md').includes('# English Radar v1.8.3'));
-assert(read('README.md').includes('English Radar v1.8.3 is the current maintenance release on `main`'));
-assert(read('README.md').includes('Content Pack 03 has 10 Signals and 20 quizzes'));
-assert(read('docs/v1.5.0-release-notes.md').includes('Content Pack 03'));
+const projectReadme = read('README.md');
+const v15ReleaseNotes = read('docs/v1.5.0-release-notes.md');
+assert(projectReadme.includes('# English Radar'));
+assert(projectReadme.includes('Latest standalone English Radar release:** `v1.8.3`'));
+assert(v15ReleaseNotes.includes('V1.5.0 adds optional Content Pack 03 for Interface Structure & Overlays.'));
+assert(v15ReleaseNotes.includes('10 audited UI Vocabulary Signals.'));
+assert(v15ReleaseNotes.includes('20 dedicated quizzes.'));
 assert(importReport.includes('Static registry: 232'));
 
 console.log('PASS: v1.5 Content Pack 03 metadata, validator, static/interface registry, bundled loading and learning-target boundary checks');
