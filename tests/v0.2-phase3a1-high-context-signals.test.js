@@ -87,6 +87,6 @@ assert(highkeyQuizzes.some((quiz) => quiz.type === 'meaning-in-context'));
 assert(highkeyQuizzes.some((quiz) => quiz.type === 'tone' || quiz.type === 'natural-usage'));
 highkeyQuizzes.forEach((quiz) => assert(byId.has(quiz.signalId)));
 
-assert.equal(signals.length, 68);
-assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 136);
+assert.equal(signals.length, 69);
+assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 138);
 console.log('PASS: v0.2 Phase 3A.1 high-context Signal v2 content, highkey compatibility, collections, relations and quizzes');

@@ -72,11 +72,11 @@ const coreQuizzes = context.window.ENGLISH_RADAR_QUIZZES;
 const uiQuizzes = context.window.ENGLISH_RADAR_UI_VOCABULARY_QUIZZES;
 const uiPack = context.window.ENGLISH_RADAR_UI_VOCABULARY_PACK;
 const registry = context.window.EnglishRadarQuizRegistry;
-assert.equal(coreSignals.length, 68, 'Core Signal count must remain 68');
-assert.equal(coreQuizzes.length, 136, 'runtime Core Quiz count must remain 136');
+assert.equal(coreSignals.length, 69, 'Core Signal count must remain 69');
+assert.equal(coreQuizzes.length, 138, 'runtime Core Quiz count must remain 138');
 assert.equal(uiQuizzes.length, 20, 'UI Quiz count must remain 20');
 assert.equal(uiPack.signals.length, 10, 'UI Vocabulary Signal count must remain 10');
-assert.equal(registry.getStaticQuizzes().length, 156, 'static Quiz registry count must remain 156');
+assert.equal(registry.getStaticQuizzes().length, 158, 'static Quiz registry count must remain 158');
 
 const storageSource = read('js/storage.js');
 for (const key of ['englishRadar_progress', 'englishRadar_currentSession', 'englishRadar_settings', 'englishRadar_inbox', 'englishRadar_quizHistory', 'englishRadar_customSignals', 'englishRadar_syncSettings', 'englishRadar_syncHistory']) {
