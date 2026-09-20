@@ -55,7 +55,8 @@ for (const page of ['index.html', 'learn.html', 'quiz.html', 'dictionary.html', 
   assert(html.includes('content-pack-05-quizzes.js?v=1.7.0'));
   assert.match(html, /v0\.1\.0/i);
 }
-assert(read('README.md').includes('Content Pack 05'));
+const v17ReleaseNotes = read('docs/v1.7.0-release-notes.md');
+assert(v17ReleaseNotes.includes('Content Pack 05 with 10 Product Naming Signals and 20 quizzes'));
 assert(fs.existsSync(path.join(root, 'docs/v1.7.0-product-naming.md')));
 assert(fs.existsSync(path.join(root, 'docs/v1.7.0-release-notes.md')));
 const notFound = read('404.html');

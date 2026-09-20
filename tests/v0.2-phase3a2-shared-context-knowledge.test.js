@@ -69,6 +69,6 @@ newIds.forEach((id) => {
   });
 });
 context.window.ENGLISH_RADAR_QUIZZES.forEach((quiz) => assert(byId.has(quiz.signalId), `${quiz.id} target must resolve`));
-assert.equal(signals.length, 66);
-assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 132);
+assert.equal(signals.length, 68);
+assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 136);
 console.log('PASS: v0.2 Phase 3A.2 shared context knowledge, abbreviations, collections, relations and quizzes');

@@ -60,6 +60,16 @@ assert.match(read('me.html'), /data-me-weak-toggle/);
 assert.match(read('js/archive.js'), /matchedPrimary/);
 assert.match(read('js/notion-sync.js'), /Notion/);
 assert.match(read('worker/src/index.js'), /Notion/);
-assert.match(read('README.md'), /English Radar v1\.8\.3/);
+const projectReadme = read('README.md');
+assert.match(
+  projectReadme,
+  /Latest standalone English Radar release:\*\* `v1\.8\.3`/,
+  'README should identify v1.8.3 as the latest standalone English Radar release'
+);
+assert.match(
+  projectReadme,
+  /Default branch \/ live Pages:\*\* Sideglance \*\*Radar\*\* `v0\.1\.0` migration preview/,
+  'README should identify main/live Pages as the Sideglance Radar v0.1.0 migration preview'
+);
 
 console.log('PASS: Sideglance Radar v0.1 Phase 1 static brand shell boundaries and compatibility checks');

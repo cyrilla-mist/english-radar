@@ -324,6 +324,69 @@
       examples: [{ text: 'The reply got far more engagement than the original post. Ratio.', zh: '那条回复的互动量远超原帖，评论区公开压过去了。', context: 'Public platform reaction' }, { text: 'People are calling it a ratio, but that does not settle who is right.', zh: '大家都说这是被 ratio 了，但这并不能决定谁才是对的。', context: 'Online argument' }],
       boundaries: { natural: ['discussing visible engagement dynamics', 'casual platform commentary'], avoid: ['formal analysis', 'treating popularity as proof of factual correctness'], note: 'A ratio reports public engagement dynamics, not truth.' },
       relations: []
+    },
+    'ai-workflow': {
+      identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI product architecture', 'Engineering chat', 'Workflow design'], tone: ['Technical', 'Process-focused', 'Neutral'] },
+      meaning: { core: 'An organized structure of steps, rules, tools, states, or handoffs that moves work from input toward an outcome.', zh: '由步骤、规则、工具、状态或交接组成、把工作从输入推进到结果的组织结构', feeling: 'This describes the shape of the process, not necessarily who is making each decision.' },
+      context: { whyPeopleUseIt: 'Builders need to discuss how work is orchestrated independently of how much autonomy any one component has.', culturalNote: 'A workflow may contain agents, and an agent may operate inside a workflow; they are not opposites.' },
+      usage: { commonPatterns: ['AI workflow', 'workflow orchestration', 'route through the workflow', 'workflow step'] },
+      examples: [{ text: 'The workflow routes the request, retrieves the policy, calls the tool, validates the result, and drafts a response.', zh: '这个工作流会分发请求、检索政策、调用工具、验证结果，再起草回复。', context: 'AI architecture discussion' }, { text: 'The agent handles one step inside the workflow; the workflow still owns the handoffs.', zh: 'agent 只负责工作流中的一个步骤，整体交接仍由工作流负责。', context: 'Engineering design review' }],
+      boundaries: { natural: ['AI architecture', 'engineering planning', 'orchestration discussions'], avoid: ['calling every multi-step application an agent', 'treating workflow and agent as mutually exclusive'], note: 'Workflow describes process structure, not necessarily component autonomy.' },
+      relations: []
+    },
+    'ai-memory': {
+      identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI product architecture', 'State design', 'Engineering chat'], tone: ['Technical', 'Practical', 'Precise'] },
+      meaning: { core: 'A system-level persistence and retrieval mechanism that lets past information matter again later.', zh: '让过去的信息能够在之后再次发挥作用的系统级持久化与检索机制', feeling: 'The system can bring relevant past information forward again.' },
+      context: { whyPeopleUseIt: 'Builders use memory to describe stored history, preferences, summaries, records, or checkpoints that can be retrieved across time.', culturalNote: 'Memory may use history, state, databases, summaries, embeddings, preferences, or checkpoints; it does not mean the base model permanently retained everything.' },
+      usage: { commonPatterns: ['conversation memory', 'persistent memory', 'retrieve a memory', 'memory store'] },
+      examples: [{ text: 'We store the user’s preferred output format and retrieve it on the next session.', zh: '我们保存用户偏好的输出格式，并在下一次会话中取回。', context: 'AI product behavior' }, { text: 'The summary is memory for the application, not a permanent change to the base model.', zh: '这个摘要是应用层的记忆，并不会永久改变基础模型。', context: 'AI architecture explanation' }],
+      boundaries: { natural: ['state architecture', 'AI product design', 'persistence and retrieval discussions'], avoid: ['saying the model remembers every old chat automatically', 'equating memory with the current context window'], note: 'Memory can retrieve information into the context window later.' },
+      relations: [{ target: 'ai-context-window', type: 'same-context' }]
+    },
+    'ai-context-window': {
+      identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['Model calls', 'AI architecture', 'Engineering chat'], tone: ['Technical', 'Precise', 'Cautionary'] },
+      meaning: { core: 'The information available to a model within the current inference or call, subject to the model’s context limits.', zh: '模型在当前推理或调用中能够看到的信息范围，受上下文容量限制', feeling: 'This is the working information the model has available right now.' },
+      context: { whyPeopleUseIt: 'Builders use the term to reason about what a model can currently attend to, not merely to quote a token-capacity number.', culturalNote: 'A larger context does not mean every included detail is used equally well, and stored past information still has to be retrieved into the current context.' },
+      usage: { commonPatterns: ['context window limit', 'fit in the context window', 'current context', 'long-context model'] },
+      examples: [{ text: 'The full trace will not fit in the current context window, so we need a summary.', zh: '完整追踪记录放不进当前上下文窗口，所以我们需要摘要。', context: 'Model call planning' }, { text: 'Memory can retrieve the old preference into the next call’s context window.', zh: '记忆机制可以把旧偏好取回到下一次调用的上下文窗口里。', context: 'AI architecture discussion' }],
+      boundaries: { natural: ['model-call planning', 'context limits', 'AI architecture discussions'], avoid: ['treating context size as long-term memory', 'assuming more context guarantees better use or better answers'], note: 'Past information existing somewhere does not mean the model can see it now.' },
+      relations: []
+    },
+    'ai-grounding': {
+      identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI reliability', 'Knowledge systems', 'Engineering chat'], tone: ['Technical', 'Cautionary', 'Evidence-focused'] },
+      meaning: { core: 'Anchoring an output to an external basis such as evidence, retrieved material, structured state, constraints, a database, search result, or tool result.', zh: '让输出锚定在外部依据上，例如证据、检索资料、结构化状态、约束、数据库或工具结果', feeling: 'This answer should be traceable to something outside unsupported generation.' },
+      context: { whyPeopleUseIt: 'Builders use grounding to describe how an answer is connected to relevant evidence or system state instead of relying only on unsupported model generation.', culturalNote: 'RAG can support grounding, but grounding is broader than RAG and never guarantees truth; sources, retrieval, interpretation, or reasoning can still fail.' },
+      usage: { commonPatterns: ['grounded answer', 'ground the response in docs', 'grounding source', 'grounded generation'] },
+      examples: [{ text: 'The answer is grounded in the policy database, so we can show which record supports it.', zh: '这个回答基于政策数据库，因此我们可以展示支持它的具体记录。', context: 'AI reliability review' }, { text: 'Adding documents is not enough; the retrieved passage must actually support the claim.', zh: '加入文档还不够，检索到的段落必须真的支持这个结论。', context: 'Knowledge-system design' }],
+      boundaries: { natural: ['AI reliability', 'retrieval systems', 'evidence and tool-result discussions'], avoid: ['assuming more context automatically grounds an answer', 'claiming grounding makes hallucination impossible', 'treating grounding as identical to RAG'], note: 'A grounded answer can still be wrong when its source or reasoning fails.' },
+      relations: []
+    },
+    'ai-system-prompt': {
+      identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI product architecture', 'Prompt design', 'Engineering chat'], tone: ['Technical', 'Directive', 'Cautionary'] },
+      meaning: { core: 'A high-priority instruction layer used to shape a model’s role, behavior, constraints, and task framing within an application.', zh: '应用中用于设定模型角色、行为、约束和任务框架的高优先级指令层', feeling: 'This is a behavioral instruction layer, not absolute control over the system.' },
+      context: { whyPeopleUseIt: 'Builders need a central place for role instructions, behavioral defaults, constraints, and application framing without repeating them in every user message.', culturalNote: 'Real application behavior may also depend on code, tools, state, validators, permissions, and guardrails.' },
+      usage: { commonPatterns: ['system prompt', 'system-level instruction', 'system prompt template', 'prompt hierarchy'] },
+      examples: [{ text: 'The system prompt tells the assistant to answer as a concise support agent.', zh: 'system prompt 要求助手以简洁的客服角色回答。', context: 'Prompt design' }, { text: 'The system prompt says to return JSON, but the application validator still rejects invalid output.', zh: 'system prompt 要求返回 JSON，但应用验证器仍会拒绝格式无效的输出。', context: 'AI application architecture' }],
+      boundaries: { natural: ['prompt design', 'AI product architecture', 'behavioral instruction discussions'], avoid: ['treating it as permanent model programming', 'assuming it guarantees deterministic compliance', 'using it as a security boundary by itself'], note: 'Rules that must be guaranteed should be enforced through application mechanisms.' },
+      relations: []
+    },
+    'ai-eval': {
+      identity: { category: 'AI Builder', collections: ['building-with-ai'], contexts: ['AI evaluation', 'Engineering chat', 'Model iteration'], tone: ['Technical', 'Evidence-focused', 'Cautionary'] },
+      meaning: { core: 'A repeatable way to test AI-system behavior against representative cases, criteria, expected properties, or metrics.', zh: '用有代表性的案例、标准、预期性质或指标重复测试 AI 系统表现的方法', feeling: 'We need repeatable evidence to know whether this actually improved.' },
+      context: { whyPeopleUseIt: 'AI behavior is probabilistic, so builders use evals to compare changes, surface regressions, and inspect failure modes instead of relying on a few memorable demos.', culturalNote: 'An eval is only as useful as the cases and criteria it represents; benchmark scores and LLM judges are not automatically the whole product truth.' },
+      usage: { commonPatterns: ['run an eval', 'eval set', 'eval regression', 'LLM-as-judge eval'] },
+      examples: [{ text: 'The new prompt improved the eval score, but it still fails on long customer histories.', zh: '新提示让 eval 分数提高了，但遇到较长的客户历史记录时仍然失败。', context: 'Model iteration' }, { text: 'Let’s add representative failure cases before calling the retrieval change better.', zh: '在说检索改动更好之前，我们先加入有代表性的失败案例。', context: 'Evaluation planning' }],
+      boundaries: { natural: ['AI testing', 'regression tracking', 'model iteration discussions'], avoid: ['calling a few manual prompts a complete evaluation', 'treating one benchmark score as the whole product', 'assuming an LLM judge is automatically objective'], note: 'Cases and criteria define what the eval can actually tell you.' },
+      relations: [{ target: 'ai-hallucination', type: 'same-context' }]
+    },
+    'github-ship': {
+      identity: { category: 'GitHub / Development', collections: ['developer-communication', 'building-products-online'], contexts: ['Release decisions', 'Engineering chat', 'Product delivery'], tone: ['Decisive', 'Practical', 'Work-casual'] },
+      meaning: { core: 'Marks the transition from private construction into real use, where users and real conditions can provide feedback.', zh: '表示从内部构建转向真实使用，让用户和现实条件开始提供反馈', feeling: 'Stop keeping this entirely inside the build process; put it in front of reality.' },
+      context: { whyPeopleUseIt: 'Builder culture needs a compact word for crossing from iteration into release and learning from real use.', culturalNote: 'Shipping does not mean perfect, permanently complete, reliable by definition, or certified safe.' },
+      usage: { commonPatterns: ['ship the fix', 'ready to ship', 'ship to users', 'ship and learn'] },
+      examples: [{ text: 'The prototype is good enough for a small beta; let’s ship it and watch the feedback.', zh: '这个原型已经足够支持小范围测试了，我们上线看看真实反馈。', context: 'Product release decision' }, { text: 'We shipped the patch, but that does not mean the investigation is finished.', zh: '补丁已经发布，但这不代表调查工作已经结束。', context: 'Engineering follow-up' }],
+      boundaries: { natural: ['release decisions', 'engineering chat', 'product delivery discussions'], avoid: ['treating shipped as perfect or permanently complete', 'equating shipping with safety or quality certification'], note: 'The useful transition is build → ship → reality feedback.' },
+      relations: []
     }
   };
 
