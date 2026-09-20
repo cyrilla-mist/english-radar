@@ -38,8 +38,8 @@ ids.forEach((id) => {
   assert.equal(resolver.resolve(signal).meaning.core, overlay.meaning.core);
 });
 
-assert.equal(signals.length, 68);
-assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 136);
+assert.equal(signals.length, 69);
+assert.equal(context.window.ENGLISH_RADAR_QUIZZES.length, 138);
 assert(byId.get('ai-system-prompt').term === 'system prompt');
 assert(byId.get('ai-eval').term === 'eval');
 

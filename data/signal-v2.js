@@ -387,6 +387,69 @@
       examples: [{ text: 'The prototype is good enough for a small beta; let’s ship it and watch the feedback.', zh: '这个原型已经足够支持小范围测试了，我们上线看看真实反馈。', context: 'Product release decision' }, { text: 'We shipped the patch, but that does not mean the investigation is finished.', zh: '补丁已经发布，但这不代表调查工作已经结束。', context: 'Engineering follow-up' }],
       boundaries: { natural: ['release decisions', 'engineering chat', 'product delivery discussions'], avoid: ['treating shipped as perfect or permanently complete', 'equating shipping with safety or quality certification'], note: 'The useful transition is build → ship → reality feedback.' },
       relations: []
+    },
+    'github-fork': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Repository collaboration', 'Open-source contribution', 'Version-control workflow'], tone: ['Technical', 'Practical', 'Independent'] },
+      meaning: { core: 'An independent repository derived from another repository, preserving repository lineage while allowing work to proceed separately.', zh: '从另一个仓库派生出的独立仓库，保留仓库来源关系，同时允许工作分开进行', feeling: 'I need my own repository lineage while still starting from this project.' },
+      context: { whyPeopleUseIt: 'Developers need a way to work independently from an upstream repository while preserving an explicit relationship to the original project.', culturalNote: 'A fork is a separate repository; upstream changes still need an explicit fetch, merge, or rebase workflow to stay aligned.' },
+      usage: { commonPatterns: ['fork the repository', 'fork the project', 'upstream repository', 'sync the fork'] },
+      examples: [{ text: 'I forked the repository because I wanted to experiment without write access to upstream.', zh: '因为没有上游仓库的写入权限，我 fork 了仓库来独立实验。', context: 'Open-source contribution' }, { text: 'The fork preserves the project lineage, but it will not receive upstream changes automatically.', zh: '这个 fork 保留了项目来源关系，但不会自动获得上游改动。', context: 'Repository collaboration' }],
+      boundaries: { natural: ['contributing without direct write access', 'independent repository experiments', 'downstream maintenance'], avoid: ['calling a copied source folder a fork', 'using fork to mean a branch inside the same repository'], note: 'A fork is a separate repository, while a branch is normally another line of history inside one repository.' },
+      relations: [{ target: 'github-branch', type: 'same-context' }]
+    },
+    'github-branch': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Version-control workflow', 'Code review', 'Engineering planning'], tone: ['Technical', 'Practical', 'Neutral'] },
+      meaning: { core: 'A named line of version-control history that lets work develop separately before it is compared, reviewed, merged, or discarded.', zh: '版本控制中让工作独立发展、之后再比较、评审、合并或放弃的一条命名历史线', feeling: 'This work can move independently without turning into a separate project.' },
+      context: { whyPeopleUseIt: 'Developers need isolated lines of work so features, fixes, experiments, or releases can evolve without immediately changing another branch.', culturalNote: 'A branch belongs to repository history and is not necessarily long-lived.' },
+      usage: { commonPatterns: ['create a branch', 'work on a branch', 'branch from main', 'merge the branch'] },
+      examples: [{ text: 'I created a branch for the keyboard-navigation fix so main stays stable while we review it.', zh: '我为键盘导航修复建了一个分支，这样评审期间 main 仍保持稳定。', context: 'Code review' }, { text: 'The experiment can live on its own branch without becoming a separate repository.', zh: '这个实验可以放在自己的分支上，不需要变成独立仓库。', context: 'Version-control workflow' }],
+      boundaries: { natural: ['feature development', 'bug fixes', 'release or experiment isolation'], avoid: ['treating a branch like a full repository fork', 'assuming branches are always long-lived or permanent'], note: 'A branch is a line of history inside a repository, not just another folder of files.' },
+      relations: []
+    },
+    'github-commit': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Version-control workflow', 'Code review', 'Engineering planning'], tone: ['Technical', 'Concrete', 'Historical'] },
+      meaning: { core: 'An intentional recorded state or change in version-control history, with identity, a message, and parent history.', zh: '带有身份、说明和父级历史的版本控制记录，用来保存一个有意记录的状态或改动', feeling: 'This is a meaningful project-history checkpoint I want to record.' },
+      context: { whyPeopleUseIt: 'Version control needs durable, named historical units so collaborators can reason about what changed, when, and why.', culturalNote: 'Saving files writes local contents; committing records selected changes into repository history.' },
+      usage: { commonPatterns: ['make a commit', 'commit the fix', 'commit message', 'inspect the commit'] },
+      examples: [{ text: 'I saved the file locally, but I have not committed the fix yet.', zh: '我已经把文件保存到本地，但还没有提交这个修复。', context: 'Version-control workflow' }, { text: 'This commit records the resolver fallback and the regression test as one coherent checkpoint.', zh: '这个 commit 把 resolver fallback 和回归测试作为一个连贯的检查点记录下来。', context: 'Code review' }],
+      boundaries: { natural: ['recording coherent repository changes', 'history inspection', 'change comparison and recovery'], avoid: ['calling Ctrl+S a commit', 'assuming every commit must represent a complete feature'], note: 'A good commit records a coherent change, even when the larger feature is not finished.' },
+      relations: []
+    },
+    'github-merge': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Version-control workflow', 'Code review', 'Release collaboration'], tone: ['Technical', 'Integrative', 'Neutral'] },
+      meaning: { core: 'Integrates changes and history from one line of version-control work into another, often reconnecting work that developed separately.', zh: '把一条版本控制工作线上的改动和历史整合到另一条工作线上，常用于重新汇合分开进行的工作', feeling: 'Bring this separate line of work back into the destination history.' },
+      context: { whyPeopleUseIt: 'Parallel development creates diverged histories, so merge is one way to integrate reviewed work into a shared line of development.', culturalNote: 'Review or approval may happen before a merge, but merge is the history-changing integration step.' },
+      usage: { commonPatterns: ['merge the branch', 'merge into main', 'merge conflict', 'merge after review'] },
+      examples: [{ text: 'The checks are green, so we can merge the branch into main.', zh: '检查都通过了，所以我们可以把这个分支合并到 main。', context: 'Release collaboration' }, { text: 'LGTM is a review signal; it does not itself merge the branch.', zh: 'LGTM 是评审信号，本身不会把分支合并进去。', context: 'Code review' }],
+      boundaries: { natural: ['integrating diverged repository history', 'post-review integration', 'resolving merge conflicts'], avoid: ['describing merge as pasting two code versions together', 'equating LGTM or PR approval with a completed merge'], note: 'Approval can precede merge, but the merge changes the destination history.' },
+      relations: [{ target: 'github-branch', type: 'often-paired' }]
+    },
+    'github-issue': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Repository collaboration', 'Engineering planning', 'Open-source contribution'], tone: ['Technical', 'Organizing', 'Neutral'] },
+      meaning: { core: 'A trackable repository discussion or work object that can hold context, ownership, progress, and follow-up.', zh: '仓库中可以积累背景、负责人、进度和后续行动的可追踪讨论或工作对象', feeling: 'This deserves a shared place where context and progress can accumulate.' },
+      context: { whyPeopleUseIt: 'Developer work often needs a durable shared object for bugs, tasks, proposals, questions, investigations, or feature requests.', culturalNote: 'A bug is one possible kind of issue; not every casual thought needs an issue.' },
+      usage: { commonPatterns: ['open an issue', 'track it in an issue', 'issue discussion', 'assign the issue'] },
+      examples: [{ text: 'I opened an issue to capture the missing keyboard-focus behavior and the reproduction steps.', zh: '我开了一个 issue，记录缺少键盘焦点行为的问题和复现步骤。', context: 'Repository collaboration' }, { text: 'This is a proposal, not a confirmed bug, but an issue gives the team a place to discuss it.', zh: '这是一个提案，不是已经确认的 bug，但 issue 可以给团队一个讨论的地方。', context: 'Engineering planning' }],
+      boundaries: { natural: ['durable task tracking', 'shared repository discussion', 'ownership and follow-up'], avoid: ['assuming issue means bug only', 'turning every passing thought into a tracked issue'], note: 'Use an issue when durable tracking or shared context is useful.' },
+      relations: [{ target: 'github-pr', type: 'often-paired' }]
+    },
+    'github-open-source': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Open-source contribution', 'Repository collaboration', 'License discussion'], tone: ['Technical', 'Community-focused', 'Cautionary'] },
+      meaning: { core: 'Software whose source code is available under an open-source license that grants defined rights to use, study, modify, and redistribute it under its terms.', zh: '按开源许可证提供源代码，并依据许可条款授予使用、研究、修改和再分发等明确权利的软件', feeling: 'You can inspect and participate under explicit reuse and redistribution rights defined by the license.' },
+      context: { whyPeopleUseIt: 'The phrase communicates a legal and collaboration model around software, not merely the visibility of its code.', culturalNote: 'A public repository is not automatically open source, and the absence of a license should not be treated as broad automatic reuse permission.' },
+      usage: { commonPatterns: ['open-source project', 'open-source license', 'contribute to open source', 'open-source contribution'] },
+      examples: [{ text: 'The repository is public, but we still need to check whether an open-source license is included.', zh: '这个仓库是公开的，但我们仍需要确认是否包含开源许可证。', context: 'License discussion' }, { text: 'The project is open source, so contributors can fork it under the rights and conditions in its license.', zh: '这个项目是开源的，因此贡献者可以按照许可证规定的权利和条件 fork 它。', context: 'Open-source contribution' }],
+      boundaries: { natural: ['license-aware collaboration', 'source inspection and modification', 'open-source contribution discussions'], avoid: ['equating a public repository with open source', 'assuming open source means no restrictions or no license terms'], note: 'Check the license and comply with its terms; this is a practical rule, not legal advice.' },
+      relations: [{ target: 'github-fork', type: 'same-context' }]
+    },
+    'github-wip': {
+      identity: { category: 'Developer Language', collections: ['developer-communication'], contexts: ['Draft pull requests', 'Engineering planning', 'Repository collaboration'], tone: ['Cautionary', 'Collaborative', 'Work-casual'] },
+      meaning: { core: 'Marks work as actively in progress so others do not mistake an intermediate state for the intended final result.', zh: '表示工作仍在进行中，提醒他人不要把中间状态误认为最终结果', feeling: 'You can look, comment, or follow along, but treat this as unfinished work.' },
+      context: { whyPeopleUseIt: 'Collaborative work often becomes visible before completion, so WIP manages how reviewers, teammates, or users should judge the current state.', culturalNote: 'WIP can invite early feedback; it does not automatically mean “do not review.”' },
+      usage: { commonPatterns: ['WIP PR', 'mark it WIP', 'still WIP', 'WIP update'] },
+      examples: [{ text: 'This is a WIP PR, so the architecture is open for feedback even though the implementation is not final.', zh: '这是一个 WIP PR，虽然实现还没完成，但架构仍欢迎反馈。', context: 'Draft pull request' }, { text: 'The demo is WIP, but feedback on the API shape would help before we finish the implementation.', zh: '这个演示还在进行中，但在实现完成前，关于 API 形状的反馈会很有帮助。', context: 'Engineering update' }],
+      boundaries: { natural: ['draft PRs', 'early implementations', 'engineering updates', 'work-in-progress demos'], avoid: ['final release status', 'presenting unfinished work as production-ready', 'treating WIP as a permanent excuse or a ban on comments'], note: 'WIP manages expectations about judgment; it can still explicitly invite early feedback.' },
+      relations: []
     }
   };
 
